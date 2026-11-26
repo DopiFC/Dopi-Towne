@@ -1,0 +1,6 @@
+{
+  "name": "DOPI TOWNE",
+  "description": "Cozy Farm & Business Simulation game with real-time farming, factories, NPC orders, P2P marketplace, friends, VIP 1-10 progression, and Firebase Firestore sync.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

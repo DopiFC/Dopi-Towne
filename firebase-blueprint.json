@@ -1,0 +1,238 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Full private and gameplay state for a DOPI TOWNE player, stored at users/{uid}.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "email": { "type": "string", "format": "email", "maxLength": 160 },
+        "profile": { "type": "object" },
+        "businessName": { "type": "string", "minLength": 2, "maxLength": 40 },
+        "level": { "type": "number" },
+        "exp": { "type": "number" },
+        "gold": { "type": "number" },
+        "dopiCoins": { "type": "number" },
+        "totalRechargedCoins": { "type": "number" },
+        "vipLevel": { "type": "number" },
+        "farmPlots": { "type": "array" },
+        "factories": { "type": "array" },
+        "inventory": { "type": "object" },
+        "storageCapacity": { "type": "number" },
+        "friends": { "type": "array" },
+        "dailyQuests": { "type": "array" },
+        "achievements": { "type": "object" },
+        "npcOrders": { "type": "array" },
+        "lastDailyReset": { "type": "string", "maxLength": 20 },
+        "helpCountToday": { "type": "number" },
+        "helpedFriendsToday": { "type": "array" },
+        "stats": { "type": "object" },
+        "hasFirstTopup": { "type": "boolean" },
+        "firstTopupClaimed": { "type": "boolean" },
+        "eventRechargedCoins": { "type": "number" },
+        "eventMonthKey": { "type": "string", "maxLength": 16 },
+        "monthlyTopupClaimed": { "type": "array" },
+        "checkInStreak": { "type": "number" },
+        "lastCheckInDate": { "type": "string", "maxLength": 20 },
+        "eventTickets": { "type": "number" },
+        "eventWeekKey": { "type": "string", "maxLength": 16 },
+        "rushOrder": { "type": "object" },
+        "reputation": { "type": "number" },
+        "autoWaterUntil": { "type": "number" },
+        "treasures": { "type": "array" },
+        "employees": { "type": "object" },
+        "vehicles": { "type": "array" },
+        "wealthScore": { "type": "number" },
+        "investments": { "type": "object" },
+        "createdAt": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": [
+        "uid", "email", "profile", "businessName", "level", "exp",
+        "gold", "dopiCoins", "totalRechargedCoins", "vipLevel",
+        "farmPlots", "factories", "inventory", "storageCapacity",
+        "friends", "dailyQuests", "lastDailyReset", "helpCountToday",
+        "createdAt", "updatedAt"
+      ]
+    },
+    "P2PCompany": {
+      "title": "P2PCompany",
+      "description": "Player-owned IPO business listed on the DOPI P2P Investment Exchange, stored at p2p_companies/{ownerUid}.",
+      "type": "object",
+      "properties": {
+        "ownerUid": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "businessName": { "type": "string", "minLength": 2, "maxLength": 40 },
+        "level": { "type": "number" },
+        "wealthScore": { "type": "number" },
+        "plotCount": { "type": "number" },
+        "employeeCount": { "type": "number" },
+        "vehicleCount": { "type": "number" },
+        "recentOrders": { "type": "number" },
+        "sharePrice": { "type": "number" },
+        "totalShares": { "type": "number" },
+        "availableShares": { "type": "number" },
+        "dividendRate": { "type": "number" },
+        "dividendPool": { "type": "number" },
+        "creditRating": { "type": "string", "enum": ["AAA", "AA", "A", "B", "C"] },
+        "lastActiveAt": { "type": "number" },
+        "isListed": { "type": "boolean" }
+      },
+      "required": [
+        "ownerUid", "businessName", "level", "wealthScore", "plotCount",
+        "employeeCount", "vehicleCount", "recentOrders", "sharePrice",
+        "totalShares", "availableShares", "dividendRate", "dividendPool",
+        "creditRating", "lastActiveAt", "isListed"
+      ]
+    },
+    "PublicFarm": {
+      "title": "PublicFarm",
+      "description": "Non-PII public farm projection for visiting, friend watering, showcase display, and server leaderboards.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "isPublic": { "type": "boolean" },
+        "businessName": { "type": "string", "minLength": 2, "maxLength": 40 },
+        "displayName": { "type": "string", "maxLength": 60 },
+        "avatarEmoji": { "type": "string", "maxLength": 16 },
+        "level": { "type": "number" },
+        "vipLevel": { "type": "number" },
+        "totalRechargedCoins": { "type": "number" },
+        "wealthScore": { "type": "number" },
+        "vehicles": { "type": "array" },
+        "treasures": { "type": "array" },
+        "farmPlots": { "type": "array" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": [
+        "uid", "isPublic", "businessName", "displayName", "avatarEmoji",
+        "level", "vipLevel", "farmPlots", "updatedAt"
+      ]
+    },
+    "TopupRequest": {
+      "title": "TopupRequest",
+      "description": "Direct DOPI Coin recharge request created by player and approved/rejected by admin via Firestore transaction.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "email": { "type": "string", "format": "email", "maxLength": 160 },
+        "businessName": { "type": "string", "maxLength": 40 },
+        "amount": { "type": "number" },
+        "transferCode": { "type": "string", "maxLength": 32, "pattern": "^[A-Z0-9_\\-]+$" },
+        "note": { "type": "string", "maxLength": 200 },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "rejectReason": { "type": "string", "maxLength": 200 },
+        "createdAt": { "type": "number" },
+        "processedAt": { "type": "number" }
+      },
+      "required": [
+        "uid", "email", "businessName", "amount", "transferCode",
+        "note", "status", "rejectReason", "createdAt", "processedAt"
+      ]
+    },
+    "EmailDirectoryEntry": {
+      "title": "EmailDirectoryEntry",
+      "description": "Exact-key email lookup mapping to player UID and non-PII summary for friend search.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "businessName": { "type": "string", "maxLength": 40 },
+        "displayName": { "type": "string", "maxLength": 60 },
+        "avatarEmoji": { "type": "string", "maxLength": 16 },
+        "level": { "type": "number" },
+        "vipLevel": { "type": "number" }
+      },
+      "required": ["uid", "businessName", "displayName", "avatarEmoji", "level", "vipLevel"]
+    },
+    "RedeemCode": {
+      "title": "RedeemCode",
+      "description": "Admin-created DOPI Coin top-up or gift code.",
+      "type": "object",
+      "properties": {
+        "code": { "type": "string", "minLength": 4, "maxLength": 40, "pattern": "^[A-Z0-9_\\-]+$" },
+        "amount": { "type": "number" },
+        "maxUses": { "type": "number" },
+        "usedCount": { "type": "number" },
+        "usedBy": { "type": "array" },
+        "expiresAt": { "type": "number" },
+        "createdBy": { "type": "string", "maxLength": 160 },
+        "createdAt": { "type": "number" },
+        "isActive": { "type": "boolean" }
+      },
+      "required": [
+        "code", "amount", "maxUses", "usedCount", "usedBy",
+        "expiresAt", "createdBy", "createdAt", "isActive"
+      ]
+    },
+    "MarketListing": {
+      "title": "MarketListing",
+      "description": "P2P Marketplace item listing traded for Gold or DOPI Coins.",
+      "type": "object",
+      "properties": {
+        "sellerUid": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "sellerName": { "type": "string", "maxLength": 40 },
+        "sellerVipLevel": { "type": "number" },
+        "itemId": { "type": "string", "maxLength": 40, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "quantity": { "type": "number" },
+        "currency": { "type": "string", "enum": ["gold", "coins"] },
+        "price": { "type": "number" },
+        "status": { "type": "string", "enum": ["active", "sold", "cancelled"] },
+        "buyerUid": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": [
+        "sellerUid", "sellerName", "sellerVipLevel", "itemId",
+        "quantity", "currency", "price", "status", "createdAt", "updatedAt"
+      ]
+    },
+    "FriendRequest": {
+      "title": "FriendRequest",
+      "description": "Friend invitation between two DOPI TOWNE players.",
+      "type": "object",
+      "properties": {
+        "fromUid": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "fromEmail": { "type": "string", "maxLength": 160 },
+        "fromName": { "type": "string", "maxLength": 60 },
+        "toUid": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "status": { "type": "string", "enum": ["pending", "accepted", "rejected"] },
+        "createdAt": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["fromUid", "fromEmail", "fromName", "toUid", "status", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{uid}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Owner-only full player account and farm state."
+    },
+    "/p2p_companies/{ownerUid}": {
+      "schema": { "$ref": "#/entities/P2PCompany" },
+      "description": "Player IPO companies listed on the DOPI P2P Investment Exchange."
+    },
+    "/public_farms/{uid}": {
+      "schema": { "$ref": "#/entities/PublicFarm" },
+      "description": "Non-PII public farm projection for visiting, showcase display, and server leaderboards."
+    },
+    "/topup_requests/{reqId}": {
+      "schema": { "$ref": "#/entities/TopupRequest" },
+      "description": "Direct DOPI Coin recharge orders processed by admin via transaction."
+    },
+    "/email_directory/{emailKey}": {
+      "schema": { "$ref": "#/entities/EmailDirectoryEntry" },
+      "description": "Exact-key email-to-UID lookup for adding friends without exposing email lists."
+    },
+    "/redeem_codes/{code}": {
+      "schema": { "$ref": "#/entities/RedeemCode" },
+      "description": "DOPI Coin redeem codes managed by admin and redeemed via Firestore transactions."
+    },
+    "/market_listings/{listingId}": {
+      "schema": { "$ref": "#/entities/MarketListing" },
+      "description": "Active and historical P2P marketplace listings."
+    },
+    "/friend_requests/{reqId}": {
+      "schema": { "$ref": "#/entities/FriendRequest" },
+      "description": "Pending, accepted, or rejected friend requests."
+    }
+  }
+}

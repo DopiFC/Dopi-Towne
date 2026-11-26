@@ -1,0 +1,612 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net (Default Deny)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // ==================== PRIMITIVE HELPERS ====================
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(uid) {
+      return isVerified() && request.auth.uid == uid;
+    }
+
+    // Zero-DB-read verified admin email check (safe inside allow list)
+    function isAdminEmail() {
+      return isVerified() && request.auth.token.email == 'nhgb2605@gmail.com';
+    }
+
+    // Full admin check for single-document operations
+    function isAdmin() {
+      return isAdminEmail() || (
+        isVerified() && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidEmailKey(id) {
+      return id is string && id.size() >= 3 && id.size() <= 160 && id.matches('^[a-zA-Z0-9_\\.\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // ==================== VALIDATION BLUEPRINTS ====================
+    function isValidUser(data, uid) {
+      return data.keys().hasAll([
+          'uid', 'email', 'profile', 'businessName', 'level', 'exp',
+          'gold', 'dopiCoins', 'totalRechargedCoins', 'vipLevel',
+          'farmPlots', 'factories', 'inventory', 'storageCapacity',
+          'friends', 'dailyQuests', 'lastDailyReset', 'helpCountToday',
+          'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'uid', 'email', 'profile', 'businessName', 'level', 'exp',
+          'gold', 'dopiCoins', 'totalRechargedCoins', 'vipLevel',
+          'farmPlots', 'factories', 'inventory', 'storageCapacity',
+          'friends', 'dailyQuests', 'achievements', 'npcOrders',
+          'lastDailyReset', 'helpCountToday', 'helpedFriendsToday',
+          'stats', 'hasFirstTopup', 'firstTopupClaimed',
+          'eventRechargedCoins', 'eventMonthKey', 'monthlyTopupClaimed',
+          'checkInStreak', 'lastCheckInDate', 'eventTickets',
+          'eventWeekKey', 'rushOrder', 'reputation', 'autoWaterUntil',
+          'treasures', 'employees', 'vehicles', 'wealthScore',
+          'investments', 'createdAt', 'updatedAt'
+        ])
+        && data.uid is string && data.uid == uid && isValidId(data.uid)
+        && data.email is string && data.email.size() >= 3 && data.email.size() <= 160
+        && data.profile is map
+        && data.businessName is string && data.businessName.size() >= 2 && data.businessName.size() <= 40
+        && data.level is int && data.level >= 1 && data.level <= 200
+        && data.exp is number && data.exp >= 0 && data.exp <= 100000000
+        && data.gold is number && data.gold >= 0 && data.gold <= 10000000000
+        && data.dopiCoins is number && data.dopiCoins >= 0 && data.dopiCoins <= 100000000
+        && data.totalRechargedCoins is number && data.totalRechargedCoins >= 0 && data.totalRechargedCoins <= 100000000
+        && data.vipLevel is int && data.vipLevel >= 0 && data.vipLevel <= 10
+        && data.farmPlots is list && data.farmPlots.size() >= 1 && data.farmPlots.size() <= 30 && data.farmPlots[0] is map
+        && data.factories is list && data.factories.size() >= 1 && data.factories.size() <= 10 && data.factories[0] is map
+        && data.inventory is map
+        && data.storageCapacity is int && data.storageCapacity >= 50 && data.storageCapacity <= 10000
+        && data.friends is list && data.friends.size() <= 100 && (data.friends.size() == 0 || data.friends[0] is string)
+        && data.dailyQuests is list && data.dailyQuests.size() <= 10 && (data.dailyQuests.size() == 0 || data.dailyQuests[0] is map)
+        && data.lastDailyReset is string && data.lastDailyReset.size() <= 20
+        && data.helpCountToday is int && data.helpCountToday >= 0 && data.helpCountToday <= 5
+        && (!('helpedFriendsToday' in data) || (data.helpedFriendsToday is list && data.helpedFriendsToday.size() <= 5 && (data.helpedFriendsToday.size() == 0 || data.helpedFriendsToday[0] is string)))
+        && (!('npcOrders' in data) || (data.npcOrders is list && data.npcOrders.size() <= 10 && (data.npcOrders.size() == 0 || data.npcOrders[0] is map)))
+        && (!('achievements' in data) || data.achievements is map)
+        && (!('stats' in data) || data.stats is map)
+        && (!('hasFirstTopup' in data) || data.hasFirstTopup is bool)
+        && (!('firstTopupClaimed' in data) || data.firstTopupClaimed is bool)
+        && (!('eventRechargedCoins' in data) || (data.eventRechargedCoins is number && data.eventRechargedCoins >= 0 && data.eventRechargedCoins <= 100000000))
+        && (!('eventMonthKey' in data) || (data.eventMonthKey is string && data.eventMonthKey.size() <= 16))
+        && (!('monthlyTopupClaimed' in data) || (data.monthlyTopupClaimed is list && data.monthlyTopupClaimed.size() <= 10 && (data.monthlyTopupClaimed.size() == 0 || data.monthlyTopupClaimed[0] is number)))
+        && (!('checkInStreak' in data) || (data.checkInStreak is int && data.checkInStreak >= 0 && data.checkInStreak <= 7))
+        && (!('lastCheckInDate' in data) || (data.lastCheckInDate is string && data.lastCheckInDate.size() <= 20))
+        && (!('eventTickets' in data) || (data.eventTickets is number && data.eventTickets >= 0 && data.eventTickets <= 1000000))
+        && (!('eventWeekKey' in data) || (data.eventWeekKey is string && data.eventWeekKey.size() <= 16))
+        && (!('rushOrder' in data) || data.rushOrder == null || data.rushOrder is map)
+        && (!('reputation' in data) || (data.reputation is number && data.reputation >= 0 && data.reputation <= 100000000))
+        && (!('autoWaterUntil' in data) || (data.autoWaterUntil is number && data.autoWaterUntil >= 0))
+        && (!('treasures' in data) || (data.treasures is list && data.treasures.size() <= 30 && (data.treasures.size() == 0 || data.treasures[0] is string)))
+        && (!('employees' in data) || data.employees is map)
+        && (!('vehicles' in data) || (data.vehicles is list && data.vehicles.size() <= 20 && (data.vehicles.size() == 0 || data.vehicles[0] is string)))
+        && (!('wealthScore' in data) || (data.wealthScore is number && data.wealthScore >= 0 && data.wealthScore <= 1000000000))
+        && (!('investments' in data) || data.investments is map)
+        && data.createdAt is number && data.createdAt > 0
+        && data.updatedAt is number && data.updatedAt > 0;
+    }
+
+    function isValidP2PCompany(data, ownerUid) {
+      return data.keys().hasAll([
+          'ownerUid', 'businessName', 'level', 'wealthScore', 'plotCount',
+          'employeeCount', 'vehicleCount', 'recentOrders', 'sharePrice',
+          'totalShares', 'availableShares', 'dividendRate', 'dividendPool',
+          'creditRating', 'lastActiveAt', 'isListed'
+        ])
+        && data.keys().hasOnly([
+          'ownerUid', 'businessName', 'level', 'wealthScore', 'plotCount',
+          'employeeCount', 'vehicleCount', 'recentOrders', 'sharePrice',
+          'totalShares', 'availableShares', 'dividendRate', 'dividendPool',
+          'creditRating', 'lastActiveAt', 'isListed'
+        ])
+        && data.ownerUid is string && data.ownerUid == ownerUid && isValidId(data.ownerUid)
+        && data.businessName is string && data.businessName.size() >= 2 && data.businessName.size() <= 40
+        && data.level is int && data.level >= 1 && data.level <= 200
+        && data.wealthScore is number && data.wealthScore >= 0 && data.wealthScore <= 1000000000
+        && data.plotCount is int && data.plotCount >= 1 && data.plotCount <= 30
+        && data.employeeCount is int && data.employeeCount >= 0 && data.employeeCount <= 100
+        && data.vehicleCount is int && data.vehicleCount >= 0 && data.vehicleCount <= 20
+        && data.recentOrders is int && data.recentOrders >= 0 && data.recentOrders <= 10000000
+        && data.sharePrice is number && data.sharePrice >= 10 && data.sharePrice <= 10000000
+        && data.totalShares is int && data.totalShares == 1000
+        && data.availableShares is int && data.availableShares >= 0 && data.availableShares <= 400
+        && data.dividendRate is int && data.dividendRate >= 5 && data.dividendRate <= 10
+        && data.dividendPool is number && data.dividendPool >= 0 && data.dividendPool <= 10000000000
+        && data.creditRating in ['AAA', 'AA', 'A', 'B', 'C']
+        && data.lastActiveAt is number && data.lastActiveAt > 0
+        && data.isListed is bool;
+    }
+
+    function isValidPublicFarm(data, uid) {
+      return data.keys().hasAll([
+          'uid', 'isPublic', 'businessName', 'displayName', 'avatarEmoji',
+          'level', 'vipLevel', 'farmPlots', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'uid', 'isPublic', 'businessName', 'displayName', 'avatarEmoji',
+          'level', 'vipLevel', 'totalRechargedCoins', 'wealthScore',
+          'vehicles', 'treasures', 'farmPlots', 'updatedAt'
+        ])
+        && data.uid is string && data.uid == uid && isValidId(data.uid)
+        && data.isPublic is bool && data.isPublic == true
+        && data.businessName is string && data.businessName.size() >= 2 && data.businessName.size() <= 40
+        && data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 60
+        && data.avatarEmoji is string && data.avatarEmoji.size() >= 1 && data.avatarEmoji.size() <= 16
+        && data.level is int && data.level >= 1 && data.level <= 200
+        && data.vipLevel is int && data.vipLevel >= 0 && data.vipLevel <= 10
+        && (!('totalRechargedCoins' in data) || (data.totalRechargedCoins is number && data.totalRechargedCoins >= 0))
+        && (!('wealthScore' in data) || (data.wealthScore is number && data.wealthScore >= 0))
+        && (!('vehicles' in data) || (data.vehicles is list && data.vehicles.size() <= 20 && (data.vehicles.size() == 0 || data.vehicles[0] is string)))
+        && (!('treasures' in data) || (data.treasures is list && data.treasures.size() <= 30 && (data.treasures.size() == 0 || data.treasures[0] is string)))
+        && data.farmPlots is list && data.farmPlots.size() >= 1 && data.farmPlots.size() <= 30 && data.farmPlots[0] is map
+        && data.updatedAt is number && data.updatedAt > 0;
+    }
+
+    function isValidTopupRequest(data) {
+      return data.keys().hasAll([
+          'uid', 'email', 'businessName', 'amount', 'transferCode',
+          'note', 'status', 'rejectReason', 'createdAt', 'processedAt'
+        ])
+        && data.keys().hasOnly([
+          'uid', 'email', 'businessName', 'amount', 'transferCode',
+          'note', 'status', 'rejectReason', 'createdAt', 'processedAt'
+        ])
+        && data.uid is string && isValidId(data.uid)
+        && data.email is string && data.email.size() >= 3 && data.email.size() <= 160
+        && data.businessName is string && data.businessName.size() >= 2 && data.businessName.size() <= 40
+        && data.amount is int && data.amount >= 10 && data.amount <= 1000000
+        && data.transferCode is string && data.transferCode.size() >= 6 && data.transferCode.size() <= 32 && data.transferCode.matches('^[A-Z0-9_\\-]+$')
+        && data.note is string && data.note.size() <= 200
+        && data.status in ['pending', 'approved', 'rejected']
+        && data.rejectReason is string && data.rejectReason.size() <= 200
+        && data.createdAt is number && data.createdAt > 0
+        && data.processedAt is number && data.processedAt >= 0;
+    }
+
+    function isValidEmailDir(data) {
+      return data.keys().hasAll(['uid', 'businessName', 'displayName', 'avatarEmoji', 'level', 'vipLevel'])
+        && data.keys().hasOnly(['uid', 'businessName', 'displayName', 'avatarEmoji', 'level', 'vipLevel'])
+        && data.uid is string && isValidId(data.uid)
+        && data.businessName is string && data.businessName.size() >= 2 && data.businessName.size() <= 40
+        && data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 60
+        && data.avatarEmoji is string && data.avatarEmoji.size() >= 1 && data.avatarEmoji.size() <= 16
+        && data.level is int && data.level >= 1 && data.level <= 200
+        && data.vipLevel is int && data.vipLevel >= 0 && data.vipLevel <= 10;
+    }
+
+    function isValidRedeemCode(data, code) {
+      return data.keys().hasAll([
+          'code', 'amount', 'maxUses', 'usedCount', 'usedBy',
+          'expiresAt', 'createdBy', 'createdAt', 'isActive'
+        ])
+        && data.keys().hasOnly([
+          'code', 'amount', 'maxUses', 'usedCount', 'usedBy',
+          'expiresAt', 'createdBy', 'createdAt', 'isActive'
+        ])
+        && data.code is string && data.code == code && data.code.size() >= 4 && data.code.size() <= 40
+        && data.amount is int && data.amount >= 1 && data.amount <= 1000000
+        && data.maxUses is int && data.maxUses >= 1 && data.maxUses <= 500
+        && data.usedCount is int && data.usedCount >= 0 && data.usedCount <= data.maxUses
+        && data.usedBy is list && data.usedBy.size() == data.usedCount && data.usedBy.size() <= 500 && (data.usedBy.size() == 0 || data.usedBy[0] is string)
+        && data.expiresAt is number && data.expiresAt > 0
+        && data.createdBy is string && data.createdBy.size() >= 3 && data.createdBy.size() <= 160
+        && data.createdAt is number && data.createdAt > 0
+        && data.isActive is bool;
+    }
+
+    function isValidMarketListing(data) {
+      return data.keys().hasAll([
+          'sellerUid', 'sellerName', 'sellerVipLevel', 'itemId',
+          'quantity', 'currency', 'price', 'status', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'sellerUid', 'sellerName', 'sellerVipLevel', 'itemId',
+          'quantity', 'currency', 'price', 'status', 'buyerUid', 'createdAt', 'updatedAt'
+        ])
+        && data.sellerUid is string && isValidId(data.sellerUid)
+        && data.sellerName is string && data.sellerName.size() >= 2 && data.sellerName.size() <= 40
+        && data.sellerVipLevel is int && data.sellerVipLevel >= 0 && data.sellerVipLevel <= 10
+        && data.itemId is string && data.itemId.size() >= 1 && data.itemId.size() <= 40 && data.itemId.matches('^[a-zA-Z0-9_\\-]+$')
+        && data.quantity is int && data.quantity >= 1 && data.quantity <= 999
+        && data.currency in ['gold', 'coins']
+        && data.price is int && data.price >= 1 && data.price <= 10000000
+        && data.status in ['active', 'sold', 'cancelled']
+        && (!('buyerUid' in data) || (data.buyerUid is string && isValidId(data.buyerUid)))
+        && data.createdAt is number && data.createdAt > 0
+        && data.updatedAt is number && data.updatedAt > 0;
+    }
+
+    function isValidFriendRequest(data) {
+      return data.keys().hasAll(['fromUid', 'fromEmail', 'fromName', 'toUid', 'status', 'createdAt'])
+        && data.keys().hasOnly(['fromUid', 'fromEmail', 'fromName', 'toUid', 'status', 'createdAt', 'updatedAt'])
+        && data.fromUid is string && isValidId(data.fromUid)
+        && data.fromEmail is string && data.fromEmail.size() >= 3 && data.fromEmail.size() <= 160
+        && data.fromName is string && data.fromName.size() >= 1 && data.fromName.size() <= 60
+        && data.toUid is string && isValidId(data.toUid)
+        && data.fromUid != data.toUid
+        && data.status in ['pending', 'accepted', 'rejected']
+        && data.createdAt is number && data.createdAt > 0
+        && (!('updatedAt' in data) || (data.updatedAt is number && data.updatedAt > 0));
+    }
+
+    // ==================== COLLECTION RULES ====================
+
+    // 1. Users (Owner + Admin read only to isolate email PII)
+    match /users/{uid} {
+      allow get: if isValidId(uid) && (isOwner(uid) || isAdmin());
+      allow list: if isAdminEmail();
+
+      allow create: if isValidId(uid)
+        && isOwner(uid)
+        && isValidUser(incoming(), uid)
+        && incoming().email == request.auth.token.email
+        && incoming().totalRechargedCoins == 0
+        && incoming().vipLevel == 0
+        && incoming().dopiCoins <= 20;
+
+      allow update: if isValidId(uid)
+        && isVerified()
+        && isValidUser(incoming(), uid)
+        && incoming().uid == existing().uid
+        && incoming().email == existing().email
+        && incoming().createdAt == existing().createdAt
+        && (
+          isAdmin()
+          || (
+            // Action: Owner gameplay & investment portfolio update (cannot self-grant hasFirstTopup)
+            isOwner(uid)
+            && incoming().get('hasFirstTopup', false) == existing().get('hasFirstTopup', false)
+            && incoming().diff(existing()).affectedKeys().hasOnly([
+              'profile', 'businessName', 'level', 'exp', 'gold', 'dopiCoins',
+              'totalRechargedCoins', 'vipLevel', 'farmPlots', 'factories',
+              'inventory', 'storageCapacity', 'friends', 'dailyQuests',
+              'achievements', 'npcOrders', 'lastDailyReset', 'helpCountToday',
+              'helpedFriendsToday', 'stats', 'hasFirstTopup', 'firstTopupClaimed',
+              'eventRechargedCoins', 'eventMonthKey', 'monthlyTopupClaimed',
+              'checkInStreak', 'lastCheckInDate', 'eventTickets',
+              'eventWeekKey', 'rushOrder', 'reputation', 'autoWaterUntil',
+              'treasures', 'employees', 'vehicles', 'wealthScore',
+              'investments', 'updatedAt'
+            ])
+          )
+          || (
+            // Action: P2P Marketplace / P2P IPO buyer transferring gold capital to seller/owner
+            request.auth.uid != uid
+            && incoming().diff(existing()).affectedKeys().hasOnly(['gold', 'updatedAt'])
+            && incoming().gold > existing().gold
+          )
+          || (
+            // Action: P2P Marketplace buyer paying seller in DOPI coins
+            request.auth.uid != uid
+            && incoming().diff(existing()).affectedKeys().hasOnly(['dopiCoins', 'updatedAt'])
+            && incoming().dopiCoins > existing().dopiCoins
+          )
+        );
+
+      allow delete: if isValidId(uid) && isAdmin();
+    }
+
+    // 2. P2P Listed Companies (Player IPO Exchange)
+    match /p2p_companies/{ownerUid} {
+      allow get: if isVerified() && isValidId(ownerUid);
+      allow list: if isVerified() && (
+        resource.data.isListed == true
+        || resource.data.ownerUid == request.auth.uid
+        || isAdminEmail()
+      );
+
+      allow create: if isValidId(ownerUid)
+        && isOwner(ownerUid)
+        && isValidP2PCompany(incoming(), ownerUid)
+        && incoming().level >= 10
+        && incoming().totalShares == 1000
+        && incoming().availableShares == 400
+        && incoming().dividendPool == 0;
+
+      allow update: if isValidId(ownerUid)
+        && isVerified()
+        && isValidP2PCompany(incoming(), ownerUid)
+        && incoming().ownerUid == existing().ownerUid
+        && incoming().totalShares == existing().totalShares
+        && (
+          isAdmin()
+          || (
+            // Action: Company owner syncing metrics, IPO toggle, dividend rate, or contributing to dividendPool
+            isOwner(ownerUid)
+            && incoming().availableShares == existing().availableShares
+            && incoming().dividendPool >= existing().dividendPool
+            && incoming().diff(existing()).affectedKeys().hasOnly([
+              'businessName', 'level', 'wealthScore', 'plotCount',
+              'employeeCount', 'vehicleCount', 'recentOrders', 'sharePrice',
+              'dividendRate', 'dividendPool', 'creditRating', 'lastActiveAt',
+              'isListed'
+            ])
+          )
+          || (
+            // Action: Investor buying P2P shares from available IPO float
+            request.auth.uid != ownerUid
+            && existing().isListed == true
+            && incoming().diff(existing()).affectedKeys().hasOnly(['availableShares'])
+            && incoming().availableShares < existing().availableShares
+            && incoming().availableShares >= 0
+          )
+          || (
+            // Action: Investor selling P2P shares back into available float
+            request.auth.uid != ownerUid
+            && incoming().diff(existing()).affectedKeys().hasOnly(['availableShares'])
+            && incoming().availableShares > existing().availableShares
+            && incoming().availableShares <= 400
+          )
+          || (
+            // Action: Shareholder claiming earned dividend share from dividendPool
+            request.auth.uid != ownerUid
+            && incoming().diff(existing()).affectedKeys().hasOnly(['dividendPool'])
+            && incoming().dividendPool < existing().dividendPool
+            && incoming().dividendPool >= 0
+          )
+        );
+
+      allow delete: if isValidId(ownerUid) && isAdmin();
+    }
+
+    // 3. Public Farms (Non-PII farm preview, showcase & leaderboard)
+    match /public_farms/{uid} {
+      allow get: if isVerified() && isValidId(uid);
+      allow list: if isVerified() && resource.data.isPublic == true;
+
+      allow create: if isValidId(uid)
+        && isOwner(uid)
+        && isValidPublicFarm(incoming(), uid);
+
+      allow update: if isValidId(uid)
+        && isVerified()
+        && isValidPublicFarm(incoming(), uid)
+        && incoming().uid == existing().uid
+        && (
+          isAdmin()
+          || (
+            // Action: Owner syncing own public farm preview & leaderboard metrics
+            isOwner(uid)
+            && incoming().diff(existing()).affectedKeys().hasOnly([
+              'isPublic', 'businessName', 'displayName', 'avatarEmoji',
+              'level', 'vipLevel', 'totalRechargedCoins', 'wealthScore',
+              'vehicles', 'treasures', 'farmPlots', 'updatedAt'
+            ])
+          )
+          || (
+            // Action: Friend watering a crop plot
+            request.auth.uid != uid
+            && incoming().diff(existing()).affectedKeys().hasOnly(['farmPlots', 'updatedAt'])
+            && incoming().farmPlots.size() == existing().farmPlots.size()
+          )
+        );
+
+      allow delete: if isValidId(uid) && isAdmin();
+    }
+
+    // 4. Direct Top-Up Requests (Player creates pending; Admin approves/rejects atomically)
+    match /topup_requests/{reqId} {
+      allow get: if isVerified() && isValidId(reqId) && (
+        existing().uid == request.auth.uid || isAdmin()
+      );
+      allow list: if isVerified() && (
+        resource.data.uid == request.auth.uid || isAdminEmail()
+      );
+
+      allow create: if isVerified()
+        && isValidId(reqId)
+        && isValidTopupRequest(incoming())
+        && incoming().uid == request.auth.uid
+        && incoming().email == request.auth.token.email
+        && incoming().status == 'pending'
+        && incoming().rejectReason == ''
+        && incoming().processedAt == 0;
+
+      allow update: if isValidId(reqId)
+        && isAdmin()
+        && isValidTopupRequest(incoming())
+        && existing().status == 'pending'
+        && incoming().status in ['approved', 'rejected']
+        && incoming().uid == existing().uid
+        && incoming().email == existing().email
+        && incoming().businessName == existing().businessName
+        && incoming().amount == existing().amount
+        && incoming().transferCode == existing().transferCode
+        && incoming().createdAt == existing().createdAt
+        && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'rejectReason', 'processedAt']);
+
+      allow delete: if isAdmin() && isValidId(reqId);
+    }
+
+    // 5. Email Directory (Exact-key lookup only; no listing/scraping)
+    match /email_directory/{emailKey} {
+      allow get: if isVerified() && isValidEmailKey(emailKey);
+      allow list: if false;
+
+      allow create: if isVerified()
+        && isValidEmailKey(emailKey)
+        && isValidEmailDir(incoming())
+        && incoming().uid == request.auth.uid;
+
+      allow update: if isVerified()
+        && isValidEmailKey(emailKey)
+        && isValidEmailDir(incoming())
+        && incoming().uid == existing().uid
+        && (
+          isAdmin()
+          || (
+            existing().uid == request.auth.uid
+            && incoming().diff(existing()).affectedKeys().hasOnly([
+              'businessName', 'displayName', 'avatarEmoji', 'level', 'vipLevel'
+            ])
+          )
+        );
+
+      allow delete: if isAdmin() && isValidEmailKey(emailKey);
+    }
+
+    // 6. Redeem Codes
+    match /redeem_codes/{code} {
+      allow get: if isVerified() && isValidId(code);
+      allow list: if isAdminEmail();
+
+      allow create: if isAdmin()
+        && isValidId(code)
+        && isValidRedeemCode(incoming(), code)
+        && incoming().usedCount == 0
+        && incoming().usedBy.size() == 0;
+
+      allow update: if isValidId(code)
+        && isVerified()
+        && isValidRedeemCode(incoming(), code)
+        && incoming().code == existing().code
+        && incoming().createdBy == existing().createdBy
+        && incoming().createdAt == existing().createdAt
+        && (
+          isAdmin()
+          || (
+            // Action: Player redeeming an active code
+            existing().isActive == true
+            && existing().usedCount < existing().maxUses
+            && !(request.auth.uid in existing().usedBy)
+            && incoming().diff(existing()).affectedKeys().hasOnly(['usedCount', 'usedBy'])
+            && incoming().usedCount == existing().usedCount + 1
+            && incoming().usedBy.size() == existing().usedBy.size() + 1
+            && request.auth.uid in incoming().usedBy
+            && incoming().usedBy.hasAll(existing().usedBy)
+          )
+        );
+
+      allow delete: if isAdmin() && isValidId(code);
+    }
+
+    // 7. P2P Market Listings
+    match /market_listings/{listingId} {
+      allow get: if isVerified() && isValidId(listingId);
+      allow list: if isVerified() && (
+        resource.data.status == 'active'
+        || resource.data.sellerUid == request.auth.uid
+        || isAdminEmail()
+      );
+
+      allow create: if isVerified()
+        && isValidId(listingId)
+        && isValidMarketListing(incoming())
+        && incoming().sellerUid == request.auth.uid
+        && incoming().status == 'active'
+        && !('buyerUid' in incoming());
+
+      allow update: if isValidId(listingId)
+        && isVerified()
+        && isValidMarketListing(incoming())
+        && incoming().sellerUid == existing().sellerUid
+        && incoming().sellerName == existing().sellerName
+        && incoming().itemId == existing().itemId
+        && incoming().quantity == existing().quantity
+        && incoming().currency == existing().currency
+        && incoming().price == existing().price
+        && incoming().createdAt == existing().createdAt
+        && (
+          isAdmin()
+          || (
+            existing().status == 'active'
+            && (
+              // Action: Seller cancels own listing
+              (
+                existing().sellerUid == request.auth.uid
+                && incoming().status == 'cancelled'
+                && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt'])
+              )
+              || (
+                // Action: Another player buys active listing
+                existing().sellerUid != request.auth.uid
+                && incoming().status == 'sold'
+                && incoming().buyerUid == request.auth.uid
+                && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'buyerUid', 'updatedAt'])
+              )
+            )
+          )
+        );
+
+      allow delete: if isAdmin() && isValidId(listingId);
+    }
+
+    // 8. Friend Requests
+    match /friend_requests/{reqId} {
+      allow get: if isVerified() && isValidId(reqId) && (
+        existing().fromUid == request.auth.uid
+        || existing().toUid == request.auth.uid
+        || isAdmin()
+      );
+      allow list: if isVerified() && (
+        resource.data.fromUid == request.auth.uid
+        || resource.data.toUid == request.auth.uid
+        || isAdminEmail()
+      );
+
+      allow create: if isVerified()
+        && isValidId(reqId)
+        && isValidFriendRequest(incoming())
+        && incoming().fromUid == request.auth.uid
+        && incoming().fromEmail == request.auth.token.email
+        && incoming().status == 'pending';
+
+      allow update: if isValidId(reqId)
+        && isVerified()
+        && isValidFriendRequest(incoming())
+        && incoming().fromUid == existing().fromUid
+        && incoming().fromEmail == existing().fromEmail
+        && incoming().fromName == existing().fromName
+        && incoming().toUid == existing().toUid
+        && incoming().createdAt == existing().createdAt
+        && (
+          isAdmin()
+          || (
+            existing().status == 'pending'
+            && existing().toUid == request.auth.uid
+            && incoming().status in ['accepted', 'rejected']
+            && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt'])
+          )
+        );
+
+      allow delete: if isValidId(reqId) && isVerified() && (
+        isAdmin()
+        || existing().fromUid == request.auth.uid
+        || existing().toUid == request.auth.uid
+      );
+    }
+
+    // 9. Admins collection (read-only by admins)
+    match /admins/{adminUid} {
+      allow get: if isValidId(adminUid) && isAdmin();
+      allow list, write: if false;
+    }
+  }
+}
