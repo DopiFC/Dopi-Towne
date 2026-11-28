@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { memo, useMemo, useState } from 'react';
 import {
   AlertTriangle,
   ArrowDownRight,
@@ -86,7 +86,7 @@ const CREDIT_STYLE: Record<CreditRating, string> = {
   C: 'text-rose-700 bg-rose-50 border-rose-200',
 };
 
-export const InvestmentView: React.FC<InvestmentViewProps> = ({
+export const InvestmentView: React.FC<InvestmentViewProps> = memo(({
   user,
   nowMs,
   p2pCompanies,
@@ -1631,4 +1631,5 @@ export const InvestmentView: React.FC<InvestmentViewProps> = ({
       )}
     </div>
   );
-};
+});
+InvestmentView.displayName = 'InvestmentView';

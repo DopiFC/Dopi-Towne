@@ -64,6 +64,7 @@ import {
 import type {
   CurrencyType,
   FactoryId,
+  FriendChatMessage,
   FriendRequestDoc,
   MarketListing,
   P2PCompanyDoc,
@@ -86,6 +87,28 @@ export async function syncPublicProjections(
   user: UserGameData,
   syncEmailDir: boolean = true
 ): Promise<void> {
+  const now = Date.now();
+  // Throttle public_farms writes during rapid gameplay actions unless syncEmailDir is explicitly requested
+  if (!syncEmailDir && now - lastPublicProjectionSyncAt < PUBLIC_PROJECTION_THROTTLE_MS) {
+    pendingPublicProjectionUser = user;
+    if (!pendingPublicProjectionTimer) {
+      const waitMs = Math.max(
+        1000,
+        PUBLIC_PROJECTION_THROTTLE_MS - (now - lastPublicProjectionSyncAt)
+      );
+      pendingPublicProjectionTimer = setTimeout(() => {
+        pendingPublicProjectionTimer = null;
+        if (pendingPublicProjectionUser) {
+          const latest = pendingPublicProjectionUser;
+          pendingPublicProjectionUser = null;
+          void syncPublicProjections(latest, false);
+        }
+      }, waitMs);
+    }
+    return;
+  }
+
+  lastPublicProjectionSyncAt = now;
   const firestore = requireDb();
   const normalizedUser = normalizeUserData(user);
   const wealthScore = calculateWealthScore(normalizedUser);
@@ -103,7 +126,7 @@ export async function syncPublicProjections(
     vehicles: (normalizedUser.vehicles ?? []).slice(0, 20),
     treasures: (normalizedUser.treasures ?? []).slice(0, 30),
     farmPlots: normalizedUser.farmPlots.slice(0, MAX_PLOTS),
-    updatedAt: Date.now(),
+    updatedAt: now,
   });
 
   try {
@@ -242,22 +265,88 @@ export function subscribeMyPublicFarm(
   );
 }
 
-export async function saveUserState(
-  nextUser: UserGameData,
-  syncEmailDir: boolean = false
+const PUBLIC_PROJECTION_THROTTLE_MS = 12_000;
+const USER_SAVE_COALESCE_MS = 280;
+
+let lastPublicProjectionSyncAt = 0;
+let pendingPublicProjectionTimer: ReturnType<typeof setTimeout> | null = null;
+let pendingPublicProjectionUser: UserGameData | null = null;
+
+let pendingUserSaveTimer: ReturnType<typeof setTimeout> | null = null;
+let pendingUserSavePayload: UserGameData | null = null;
+let pendingUserSaveSyncEmail = false;
+let pendingUserSaveResolvers: Array<() => void> = [];
+
+async function executeImmediateUserSave(
+  payload: UserGameData,
+  syncEmailDir: boolean
 ): Promise<void> {
   const firestore = requireDb();
-  const payload = normalizeUserData({
-    ...nextUser,
-    businessName: nextUser.businessName.trim().slice(0, 40) || 'Nông Trại DOPI',
-    updatedAt: Date.now(),
-  });
   try {
     await setDoc(doc(firestore, 'users', payload.uid), sanitizeForFirestore(payload));
   } catch (error) {
     handleFirestoreError(error, OperationType.UPDATE, `users/${payload.uid}`);
   }
   await syncPublicProjections(payload, syncEmailDir);
+}
+
+export async function flushPendingUserSave(): Promise<void> {
+  if (pendingUserSaveTimer !== null) {
+    clearTimeout(pendingUserSaveTimer);
+    pendingUserSaveTimer = null;
+  }
+  if (!pendingUserSavePayload) return;
+  const payload = pendingUserSavePayload;
+  const syncEmail = pendingUserSaveSyncEmail;
+  const resolvers = pendingUserSaveResolvers;
+  pendingUserSavePayload = null;
+  pendingUserSaveSyncEmail = false;
+  pendingUserSaveResolvers = [];
+  await executeImmediateUserSave(payload, syncEmail);
+  for (const r of resolvers) r();
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      void flushPendingUserSave();
+    }
+  });
+  window.addEventListener('pagehide', () => {
+    void flushPendingUserSave();
+  });
+}
+
+export async function saveUserState(
+  nextUser: UserGameData,
+  syncEmailDir: boolean = false
+): Promise<void> {
+  const payload = normalizeUserData({
+    ...nextUser,
+    businessName: nextUser.businessName.trim().slice(0, 40) || 'Nông Trại DOPI',
+    updatedAt: Date.now(),
+  });
+
+  // Coalesce rapid consecutive UI clicks within 280ms into a single Firestore write
+  if (syncEmailDir) {
+    pendingUserSavePayload = payload;
+    pendingUserSaveSyncEmail = true;
+    await flushPendingUserSave();
+    return;
+  }
+
+  pendingUserSavePayload = payload;
+  pendingUserSaveSyncEmail = pendingUserSaveSyncEmail || syncEmailDir;
+
+  return new Promise<void>((resolve) => {
+    pendingUserSaveResolvers.push(resolve);
+    if (pendingUserSaveTimer !== null) {
+      clearTimeout(pendingUserSaveTimer);
+    }
+    pendingUserSaveTimer = setTimeout(() => {
+      void flushPendingUserSave();
+    }, USER_SAVE_COALESCE_MS);
+  });
 }
 
 /**
@@ -275,6 +364,8 @@ export async function txRedeemCode(
 
   const codeRef = doc(firestore, 'redeem_codes', normalizedCode);
   const userRef = doc(firestore, 'users', uid);
+
+  await flushPendingUserSave();
 
   try {
     const result = await runTransaction(firestore, async (tx) => {
@@ -349,6 +440,7 @@ export async function txBuyNewPlot(
 ): Promise<{ cost: number; totalPlots: number }> {
   const firestore = requireDb();
   const userRef = doc(firestore, 'users', uid);
+  await flushPendingUserSave();
   try {
     return await runTransaction(firestore, async (tx) => {
       const snap = await tx.get(userRef);
@@ -403,6 +495,7 @@ export async function txExpandStorage(
 ): Promise<{ cost: number; newCapacity: number }> {
   const firestore = requireDb();
   const userRef = doc(firestore, 'users', uid);
+  await flushPendingUserSave();
   try {
     return await runTransaction(firestore, async (tx) => {
       const snap = await tx.get(userRef);
@@ -448,6 +541,8 @@ export async function txUnlockFactory(
   const userRef = doc(firestore, 'users', uid);
   const factoryDef = FACTORIES.find((f) => f.id === factoryId);
   if (!factoryDef) throw new Error('Nhà máy không tồn tại.');
+
+  await flushPendingUserSave();
 
   try {
     return await runTransaction(firestore, async (tx) => {
@@ -498,7 +593,8 @@ export function subscribeActiveMarketListings(
   const firestore = requireDb();
   const q = query(
     collection(firestore, 'market_listings'),
-    where('status', '==', 'active')
+    where('status', '==', 'active'),
+    limit(80)
   );
   return onSnapshot(
     q,
@@ -540,6 +636,8 @@ export async function txCreateMarketListing(
   const userRef = doc(firestore, 'users', sellerUid);
   const listingId = `mkt_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
   const listingRef = doc(firestore, 'market_listings', listingId);
+
+  await flushPendingUserSave();
 
   try {
     await runTransaction(firestore, async (tx) => {
@@ -611,6 +709,8 @@ export async function txCancelMarketListing(
   const userRef = doc(firestore, 'users', sellerUid);
   const listingRef = doc(firestore, 'market_listings', listingId);
 
+  await flushPendingUserSave();
+
   try {
     await runTransaction(firestore, async (tx) => {
       const [listingSnap, userSnap] = await Promise.all([
@@ -679,6 +779,8 @@ export async function txBuyMarketListing(
   const firestore = requireDb();
   const buyerRef = doc(firestore, 'users', buyerUid);
   const listingRef = doc(firestore, 'market_listings', listingId);
+
+  await flushPendingUserSave();
 
   try {
     return await runTransaction(firestore, async (tx) => {
@@ -1155,6 +1257,89 @@ export async function txWaterFriendPlot(
   }
 }
 
+/**
+ * Chat Bạn Bè: Tạo mã phòng chat đôi định danh duy nhất cho 2 người chơi
+ */
+export function buildFriendChatId(uidA: string, uidB: string): string {
+  return [uidA.trim(), uidB.trim()].sort().join('__');
+}
+
+/**
+ * Chat Bạn Bè: Lắng nghe tin nhắn real-time chỉ cho cuộc hội thoại đang mở (chống lag tuyệt đối)
+ */
+export function subscribeFriendChatMessages(
+  myUid: string,
+  friendUid: string,
+  onData: (messages: FriendChatMessage[]) => void
+): Unsubscribe {
+  const firestore = requireDb();
+  const chatId = buildFriendChatId(myUid, friendUid);
+  const q = query(
+    collection(firestore, 'friend_messages'),
+    where('chatId', '==', chatId),
+    limit(60)
+  );
+  return onSnapshot(
+    q,
+    (snap) => {
+      const items: FriendChatMessage[] = snap.docs
+        .map((d) => ({
+          ...(d.data() as Omit<FriendChatMessage, 'id'>),
+          id: d.id,
+        }))
+        .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0))
+        .slice(-40);
+      onData(items);
+    },
+    (error) => {
+      logFirestoreListenerError(error, OperationType.LIST, 'friend_messages');
+    }
+  );
+}
+
+/**
+ * Chat Bạn Bè: Gửi tin nhắn mới lên Firestore
+ */
+export async function sendFriendChatMessage(params: {
+  senderUid: string;
+  senderName: string;
+  senderAvatar: string;
+  recipientUid: string;
+  text: string;
+}): Promise<FriendChatMessage> {
+  const firestore = requireDb();
+  const cleanText = params.text.trim().slice(0, 400);
+  if (!cleanText) {
+    throw new Error('Nội dung tin nhắn không được để trống.');
+  }
+  if (params.senderUid === params.recipientUid) {
+    throw new Error('Không thể tự nhắn tin cho chính mình.');
+  }
+
+  const chatId = buildFriendChatId(params.senderUid, params.recipientUid);
+  const now = Date.now();
+  const msgId = `msg_${now}_${Math.random().toString(36).slice(2, 8)}`;
+  const payload: Omit<FriendChatMessage, 'id'> = {
+    chatId,
+    senderUid: params.senderUid,
+    senderName: (params.senderName || 'Nông Trại DOPI').slice(0, 60),
+    senderAvatar: (params.senderAvatar || '🧑‍🌾').slice(0, 16),
+    recipientUid: params.recipientUid,
+    text: cleanText,
+    createdAt: now,
+  };
+
+  try {
+    await setDoc(
+      doc(firestore, 'friend_messages', msgId),
+      sanitizeForFirestore(payload)
+    );
+    return { id: msgId, ...payload };
+  } catch (error) {
+    handleFirestoreError(error, OperationType.CREATE, `friend_messages/${msgId}`);
+  }
+}
+
 // ==================== ADMIN PANEL FUNCTIONS ====================
 
 export function subscribeAllRedeemCodes(
@@ -1297,7 +1482,8 @@ export function subscribeUserTopupRequests(
   const firestore = requireDb();
   const q = query(
     collection(firestore, 'topup_requests'),
-    where('uid', '==', uid)
+    where('uid', '==', uid),
+    limit(50)
   );
   return onSnapshot(
     q,
@@ -1321,7 +1507,8 @@ export function subscribeAllTopupRequests(
   const firestore = requireDb();
   const q = query(
     collection(firestore, 'topup_requests'),
-    orderBy('createdAt', 'desc')
+    orderBy('createdAt', 'desc'),
+    limit(100)
   );
   return onSnapshot(
     q,
@@ -1673,6 +1860,8 @@ export async function txBuyP2PShares(
   const ownerRef = doc(firestore, 'users', ownerUid);
   const compRef = doc(firestore, 'p2p_companies', ownerUid);
 
+  await flushPendingUserSave();
+
   try {
     return await runTransaction(firestore, async (tx) => {
       const [buyerSnap, compSnap, ownerSnap] = await Promise.all([
@@ -1818,6 +2007,8 @@ export async function txSellP2PShares(
   const sellerRef = doc(firestore, 'users', sellerUid);
   const compRef = doc(firestore, 'p2p_companies', ownerUid);
 
+  await flushPendingUserSave();
+
   try {
     return await runTransaction(firestore, async (tx) => {
       const [sellerSnap, compSnap] = await Promise.all([
@@ -1927,6 +2118,8 @@ export async function txClaimDividends(
 }> {
   const firestore = requireDb();
   const userRef = doc(firestore, 'users', uid);
+
+  await flushPendingUserSave();
 
   try {
     return await runTransaction(firestore, async (tx) => {

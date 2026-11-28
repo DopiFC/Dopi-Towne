@@ -76,7 +76,7 @@ export const QuestsVipView: React.FC<QuestsVipViewProps> = ({
             }`}
           >
             <Crown className="w-3.5 h-3.5" />
-            Bảng VIP 1–10
+            Bảng VIP 1–20
           </button>
         </div>
       </div>
@@ -242,7 +242,7 @@ export const QuestsVipView: React.FC<QuestsVipViewProps> = ({
                 </strong>{' '}
                 {nextVip
                   ? `· Cần thêm ${formatNumber(Math.max(0, nextVip.requiredCoins - user.totalRechargedCoins))} Xu để lên VIP ${nextVip.level}`
-                  : '· Bạn đã chạm đỉnh VIP 10!'}
+                  : '· Bạn đã chạm đỉnh VIP 20!'}
               </p>
             </div>
 

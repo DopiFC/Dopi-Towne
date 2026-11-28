@@ -585,11 +585,15 @@ export function getMarketTickerHeadlines(
 
 /**
  * Phí giao dịch chứng khoán & cổ phần P2P:
- * VIP 0 = 4.0%, giảm dần 0.25% mỗi cấp VIP xuống còn 1.5% ở VIP 10.
+ * VIP 0 = 4.0%, giảm dần 0.25% mỗi cấp VIP xuống 1.5% ở VIP 10,
+ * và tiếp tục giảm xuống tối thiểu 0.8% ở VIP 20.
  */
 export function calculateInvestmentFeePct(vipLevel: number): number {
-  const clamped = Math.max(0, Math.min(10, Math.floor(vipLevel)));
-  return Number(Math.max(1.5, 4 - clamped * 0.25).toFixed(2));
+  const clamped = Math.max(0, Math.min(20, Math.floor(vipLevel)));
+  if (clamped <= 10) {
+    return Number(Math.max(1.5, 4 - clamped * 0.25).toFixed(2));
+  }
+  return Number(Math.max(0.8, 1.5 - (clamped - 10) * 0.07).toFixed(2));
 }
 
 export function calculateBuyTrade(

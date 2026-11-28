@@ -266,6 +266,7 @@ export interface UserGameData {
   vehicles: string[];
   wealthScore: number;
   investments?: UserInvestments;
+  enterprise?: EnterpriseState;
   createdAt: number;
   updatedAt: number;
 }
@@ -477,5 +478,118 @@ export interface UserInvestments {
   totalInvested: number;
   realizedProfit: number;
   lastDividendClaimAt: number;
+}
+
+// ==================== FRIEND CHAT & ENTERPRISE ERP TYPES ====================
+
+export interface FriendChatMessage {
+  id: string;
+  chatId: string;
+  senderUid: string;
+  senderName: string;
+  senderAvatar: string;
+  recipientUid: string;
+  text: string;
+  createdAt: number;
+}
+
+export type EnterpriseSpecialistId =
+  | 'lean_engineer'
+  | 'cost_auditor'
+  | 'bio_agronomist'
+  | 'b2b_director'
+  | 'logistics_architect'
+  | 'cfo_treasurer';
+
+export type EnterpriseSkillCategory =
+  | 'production_speed'
+  | 'cost_reduction'
+  | 'crop_genetics'
+  | 'revenue_boost'
+  | 'logistics'
+  | 'finance';
+
+export interface EnterpriseSpecialistDef {
+  id: EnterpriseSpecialistId;
+  name: string;
+  role: string;
+  emoji: string;
+  skillName: string;
+  skillBadge: string;
+  skillCategory: EnterpriseSkillCategory;
+  maxLevel: number;
+  baseHireFundCost: number;
+  monthlySalaryGold: number;
+  effectPerLevelPct: number;
+  secondaryPerLevelPct: number;
+  wealthPerLevel: number;
+  description: string;
+}
+
+export type EnterpriseLedgerType =
+  | 'deposit'
+  | 'withdraw'
+  | 'payroll'
+  | 'wholesale'
+  | 'campaign'
+  | 'bonus'
+  | 'dept_upgrade'
+  | 'hire_specialist'
+  | 'headhunt';
+
+export interface EnterpriseLedgerEntry {
+  id: string;
+  type: EnterpriseLedgerType;
+  title: string;
+  amountGold: number;
+  isPositive: boolean;
+  createdAt: number;
+}
+
+export interface EnterpriseCampaignDef {
+  id: string;
+  name: string;
+  emoji: string;
+  costGold: number;
+  durationHours: number;
+  orderBonusPct: number;
+  wholesaleBonusPct: number;
+  moraleBoost: number;
+  description: string;
+}
+
+export interface WholesaleContractDef {
+  id: string;
+  title: string;
+  partnerName: string;
+  emoji: string;
+  minLevel: number;
+  items: Record<string, number>;
+  rewardGold: number;
+  corporateFundBonus: number;
+  rewardExp: number;
+  rewardReputation: number;
+}
+
+export interface EnterpriseState {
+  corporateFund: number;
+  payrollReserveRatio: number; // % of corporate fund earmarked for monthly salary (10..80)
+  rdLevel: number; // 1..10 (+3% extra crop/factory yield & value per level)
+  marketingLevel: number; // 1..10 (+4% wholesale & NPC order payout per level)
+  operationsLevel: number; // 1..10 (-3% monthly payroll overhead & +morale stability)
+  morale: number; // 0..100%
+  lastPayrollMonth: string; // YYYY-MM
+  lastPayrollPaidAt: number;
+  autoPaySalary: boolean;
+  totalRevenueGold: number;
+  totalPayrollPaidGold: number;
+  totalContractsDone: number;
+  activeCampaignId: string | null;
+  activeCampaignName: string;
+  activeCampaignUntil: number;
+  specialists: Record<EnterpriseSpecialistId, number>;
+  headhuntDiscountPct: number;
+  headhuntCount: number;
+  ledger: EnterpriseLedgerEntry[];
 }
 

@@ -38,11 +38,11 @@ test('Deterministic 15-minute stock engine returns identical 24-session history 
   }
 });
 
-test('Investment trading fee scales from 4% at VIP 0 down to 1.5% at VIP 10', () => {
+test('Investment trading fee scales from 4% at VIP 0 down to 1.5% at VIP 10 and 0.8% at VIP 20', () => {
   assert.equal(calculateInvestmentFeePct(0), 4);
   assert.equal(calculateInvestmentFeePct(4), 3);
   assert.equal(calculateInvestmentFeePct(10), 1.5);
-  assert.equal(calculateInvestmentFeePct(15), 1.5);
+  assert.equal(calculateInvestmentFeePct(20), 0.8);
 
   const buyVip0 = calculateBuyTrade(1000, 2, 0);
   assert.equal(buyVip0.gross, 2000);

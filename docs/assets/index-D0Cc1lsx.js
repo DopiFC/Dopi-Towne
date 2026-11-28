@@ -36195,6 +36195,215 @@ var VIP_TIERS = [
 		frameTitle: "Huyền Thoại DOPI TOWNE",
 		frameRingClass: "ring-amber-400 bg-gradient-to-br from-amber-50 to-yellow-100 text-amber-900",
 		badgeColorClass: "text-amber-700"
+	},
+	{
+		level: 11,
+		requiredCoins: 14e4,
+		growthReductionPct: 21.5,
+		marketTaxPct: 2.8,
+		factoryQueueSlots: 7,
+		harvestAllUnlocked: true,
+		frameTitle: "Tổng Tài Nông Nghiệp",
+		frameRingClass: "ring-emerald-400 bg-gradient-to-br from-emerald-50 to-teal-100 text-emerald-900",
+		badgeColorClass: "text-emerald-700"
+	},
+	{
+		level: 12,
+		requiredCoins: 19e4,
+		growthReductionPct: 23,
+		marketTaxPct: 2.6,
+		factoryQueueSlots: 7,
+		harvestAllUnlocked: true,
+		frameTitle: "Chủ Tịch Tập Đoàn",
+		frameRingClass: "ring-teal-500 bg-gradient-to-br from-teal-50 to-cyan-100 text-teal-900",
+		badgeColorClass: "text-teal-700"
+	},
+	{
+		level: 13,
+		requiredCoins: 25e4,
+		growthReductionPct: 24.5,
+		marketTaxPct: 2.4,
+		factoryQueueSlots: 7,
+		harvestAllUnlocked: true,
+		frameTitle: "Thống Đốc Thương Trường",
+		frameRingClass: "ring-sky-500 bg-gradient-to-br from-sky-50 to-blue-100 text-sky-900",
+		badgeColorClass: "text-sky-700"
+	},
+	{
+		level: 14,
+		requiredCoins: 33e4,
+		growthReductionPct: 26,
+		marketTaxPct: 2.2,
+		factoryQueueSlots: 8,
+		harvestAllUnlocked: true,
+		frameTitle: "Lãnh Chúa Thảo Nguyên",
+		frameRingClass: "ring-blue-500 bg-gradient-to-br from-blue-50 to-indigo-100 text-blue-900",
+		badgeColorClass: "text-blue-700"
+	},
+	{
+		level: 15,
+		requiredCoins: 43e4,
+		growthReductionPct: 27.5,
+		marketTaxPct: 2,
+		factoryQueueSlots: 8,
+		harvestAllUnlocked: true,
+		frameTitle: "Công Tước Hoàng Gia",
+		frameRingClass: "ring-indigo-500 bg-gradient-to-br from-indigo-50 to-violet-100 text-indigo-900",
+		badgeColorClass: "text-indigo-700"
+	},
+	{
+		level: 16,
+		requiredCoins: 56e4,
+		growthReductionPct: 29,
+		marketTaxPct: 1.8,
+		factoryQueueSlots: 8,
+		harvestAllUnlocked: true,
+		frameTitle: "Đại Công Tước DOPI",
+		frameRingClass: "ring-violet-500 bg-gradient-to-br from-violet-50 to-purple-100 text-violet-900",
+		badgeColorClass: "text-violet-700"
+	},
+	{
+		level: 17,
+		requiredCoins: 72e4,
+		growthReductionPct: 30.5,
+		marketTaxPct: 1.6,
+		factoryQueueSlots: 9,
+		harvestAllUnlocked: true,
+		frameTitle: "Vương Giả Tài Phú",
+		frameRingClass: "ring-purple-500 bg-gradient-to-br from-purple-50 to-fuchsia-100 text-purple-900",
+		badgeColorClass: "text-purple-700"
+	},
+	{
+		level: 18,
+		requiredCoins: 92e4,
+		growthReductionPct: 32,
+		marketTaxPct: 1.4,
+		factoryQueueSlots: 9,
+		harvestAllUnlocked: true,
+		frameTitle: "Thái Thượng Hoàng Nông Gia",
+		frameRingClass: "ring-fuchsia-500 bg-gradient-to-br from-fuchsia-50 to-rose-100 text-fuchsia-900",
+		badgeColorClass: "text-fuchsia-700"
+	},
+	{
+		level: 19,
+		requiredCoins: 12e5,
+		growthReductionPct: 33.5,
+		marketTaxPct: 1.2,
+		factoryQueueSlots: 9,
+		harvestAllUnlocked: true,
+		frameTitle: "Đế Vương Kinh Tế DOPI",
+		frameRingClass: "ring-rose-500 bg-gradient-to-br from-rose-50 to-amber-100 text-rose-900",
+		badgeColorClass: "text-rose-700"
+	},
+	{
+		level: 20,
+		requiredCoins: 16e5,
+		growthReductionPct: 35,
+		marketTaxPct: 1,
+		factoryQueueSlots: 10,
+		harvestAllUnlocked: true,
+		frameTitle: "Thần Nông Chí Tôn VIP 20",
+		frameRingClass: "ring-amber-500 bg-gradient-to-br from-amber-100 via-yellow-50 to-emerald-100 text-amber-950",
+		badgeColorClass: "text-amber-800"
+	}
+];
+var ENTERPRISE_CAMPAIGNS = [
+	{
+		id: "camp_brand_festival",
+		name: "Chiến Dịch Quảng Bá Thương Hiệu Nông Sản Sạch",
+		emoji: "📣",
+		costGold: 3500,
+		durationHours: 6,
+		orderBonusPct: 18,
+		wholesaleBonusPct: 15,
+		moraleBoost: 8,
+		description: "Quảng bá thương hiệu nông trại trên toàn thị trấn: +18% giá trị đơn NPC, +15% doanh thu hợp đồng sỉ trong 6 giờ."
+	},
+	{
+		id: "camp_cold_chain",
+		name: "Tối Ưu Chuỗi Cung Ứng Kho Lạnh B2B",
+		emoji: "❄️",
+		costGold: 8500,
+		durationHours: 12,
+		orderBonusPct: 24,
+		wholesaleBonusPct: 28,
+		moraleBoost: 12,
+		description: "Chuẩn hóa bảo quản lạnh và vận tải nhanh: +28% doanh thu hợp đồng sỉ B2B, +24% thưởng đơn NPC trong 12 giờ."
+	},
+	{
+		id: "camp_global_expo",
+		name: "Hội Chợ Xuất Khẩu Nông Sản Quốc Tế DOPI",
+		emoji: "🌐",
+		costGold: 22e3,
+		durationHours: 24,
+		orderBonusPct: 35,
+		wholesaleBonusPct: 45,
+		moraleBoost: 20,
+		description: "Ký kết hợp đồng xuất khẩu quy mô lớn: +45% giá trị lô hàng sỉ, +35% đơn hàng thị trấn và +20% tinh thần nhân sự suốt 24 giờ."
+	}
+];
+var WHOLESALE_CONTRACTS = [
+	{
+		id: "ws_grain_supply",
+		title: "Lô Hàng Lương Thực Chuỗi Tiệm Bánh",
+		partnerName: "Hệ Thống Bakery Thị Trấn",
+		emoji: "🌾",
+		minLevel: 1,
+		items: {
+			wheat: 8,
+			corn: 4
+		},
+		rewardGold: 1150,
+		corporateFundBonus: 320,
+		rewardExp: 145,
+		rewardReputation: 25
+	},
+	{
+		id: "ws_fresh_fruit_box",
+		title: "Hợp Đồng Trái Cây Tươi Siêu Thị Xanh",
+		partnerName: "Chuỗi Siêu Thị DOPI Mart",
+		emoji: "🍓",
+		minLevel: 2,
+		items: {
+			tomato: 6,
+			strawberry: 3
+		},
+		rewardGold: 1780,
+		corporateFundBonus: 480,
+		rewardExp: 220,
+		rewardReputation: 40
+	},
+	{
+		id: "ws_coffee_bakery_combo",
+		title: "Suất Cung Ứng Bữa Sáng Doanh Nghiệp",
+		partnerName: "Khu Văn Phòng Trung Tâm DOPI",
+		emoji: "🥐",
+		minLevel: 3,
+		items: {
+			butter_bread: 2,
+			phin_coffee: 1,
+			coffee: 2
+		},
+		rewardGold: 2850,
+		corporateFundBonus: 750,
+		rewardExp: 340,
+		rewardReputation: 65
+	},
+	{
+		id: "ws_tropical_export",
+		title: "Container Xuất Khẩu Đặc Sản Nhiệt Đới",
+		partnerName: "Tập Đoàn Xuất Nhập Khẩu Á Châu",
+		emoji: "🍈",
+		minLevel: 6,
+		items: {
+			dopi_durian: 2,
+			strawberry_tart: 1,
+			fresh_milk: 1
+		},
+		rewardGold: 5600,
+		corporateFundBonus: 1450,
+		rewardExp: 620,
+		rewardReputation: 120
 	}
 ];
 var ACHIEVEMENTS = [
@@ -36714,10 +36923,13 @@ function getMarketTickerHeadlines(nowMs = Date.now()) {
 }
 /**
 * Phí giao dịch chứng khoán & cổ phần P2P:
-* VIP 0 = 4.0%, giảm dần 0.25% mỗi cấp VIP xuống còn 1.5% ở VIP 10.
+* VIP 0 = 4.0%, giảm dần 0.25% mỗi cấp VIP xuống 1.5% ở VIP 10,
+* và tiếp tục giảm xuống tối thiểu 0.8% ở VIP 20.
 */
 function calculateInvestmentFeePct(vipLevel) {
-	return Number(Math.max(1.5, 4 - Math.max(0, Math.min(10, Math.floor(vipLevel))) * .25).toFixed(2));
+	const clamped = Math.max(0, Math.min(20, Math.floor(vipLevel)));
+	if (clamped <= 10) return Number(Math.max(1.5, 4 - clamped * .25).toFixed(2));
+	return Number(Math.max(.8, 1.5 - (clamped - 10) * .07).toFixed(2));
 }
 function calculateBuyTrade(unitPrice, quantity, vipLevel) {
 	const gross = Math.max(1, Math.floor(unitPrice)) * Math.max(1, Math.floor(quantity));
@@ -36945,13 +37157,13 @@ function calculateVipLevel(totalRechargedCoins) {
 	const safeTotal = Math.max(0, Math.floor(totalRechargedCoins));
 	let tier = 0;
 	for (const v of VIP_TIERS) if (safeTotal >= v.requiredCoins) tier = v.level;
-	return tier;
+	return Math.min(20, tier);
 }
 function getVipPerks(vipLevel) {
-	return VIP_TIERS[Math.max(0, Math.min(10, Math.floor(vipLevel)))] ?? VIP_TIERS[0];
+	return VIP_TIERS[Math.max(0, Math.min(20, Math.floor(vipLevel)))] ?? VIP_TIERS[0];
 }
 function getNextVipTier(vipLevel) {
-	if (vipLevel >= 10) return null;
+	if (vipLevel >= 20) return null;
 	return VIP_TIERS[vipLevel + 1] ?? null;
 }
 function calculatePlotCost(currentPlotCount) {
@@ -36974,7 +37186,78 @@ function calculateEmployeeUpgradeCost(employeeId, currentLevel) {
 		coins: safeLevel >= 3 ? Math.round(def.baseUpgradeCoins * Math.pow(1.6, safeLevel - 3)) : 0
 	};
 }
-function getBusinessBonuses(user) {
+function calculateDepartmentUpgradeCost(currentLevel) {
+	return Math.round(3200 * Math.pow(1.55, Math.max(1, Math.floor(currentLevel)) - 1));
+}
+function calculateMonthlyPayroll(employees, operationsLevel = 1) {
+	const discountPct = (Math.max(1, Math.min(10, Math.floor(operationsLevel || 1))) - 1) * 3;
+	const baseMonthlyRate = {
+		diligent_farmer: 420,
+		agri_engineer: 650,
+		factory_manager: 880,
+		sales_director: 1150
+	};
+	let grossSalary = 0;
+	let headcount = 0;
+	const breakdown = EMPLOYEES.map((def) => {
+		const lv = Math.max(0, Math.floor(employees?.[def.id] || 0));
+		if (lv > 0) headcount += 1;
+		const monthlySalary = lv > 0 ? Math.round(baseMonthlyRate[def.id] * lv * (1 + (lv - 1) * .12)) : 0;
+		grossSalary += monthlySalary;
+		return {
+			id: def.id,
+			name: def.name,
+			emoji: def.emoji,
+			role: def.role,
+			level: lv,
+			monthlySalary
+		};
+	});
+	const netSalary = Math.max(0, Math.round(grossSalary * (1 - discountPct / 100)));
+	return {
+		grossSalary,
+		discountPct,
+		netSalary,
+		headcount,
+		breakdown
+	};
+}
+function calculateInventoryValuation(inventory, nowMs = Date.now()) {
+	const surge = getHourlyMarketSurge(nowMs);
+	let cropValue = 0;
+	let productValue = 0;
+	let boosterValue = 0;
+	let cropUnits = 0;
+	let productUnits = 0;
+	let boosterUnits = 0;
+	for (const [itemId, rawQty] of Object.entries(inventory || {})) {
+		const qty = Math.max(0, Math.floor(rawQty || 0));
+		if (qty <= 0) continue;
+		const entry = ITEM_CATALOG[itemId];
+		if (!entry) continue;
+		const val = getItemSellPriceWithSurge(itemId, surge) * qty;
+		if (entry.category === "crop") {
+			cropValue += val;
+			cropUnits += qty;
+		} else if (entry.category === "product") {
+			productValue += val;
+			productUnits += qty;
+		} else {
+			boosterValue += val;
+			boosterUnits += qty;
+		}
+	}
+	return {
+		totalMarketValue: cropValue + productValue + boosterValue,
+		cropValue,
+		productValue,
+		boosterValue,
+		cropUnits,
+		productUnits,
+		boosterUnits
+	};
+}
+function getBusinessBonuses(user, nowMs = Date.now()) {
 	const emp = user.employees ?? {
 		diligent_farmer: 0,
 		agri_engineer: 0,
@@ -36982,6 +37265,7 @@ function getBusinessBonuses(user) {
 		sales_director: 0
 	};
 	const ownedVehicles = user.vehicles ?? [];
+	const ent = user.enterprise;
 	let bestVehicleRewardPct = 0;
 	let bestVehicleRefreshPct = 0;
 	let bestVehicleId = null;
@@ -36992,12 +37276,28 @@ function getBusinessBonuses(user) {
 			bestVehicleId = v.id;
 		}
 	}
+	const rdBonusPct = ent ? Math.max(0, (ent.rdLevel - 1) * 3) : 0;
+	const mktBonusPct = ent ? Math.max(0, (ent.marketingLevel - 1) * 4) : 0;
+	const morale = ent?.morale ?? 85;
+	const moraleEfficiencyPct = morale >= 90 ? 115 : morale >= 70 ? 100 : morale >= 45 ? 85 : 70;
+	let campOrderBonus = 0;
+	let campWholesaleBonus = 0;
+	if (ent && ent.activeCampaignId && ent.activeCampaignUntil > nowMs) {
+		const camp = ENTERPRISE_CAMPAIGNS.find((c) => c.id === ent.activeCampaignId);
+		if (camp) {
+			campOrderBonus = camp.orderBonusPct;
+			campWholesaleBonus = camp.wholesaleBonusPct;
+		}
+	}
+	const empScale = moraleEfficiencyPct / 100;
 	return {
 		autoHarvestEnabled: (emp.diligent_farmer || 0) >= 1,
-		extraYieldChancePct: Math.min(80, (emp.agri_engineer || 0) * 8),
-		factorySpeedReductionPct: Math.min(50, (emp.factory_manager || 0) * 6),
-		orderRewardBonusPct: (emp.sales_director || 0) * 7 + bestVehicleRewardPct,
+		extraYieldChancePct: Math.min(85, Math.round((emp.agri_engineer || 0) * 8 * empScale + rdBonusPct)),
+		factorySpeedReductionPct: Math.min(55, Math.round((emp.factory_manager || 0) * 6 * empScale + Math.floor(rdBonusPct / 2))),
+		orderRewardBonusPct: Math.round((emp.sales_director || 0) * 7 * empScale) + bestVehicleRewardPct + mktBonusPct + campOrderBonus,
+		wholesaleBonusPct: bestVehicleRewardPct + mktBonusPct + rdBonusPct + campWholesaleBonus,
 		orderRefreshReductionPct: bestVehicleRefreshPct,
+		moraleEfficiencyPct,
 		bestVehicleId
 	};
 }
@@ -37024,7 +37324,8 @@ function calculateWealthScore(user) {
 		const t = TREASURES.find((item) => item.id === tId);
 		if (t) treasureScore += t.wealthBonus;
 	}
-	return Math.round(levelScore + plotScore + vipScore + repScore + empScore + vehicleScore + treasureScore);
+	const enterpriseScore = user.enterprise ? Math.floor((user.enterprise.corporateFund || 0) * .25) + ((user.enterprise.rdLevel || 1) - 1) * 1500 + ((user.enterprise.marketingLevel || 1) - 1) * 1500 + ((user.enterprise.operationsLevel || 1) - 1) * 1500 : 0;
+	return Math.round(levelScore + plotScore + vipScore + repScore + empScore + vehicleScore + treasureScore + enterpriseScore);
 }
 function calculateGrowthDurationMs(cropId, vipLevel, autoSprinklerActive = false) {
 	const crop = CROPS.find((c) => c.id === cropId);
@@ -37065,13 +37366,13 @@ function getTotalInventoryCount(inventory) {
 	return Object.values(inventory).reduce((sum, qty) => sum + Math.max(0, Math.floor(qty || 0)), 0);
 }
 function getExpRequiredForLevel(level) {
-	return Math.round(100 * Math.pow(1.32, Math.max(0, level - 1)));
+	return Math.round(100 + Math.pow(Math.max(0, Math.max(1, Math.min(999, Math.floor(level || 1))) - 1), 1.45) * 35);
 }
 function applyExpAndLevelUp(currentLevel, currentExp, gainedExp) {
-	let level = Math.max(1, currentLevel);
-	let exp = Math.max(0, currentExp) + Math.max(0, gainedExp);
+	let level = Math.max(1, Math.min(999, Math.floor(currentLevel || 1)));
+	let exp = Math.max(0, Math.floor(currentExp || 0)) + Math.max(0, Math.floor(gainedExp || 0));
 	let leveledUp = false;
-	while (level < 200) {
+	while (level < 999) {
 		const needed = getExpRequiredForLevel(level);
 		if (exp >= needed) {
 			exp -= needed;
@@ -37332,6 +37633,62 @@ function normalizeFarmPlots(rawPlots, nowMs = Date.now()) {
 		mutationBoosted: Boolean(p?.mutationBoosted)
 	}));
 }
+function createInitialEnterpriseState(nowMs = Date.now()) {
+	return {
+		corporateFund: 2500,
+		payrollReserveRatio: 40,
+		rdLevel: 1,
+		marketingLevel: 1,
+		operationsLevel: 1,
+		morale: 92,
+		lastPayrollMonth: getCurrentMonthKey(nowMs),
+		lastPayrollPaidAt: nowMs,
+		autoPaySalary: true,
+		totalRevenueGold: 2500,
+		totalPayrollPaidGold: 0,
+		totalContractsDone: 0,
+		activeCampaignId: null,
+		activeCampaignName: "",
+		activeCampaignUntil: 0,
+		ledger: [{
+			id: `ldg_init_${nowMs}`,
+			type: "deposit",
+			title: "Vốn điều lệ khởi tạo Quỹ Doanh Nghiệp",
+			amountGold: 2500,
+			isPositive: true,
+			createdAt: nowMs
+		}]
+	};
+}
+function normalizeEnterpriseState(raw, nowMs = Date.now()) {
+	if (!raw || typeof raw !== "object") return createInitialEnterpriseState(nowMs);
+	const cleanLedger = Array.isArray(raw.ledger) ? raw.ledger.filter((e) => Boolean(e && typeof e === "object")).slice(0, 20).map((e, idx) => ({
+		id: typeof e.id === "string" && e.id ? e.id : `ldg_${nowMs}_${idx}`,
+		type: e.type || "deposit",
+		title: (e.title || "Giao dịch quỹ").slice(0, 120),
+		amountGold: Math.max(0, Math.floor(Number(e.amountGold) || 0)),
+		isPositive: Boolean(e.isPositive ?? true),
+		createdAt: Number(e.createdAt) || nowMs
+	})) : [];
+	return {
+		corporateFund: Math.max(0, Math.floor(Number(raw.corporateFund ?? 2500))),
+		payrollReserveRatio: Math.max(10, Math.min(80, Math.floor(Number(raw.payrollReserveRatio ?? 40)))),
+		rdLevel: Math.max(1, Math.min(10, Math.floor(Number(raw.rdLevel) || 1))),
+		marketingLevel: Math.max(1, Math.min(10, Math.floor(Number(raw.marketingLevel) || 1))),
+		operationsLevel: Math.max(1, Math.min(10, Math.floor(Number(raw.operationsLevel) || 1))),
+		morale: Math.max(0, Math.min(100, Math.floor(Number(raw.morale ?? 92)))),
+		lastPayrollMonth: typeof raw.lastPayrollMonth === "string" && raw.lastPayrollMonth ? raw.lastPayrollMonth : getCurrentMonthKey(nowMs),
+		lastPayrollPaidAt: Math.max(0, Number(raw.lastPayrollPaidAt) || nowMs),
+		autoPaySalary: Boolean(raw.autoPaySalary ?? true),
+		totalRevenueGold: Math.max(0, Math.floor(Number(raw.totalRevenueGold ?? 2500))),
+		totalPayrollPaidGold: Math.max(0, Math.floor(Number(raw.totalPayrollPaidGold) || 0)),
+		totalContractsDone: Math.max(0, Math.floor(Number(raw.totalContractsDone) || 0)),
+		activeCampaignId: typeof raw.activeCampaignId === "string" && raw.activeCampaignId ? raw.activeCampaignId : null,
+		activeCampaignName: typeof raw.activeCampaignName === "string" ? raw.activeCampaignName : "",
+		activeCampaignUntil: Math.max(0, Number(raw.activeCampaignUntil) || 0),
+		ledger: cleanLedger
+	};
+}
 function normalizePublicFarmData(raw, nowMs = Date.now()) {
 	const safeBusinessName = (raw.businessName || "").trim().slice(0, 40) || "Nông Trại DOPI";
 	const safeDisplayName = (raw.displayName || "").trim().slice(0, 60) || safeBusinessName;
@@ -37342,8 +37699,8 @@ function normalizePublicFarmData(raw, nowMs = Date.now()) {
 		businessName: safeBusinessName.length >= 2 ? safeBusinessName : "Nông Trại DOPI",
 		displayName: safeDisplayName.length >= 1 ? safeDisplayName : "Nông Dân",
 		avatarEmoji: safeAvatar,
-		level: Math.max(1, Math.floor(Number(raw.level) || 1)),
-		vipLevel: Math.max(0, Math.min(10, Math.floor(Number(raw.vipLevel) || 0))),
+		level: Math.max(1, Math.min(999, Math.floor(Number(raw.level) || 1))),
+		vipLevel: Math.max(0, Math.min(20, Math.floor(Number(raw.vipLevel) || 0))),
 		totalRechargedCoins: Math.max(0, Math.floor(Number(raw.totalRechargedCoins) || 0)),
 		wealthScore: Math.max(0, Math.round(Number(raw.wealthScore) || 0)),
 		vehicles: Array.isArray(raw.vehicles) ? raw.vehicles.filter((v) => typeof v === "string").slice(0, 20) : [],
@@ -37377,6 +37734,10 @@ function normalizeUserData(raw, nowMs = Date.now()) {
 		};
 	});
 	const cleanFriends = Array.isArray(raw.friends) ? Array.from(new Set(raw.friends.filter((f) => typeof f === "string" && f.trim().length > 0 && f !== raw.uid))).slice(0, 100) : [];
+	const rolledExp = applyExpAndLevelUp(Math.max(1, Math.min(999, Math.floor(Number(raw.level) || 1))), Math.max(0, Math.floor(Number(raw.exp) || 0)), 0);
+	const totalRecharged = Math.max(0, Math.floor(Number(raw.totalRechargedCoins) || 0));
+	const computedVip = calculateVipLevel(totalRecharged);
+	const rawVip = Math.max(0, Math.min(20, Math.floor(Number(raw.vipLevel) || 0)));
 	const normalized = {
 		uid: raw.uid,
 		email: safeEmail,
@@ -37386,12 +37747,12 @@ function normalizeUserData(raw, nowMs = Date.now()) {
 			joinedAt: Number(raw.profile?.joinedAt) || nowMs
 		},
 		businessName: safeBusinessName,
-		level: Math.max(1, Math.floor(Number(raw.level) || 1)),
-		exp: Math.max(0, Math.floor(Number(raw.exp) || 0)),
+		level: rolledExp.level,
+		exp: rolledExp.exp,
 		gold: Math.max(0, Math.floor(Number(raw.gold ?? 450))),
 		dopiCoins: Math.max(0, Math.floor(Number(raw.dopiCoins ?? 15))),
-		totalRechargedCoins: Math.max(0, Math.floor(Number(raw.totalRechargedCoins) || 0)),
-		vipLevel: Math.max(0, Math.min(10, Math.floor(Number(raw.vipLevel) || 0))),
+		totalRechargedCoins: totalRecharged,
+		vipLevel: Math.max(rawVip, computedVip),
 		farmPlots: normalizeFarmPlots(raw.farmPlots, nowMs),
 		factories: normalizedFactories,
 		inventory: raw.inventory && typeof raw.inventory === "object" ? { ...raw.inventory } : {},
@@ -37399,7 +37760,7 @@ function normalizeUserData(raw, nowMs = Date.now()) {
 		friends: cleanFriends,
 		dailyQuests: Array.isArray(raw.dailyQuests) && raw.dailyQuests.length > 0 ? raw.dailyQuests : generateDailyQuests(),
 		achievements: raw.achievements && typeof raw.achievements === "object" ? { ...raw.achievements } : {},
-		npcOrders: Array.isArray(raw.npcOrders) && raw.npcOrders.length > 0 ? raw.npcOrders : generateNpcOrders(raw.level ?? 1, nowMs),
+		npcOrders: Array.isArray(raw.npcOrders) && raw.npcOrders.length > 0 ? raw.npcOrders : generateNpcOrders(rolledExp.level, nowMs),
 		lastDailyReset: raw.lastDailyReset || getTodayDateKey(nowMs),
 		helpCountToday: Math.max(0, Math.floor(Number(raw.helpCountToday) || 0)),
 		helpedFriendsToday: Array.isArray(raw.helpedFriendsToday) ? raw.helpedFriendsToday.filter((x) => typeof x === "string").slice(0, 10) : [],
@@ -37419,7 +37780,7 @@ function normalizeUserData(raw, nowMs = Date.now()) {
 		lastCheckInDate: typeof raw.lastCheckInDate === "string" ? raw.lastCheckInDate : "",
 		eventTickets: Math.max(0, Math.floor(Number(raw.eventTickets) || 0)),
 		eventWeekKey: raw.eventWeekKey || weekKey,
-		rushOrder: raw.rushOrder && raw.rushOrder.expiresAt > nowMs ? raw.rushOrder : generateRushOrder(raw.level ?? 1, nowMs),
+		rushOrder: raw.rushOrder && raw.rushOrder.expiresAt > nowMs ? raw.rushOrder : generateRushOrder(rolledExp.level, nowMs),
 		reputation: Math.max(0, Math.floor(Number(raw.reputation) || 0)),
 		autoWaterUntil: Math.max(0, Number(raw.autoWaterUntil) || 0),
 		treasures: Array.isArray(raw.treasures) ? raw.treasures.filter((t) => typeof t === "string") : [],
@@ -37432,6 +37793,7 @@ function normalizeUserData(raw, nowMs = Date.now()) {
 		vehicles: Array.isArray(raw.vehicles) ? raw.vehicles.filter((v) => typeof v === "string") : [],
 		wealthScore: Math.max(0, Math.round(Number(raw.wealthScore) || 0)),
 		investments: normalizeUserInvestments(raw.investments),
+		enterprise: normalizeEnterpriseState(raw.enterprise, nowMs),
 		createdAt: Number(raw.createdAt) || nowMs,
 		updatedAt: Number(raw.updatedAt) || nowMs
 	};
@@ -37515,6 +37877,7 @@ function createInitialUserData(uid, email, displayName, nowMs = Date.now()) {
 		vehicles: [],
 		wealthScore: 0,
 		investments: createEmptyInvestments(),
+		enterprise: createInitialEnterpriseState(nowMs),
 		createdAt: nowMs,
 		updatedAt: nowMs
 	};
@@ -37723,6 +38086,49 @@ function createSandboxBundle(isAdminPreview) {
 			totalInvested: 23700,
 			realizedProfit: 1450,
 			lastDividendClaimAt: 0
+		},
+		enterprise: {
+			corporateFund: 18500,
+			payrollReserveRatio: 40,
+			rdLevel: 2,
+			marketingLevel: 2,
+			operationsLevel: 2,
+			morale: 94,
+			lastPayrollMonth: getCurrentMonthKey(now),
+			lastPayrollPaidAt: now - 1728e5,
+			autoPaySalary: true,
+			totalRevenueGold: 42800,
+			totalPayrollPaidGold: 4960,
+			totalContractsDone: 5,
+			activeCampaignId: "camp_brand_festival",
+			activeCampaignName: "Chiến Dịch Quảng Bá Thương Hiệu Nông Sản Sạch",
+			activeCampaignUntil: now + 144e5,
+			ledger: [
+				{
+					id: "ldg_seed_1",
+					type: "wholesale",
+					title: "Hoàn tất Hợp đồng Sỉ: Chuỗi Siêu Thị DOPI Mart",
+					amountGold: 2260,
+					isPositive: true,
+					createdAt: now - 108e5
+				},
+				{
+					id: "ldg_seed_2",
+					type: "payroll",
+					title: `Chi lương nhân sự kỳ ${getCurrentMonthKey(now)} (3 nhân sự)`,
+					amountGold: 2600,
+					isPositive: false,
+					createdAt: now - 1728e5
+				},
+				{
+					id: "ldg_seed_3",
+					type: "deposit",
+					title: "Bổ sung vốn lưu động vào Quỹ Doanh Nghiệp",
+					amountGold: 15e3,
+					isPositive: true,
+					createdAt: now - 2592e5
+				}
+			]
 		}
 	};
 	user.wealthScore = calculateWealthScore(user);
@@ -38055,6 +38461,38 @@ function createSandboxBundle(isAdminPreview) {
 			buildSeedCompany("top_tycoon_02", "Điền Trang Cacao Xanh", 31, 412e3, 18, 8, 5, 86, 260, 8, 4200, now - 9e5),
 			buildSeedCompany("friend_linh_02", "Vườn Dâu Thảo Nguyên", 16, 78500, 12, 4, 4, 39, 310, 7, 1850, now - 24e5),
 			buildSeedCompany("friend_tuan_03", "Xưởng Rang Cao Nguyên", 12, 34200, 9, 2, 3, 18, 370, 6, 620, now - 7776e5)
+		],
+		friendMessages: [
+			{
+				id: "msg_seed_1",
+				chatId: ["friend_linh_02", user.uid].sort().join("__"),
+				senderUid: "friend_linh_02",
+				senderName: "Vườn Dâu Thảo Nguyên",
+				senderAvatar: "🍓",
+				recipientUid: user.uid,
+				text: "Chào Minh Khang! Mình vừa tưới ô Ngô Ngọt giúp nông trại bạn rồi nha 💧",
+				createdAt: now - 12e5
+			},
+			{
+				id: "msg_seed_2",
+				chatId: ["friend_linh_02", user.uid].sort().join("__"),
+				senderUid: user.uid,
+				senderName: user.businessName,
+				senderAvatar: user.profile.avatarEmoji,
+				recipientUid: "friend_linh_02",
+				text: "Cảm ơn Thảo Linh nhiều nhé! Để mình qua tưới vườn Dâu Tây cho bạn ngay 🌱",
+				createdAt: now - 9e5
+			},
+			{
+				id: "msg_seed_3",
+				chatId: ["friend_tuan_03", user.uid].sort().join("__"),
+				senderUid: "friend_tuan_03",
+				senderName: "Xưởng Rang Cao Nguyên",
+				senderAvatar: "☕",
+				recipientUid: user.uid,
+				text: "Bên bạn còn dư Cà Phê Hạt không, treo lên Chợ P2P mình thu mua hết nhé!",
+				createdAt: now - 6e5
+			}
 		]
 	};
 }
@@ -38724,6 +39162,57 @@ async function txWaterFriendPlot(helperUid, friendUid, plotId) {
 	} catch (error) {
 		if (error instanceof Error && !error.message.includes("permission")) throw error;
 		handleFirestoreError(error, OperationType.WRITE, `public_farms/${friendUid}`);
+	}
+}
+/**
+* Chat Bạn Bè: Tạo mã phòng chat đôi định danh duy nhất cho 2 người chơi
+*/
+function buildFriendChatId(uidA, uidB) {
+	return [uidA.trim(), uidB.trim()].sort().join("__");
+}
+/**
+* Chat Bạn Bè: Lắng nghe tin nhắn real-time chỉ cho cuộc hội thoại đang mở (chống lag tuyệt đối)
+*/
+function subscribeFriendChatMessages(myUid, friendUid, onData) {
+	const firestore = requireDb();
+	const chatId = buildFriendChatId(myUid, friendUid);
+	return onSnapshot(query(collection(firestore, "friend_messages"), where("chatId", "==", chatId), limit(60)), (snap) => {
+		onData(snap.docs.map((d) => ({
+			...d.data(),
+			id: d.id
+		})).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0)).slice(-40));
+	}, (error) => {
+		logFirestoreListenerError(error, OperationType.LIST, "friend_messages");
+	});
+}
+/**
+* Chat Bạn Bè: Gửi tin nhắn mới lên Firestore
+*/
+async function sendFriendChatMessage(params) {
+	const firestore = requireDb();
+	const cleanText = params.text.trim().slice(0, 400);
+	if (!cleanText) throw new Error("Nội dung tin nhắn không được để trống.");
+	if (params.senderUid === params.recipientUid) throw new Error("Không thể tự nhắn tin cho chính mình.");
+	const chatId = buildFriendChatId(params.senderUid, params.recipientUid);
+	const now = Date.now();
+	const msgId = `msg_${now}_${Math.random().toString(36).slice(2, 8)}`;
+	const payload = {
+		chatId,
+		senderUid: params.senderUid,
+		senderName: (params.senderName || "Nông Trại DOPI").slice(0, 60),
+		senderAvatar: (params.senderAvatar || "🧑‍🌾").slice(0, 16),
+		recipientUid: params.recipientUid,
+		text: cleanText,
+		createdAt: now
+	};
+	try {
+		await setDoc(doc(firestore, "friend_messages", msgId), sanitizeForFirestore(payload));
+		return {
+			id: msgId,
+			...payload
+		};
+	} catch (error) {
+		handleFirestoreError(error, OperationType.CREATE, `friend_messages/${msgId}`);
 	}
 }
 function subscribeAllRedeemCodes(onData) {
@@ -39490,6 +39979,19 @@ var createLucideIcon = (iconName, iconNode) => {
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
+var ArrowDownLeft = createLucideIcon("arrow-down-left", [["path", {
+	d: "M17 7 7 17",
+	key: "15tmo1"
+}], ["path", {
+	d: "M17 17H7V7",
+	key: "1org7z"
+}]]);
+/**
+* @license lucide-react v0.546.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
 var ArrowDownRight = createLucideIcon("arrow-down-right", [["path", {
 	d: "m7 7 10 10",
 	key: "1fmybs"
@@ -40015,6 +40517,38 @@ var Factory = createLucideIcon("factory", [
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
+var FileSpreadsheet = createLucideIcon("file-spreadsheet", [
+	["path", {
+		d: "M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z",
+		key: "1rqfz7"
+	}],
+	["path", {
+		d: "M14 2v4a2 2 0 0 0 2 2h4",
+		key: "tnqrlb"
+	}],
+	["path", {
+		d: "M8 13h2",
+		key: "yr2amv"
+	}],
+	["path", {
+		d: "M14 13h2",
+		key: "un5t4a"
+	}],
+	["path", {
+		d: "M8 17h2",
+		key: "2yhykz"
+	}],
+	["path", {
+		d: "M14 17h2",
+		key: "10kma7"
+	}]
+]);
+/**
+* @license lucide-react v0.546.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
 var Flame = createLucideIcon("flame", [["path", {
 	d: "M12 3q1 4 4 6.5t3 5.5a1 1 0 0 1-14 0 5 5 0 0 1 1-3 1 1 0 0 0 5 0c0-2-1.5-3-1.5-5q0-2 2.5-4",
 	key: "1slcih"
@@ -40079,6 +40613,16 @@ var Globe = createLucideIcon("globe", [
 		key: "9i4pu4"
 	}]
 ]);
+/**
+* @license lucide-react v0.546.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var HeartHandshake = createLucideIcon("heart-handshake", [["path", {
+	d: "M19.414 14.414C21 12.828 22 11.5 22 9.5a5.5 5.5 0 0 0-9.591-3.676.6.6 0 0 1-.818.001A5.5 5.5 0 0 0 2 9.5c0 2.3 1.5 4 3 5.5l5.535 5.362a2 2 0 0 0 2.879.052 2.12 2.12 0 0 0-.004-3 2.124 2.124 0 1 0 3-3 2.124 2.124 0 0 0 3.004 0 2 2 0 0 0 0-2.828l-1.881-1.882a2.41 2.41 0 0 0-3.409 0l-1.71 1.71a2 2 0 0 1-2.828 0 2 2 0 0 1 0-2.828l2.823-2.762",
+	key: "17lmqv"
+}]]);
 /**
 * @license lucide-react v0.546.0 - ISC
 *
@@ -40162,6 +40706,26 @@ var Landmark = createLucideIcon("landmark", [
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
+var Layers = createLucideIcon("layers", [
+	["path", {
+		d: "M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z",
+		key: "zw3jo"
+	}],
+	["path", {
+		d: "M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12",
+		key: "1wduqc"
+	}],
+	["path", {
+		d: "M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17",
+		key: "kqbvx6"
+	}]
+]);
+/**
+* @license lucide-react v0.546.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
 var LockOpen = createLucideIcon("lock-open", [["rect", {
 	width: "18",
 	height: "11",
@@ -40235,6 +40799,26 @@ var Mail = createLucideIcon("mail", [["path", {
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
+var Megaphone = createLucideIcon("megaphone", [
+	["path", {
+		d: "M11 6a13 13 0 0 0 8.4-2.8A1 1 0 0 1 21 4v12a1 1 0 0 1-1.6.8A13 13 0 0 0 11 14H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z",
+		key: "q8bfy3"
+	}],
+	["path", {
+		d: "M6 14a12 12 0 0 0 2.4 7.2 2 2 0 0 0 3.2-2.4A8 8 0 0 1 10 14",
+		key: "1853fq"
+	}],
+	["path", {
+		d: "M8 6v8",
+		key: "15ugcq"
+	}]
+]);
+/**
+* @license lucide-react v0.546.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
 var Menu = createLucideIcon("menu", [
 	["path", {
 		d: "M4 5h16",
@@ -40249,6 +40833,16 @@ var Menu = createLucideIcon("menu", [
 		key: "1djgab"
 	}]
 ]);
+/**
+* @license lucide-react v0.546.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var MessageCircle = createLucideIcon("message-circle", [["path", {
+	d: "M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719",
+	key: "1sd12s"
+}]]);
 /**
 * @license lucide-react v0.546.0 - ISC
 *
@@ -40463,6 +41057,26 @@ var Power = createLucideIcon("power", [["path", {
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
+var Receipt = createLucideIcon("receipt", [
+	["path", {
+		d: "M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z",
+		key: "q3az6g"
+	}],
+	["path", {
+		d: "M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8",
+		key: "1h4pet"
+	}],
+	["path", {
+		d: "M12 17.5v-11",
+		key: "1jc1ny"
+	}]
+]);
+/**
+* @license lucide-react v0.546.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
 var RefreshCw = createLucideIcon("refresh-cw", [
 	["path", {
 		d: "M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8",
@@ -40495,6 +41109,19 @@ var Search = createLucideIcon("search", [["path", {
 	cy: "11",
 	r: "8",
 	key: "4ej97u"
+}]]);
+/**
+* @license lucide-react v0.546.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Send = createLucideIcon("send", [["path", {
+	d: "M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z",
+	key: "1ffxy3"
+}], ["path", {
+	d: "m21.854 2.147-10.94 10.939",
+	key: "12cjpa"
 }]]);
 /**
 * @license lucide-react v0.546.0 - ISC
@@ -42133,302 +42760,1276 @@ var AuthScreen = ({ unverifiedUser, onRefreshVerification, onToast }) => {
 	});
 };
 // src/components/BusinessView.tsx
-var BusinessView = ({ user, onUpgradeEmployee, onBuyVehicle }) => {
-	const bonuses = getBusinessBonuses(user);
+function formatRemainingDuration(ms) {
+	const totalSec = Math.max(0, Math.ceil(ms / 1e3));
+	const h = Math.floor(totalSec / 3600);
+	const m = Math.floor(totalSec % 3600 / 60);
+	const s = totalSec % 60;
+	if (h > 0) return `${h}g ${m}p`;
+	if (m > 0) return `${m}p ${s}s`;
+	return `${s}s`;
+}
+var BusinessView = ({ user, nowMs, onUpgradeEmployee, onBuyVehicle, onDepositFund, onWithdrawFund, onUpgradeDepartment, onLaunchCampaign, onFulfillWholesaleContract, onPayMonthlySalary, onBonusEmployeeMorale, onToggleAutoPaySalary }) => {
+	const [activeSubTab, setActiveSubTab] = (0, import_react.useState)("treasury");
+	const [customFundInput, setCustomFundInput] = (0, import_react.useState)("5000");
+	const ent = user.enterprise ?? createInitialEnterpriseState(nowMs);
+	const bonuses = getBusinessBonuses(user, nowMs);
 	const wealthScore = calculateWealthScore(user);
+	const payrollInfo = calculateMonthlyPayroll(user.employees, ent.operationsLevel);
+	const stockValuation = calculateInventoryValuation(user.inventory, nowMs);
+	const totalStockUnits = stockValuation.cropUnits + stockValuation.productUnits + stockValuation.boosterUnits;
+	const currentPeriodKey = new Date(nowMs).toISOString().slice(0, 7);
+	const isCurrentMonthPaid = ent.lastPayrollMonth === currentPeriodKey;
+	const activeCampaignDef = ent.activeCampaignId && ent.activeCampaignUntil > nowMs ? ENTERPRISE_CAMPAIGNS.find((c) => c.id === ent.activeCampaignId) || null : null;
+	const parsedCustomAmount = Math.max(0, Math.floor(Number(customFundInput.replace(/[^0-9]/g, "")) || 0));
+	const inventoryItems = Object.entries(user.inventory || {}).filter(([, qty]) => qty > 0).map(([itemId, qty]) => {
+		const meta = ITEM_CATALOG[itemId];
+		const unitValue = meta?.baseSellPrice ?? 0;
+		return {
+			itemId,
+			qty,
+			name: meta?.name || itemId,
+			emoji: meta?.emoji || "📦",
+			category: meta?.category || "crop",
+			unitValue,
+			totalValue: qty * unitValue
+		};
+	}).sort((a, b) => b.totalValue - a.totalValue);
+	const departments = [
+		{
+			key: "rd",
+			name: "Phòng R&D Nông Nghiệp",
+			emoji: "🧬",
+			level: ent.rdLevel,
+			perkText: `+${(ent.rdLevel - 1) * 3}% tỉ lệ thu hoạch đôi & -${Math.floor((ent.rdLevel - 1) * 3 / 2)}% TG chế biến`,
+			description: "Nghiên cứu giống cây năng suất cao và tối ưu dây chuyền nhà máy chế biến."
+		},
+		{
+			key: "marketing",
+			name: "Phòng Marketing & Thương Hiệu",
+			emoji: "📣",
+			level: ent.marketingLevel,
+			perkText: `+${(ent.marketingLevel - 1) * 4}% doanh thu Đơn NPC & Hợp đồng B2B`,
+			description: "Quảng bá thương hiệu nông sản sạch DOPI giúp đàm phán giá bán cao hơn."
+		},
+		{
+			key: "operations",
+			name: "Phòng Vận Hành & Nhân Sự (HR)",
+			emoji: "🏢",
+			level: ent.operationsLevel,
+			perkText: `-${(ent.operationsLevel - 1) * 3}% quỹ lương hàng tháng`,
+			description: "Chuẩn hóa quy trình ERP giúp tiết kiệm chi phí vận hành và tối ưu quỹ lương nhân sự."
+		}
+	];
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "space-y-6",
 		children: [
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 				className: "bg-white rounded-2xl border border-[#DCE7D3] p-5 space-y-4",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "flex flex-wrap items-center justify-between gap-4",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "flex items-center gap-3",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-							className: "w-11 h-11 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center shrink-0",
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Briefcase, { className: "w-5 h-5" })
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", {
-							className: "text-xl sm:text-2xl font-bold text-slate-900",
-							children: "Doanh Nghiệp & Tài Sản DOPI"
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-							className: "text-xs text-slate-500 mt-0.5",
-							children: "Tuyển nhân sự vận hành tự động & đầu tư đội xe vận tải để bứt phá BXH Tài Phú."
-						})] })]
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "flex items-center gap-6",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "flex flex-wrap items-center justify-between gap-4",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex items-center gap-3",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+								className: "w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Building2, { className: "w-6 h-6" })
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex flex-wrap items-center gap-2",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h1", {
+									className: "text-xl sm:text-2xl font-bold text-slate-900",
+									children: ["Quản Trị Doanh Nghiệp ERP — ", user.businessName]
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									className: "px-2.5 py-0.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold",
+									children: "Mô phỏng Doanh Nghiệp Thật"
+								})]
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+								className: "text-xs text-slate-500 mt-0.5",
+								children: "Quản lý Quỹ công ty, Định giá Tồn kho & Hợp đồng Sỉ B2B, Chiến dịch Kinh doanh và Bảng lương Nhân sự hàng tháng."
+							})] })]
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex flex-wrap items-center gap-4 sm:gap-6",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "text-right",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: "text-[11px] text-slate-500",
+										children: "Quỹ Doanh Nghiệp"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "text-lg sm:text-xl font-mono-num font-bold text-emerald-700",
+										children: [formatNumber(ent.corporateFund), " V"]
+									})]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+									className: "h-8 w-px bg-slate-200",
+									"aria-hidden": "true"
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "text-right",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: "text-[11px] text-slate-500",
+										children: "Giá Trị Hàng Hóa Kho"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "text-lg sm:text-xl font-mono-num font-bold text-sky-700",
+										children: [formatNumber(stockValuation.totalMarketValue), " V"]
+									})]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+									className: "h-8 w-px bg-slate-200",
+									"aria-hidden": "true"
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "text-right",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: "text-[11px] text-slate-500",
+										children: "Điểm Tài Phú"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: "text-lg sm:text-xl font-mono-num font-bold text-amber-700",
+										children: formatNumber(wealthScore)
+									})]
+								})
+							]
+						})]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "grid grid-cols-2 sm:grid-cols-5 gap-2.5 pt-2 border-t border-slate-100 text-xs",
 						children: [
 							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								className: "text-right",
+								className: "rounded-xl bg-[#F7FAF3] border border-[#E2ECDA] p-3",
 								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-									className: "text-[11px] text-slate-500",
-									children: "Điểm Tài Phú"
+									className: "text-slate-500",
+									children: "Thu hoạch tự động"
 								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-									className: "text-xl font-mono-num font-bold text-amber-700",
-									children: formatNumber(wealthScore)
+									className: "font-bold text-slate-900 mt-0.5",
+									children: bonuses.autoHarvestEnabled ? "Đang bật (Online)" : "Chưa thuê NV"
 								})]
 							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-								className: "h-9 w-px bg-slate-200",
-								"aria-hidden": "true"
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "rounded-xl bg-[#F7FAF3] border border-[#E2ECDA] p-3",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+									className: "text-slate-500",
+									children: "Tỉ lệ thu hoạch đôi"
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "font-mono-num font-bold text-emerald-700 mt-0.5",
+									children: [
+										"+",
+										bonuses.extraYieldChancePct,
+										"%"
+									]
+								})]
 							}),
 							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								className: "text-right",
+								className: "rounded-xl bg-[#F7FAF3] border border-[#E2ECDA] p-3",
 								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-									className: "text-[11px] text-slate-500",
-									children: "Danh Vọng"
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-									className: "text-xl font-mono-num font-bold text-emerald-700",
-									children: formatNumber(user.reputation || 0)
+									className: "text-slate-500",
+									children: "Tốc độ nhà máy"
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "font-mono-num font-bold text-sky-700 mt-0.5",
+									children: [
+										"-",
+										bonuses.factorySpeedReductionPct,
+										"% thời gian"
+									]
+								})]
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "rounded-xl bg-[#F7FAF3] border border-[#E2ECDA] p-3",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+									className: "text-slate-500",
+									children: "Thưởng doanh thu"
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "font-mono-num font-bold text-amber-700 mt-0.5",
+									children: [
+										"+",
+										bonuses.orderRewardBonusPct,
+										"% Vàng"
+									]
+								})]
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "rounded-xl bg-[#F7FAF3] border border-[#E2ECDA] p-3 col-span-2 sm:col-span-1",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+									className: "text-slate-500",
+									children: "Tinh thần nhân sự"
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "font-mono-num font-bold text-rose-700 mt-0.5",
+									children: [
+										ent.morale,
+										"% (",
+										bonuses.moraleEfficiencyPct,
+										"% hiệu suất)"
+									]
 								})]
 							})
 						]
-					})]
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-slate-100 text-xs",
-					children: [
-						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "rounded-xl bg-[#F7FAF3] border border-[#E2ECDA] p-3",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-								className: "text-slate-500",
-								children: "Thu hoạch tự động"
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-								className: "font-bold text-slate-900 mt-0.5",
-								children: bonuses.autoHarvestEnabled ? "Đang bật (Online)" : "Chưa kích hoạt"
-							})]
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "rounded-xl bg-[#F7FAF3] border border-[#E2ECDA] p-3",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-								className: "text-slate-500",
-								children: "Tỉ lệ thu hoạch đôi"
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								className: "font-mono-num font-bold text-emerald-700 mt-0.5",
-								children: [
-									"+",
-									bonuses.extraYieldChancePct,
-									"%"
-								]
-							})]
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "rounded-xl bg-[#F7FAF3] border border-[#E2ECDA] p-3",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-								className: "text-slate-500",
-								children: "Tốc độ nhà máy"
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								className: "font-mono-num font-bold text-sky-700 mt-0.5",
-								children: [
-									"-",
-									bonuses.factorySpeedReductionPct,
-									"% thời gian"
-								]
-							})]
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "rounded-xl bg-[#F7FAF3] border border-[#E2ECDA] p-3",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-								className: "text-slate-500",
-								children: "Thưởng đơn hàng NPC"
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								className: "font-mono-num font-bold text-amber-700 mt-0.5",
-								children: [
-									"+",
-									bonuses.orderRewardBonusPct,
-									"% Vàng"
-								]
-							})]
-						})
-					]
-				})]
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("section", {
-				className: "space-y-3.5",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "flex flex-wrap items-center justify-between gap-2",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "flex items-center gap-2",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Users, { className: "w-5 h-5 text-emerald-700" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
-							className: "text-lg font-bold text-slate-900",
-							children: "Đội Ngũ Nhân Viên Chuyên Nghiệp"
-						})]
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-						className: "text-xs text-slate-500",
-						children: "Chi phí nâng cấp tăng 1.8× mỗi cấp · Từ Lv.4 kết hợp thêm Xu DOPI"
-					})]
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-					className: "grid grid-cols-1 md:grid-cols-2 gap-4",
-					children: EMPLOYEES.map((emp) => {
-						const currentLv = user.employees?.[emp.id] || 0;
-						const isMax = currentLv >= emp.maxLevel;
-						const cost = calculateEmployeeUpgradeCost(emp.id, currentLv);
-						const canAfford = !isMax && user.gold >= cost.gold && user.dopiCoins >= cost.coins;
-						return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "bg-white rounded-2xl border border-[#DCE7D3] p-5 flex flex-col justify-between gap-4",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-								className: "flex items-start justify-between gap-3",
-								children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-									className: "flex items-start gap-3",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-										className: "w-12 h-12 rounded-2xl bg-[#F4FAF0] border border-[#DCE7D3] flex items-center justify-center text-2xl shrink-0",
-										children: emp.emoji
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
-										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-											className: "flex items-center gap-2",
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
-												className: "text-base font-bold text-slate-900",
-												children: emp.name
-											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-												className: "font-mono-num text-xs font-bold text-emerald-700",
-												children: [
-													"Lv.",
-													currentLv,
-													"/",
-													emp.maxLevel
-												]
-											})]
-										}),
-										/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-											className: "text-xs font-semibold text-amber-700 mt-0.5",
-											children: emp.role
-										}),
-										/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-											className: "text-xs text-slate-500 mt-1",
-											children: emp.description
-										})
-									] })]
-								})
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								className: "flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-									className: "text-xs text-slate-500 font-mono-num",
-									children: [
-										"Tài Phú: +",
-										formatNumber(emp.wealthPerLevel),
-										"/cấp"
-									]
-								}), isMax ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-									className: "inline-flex items-center gap-1 text-xs font-bold text-emerald-700",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleCheck, { className: "w-4 h-4" }), "Đạt cấp tối đa"]
-								}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
-									type: "button",
-									disabled: !canAfford,
-									onClick: () => onUpgradeEmployee(emp.id),
-									className: "inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap font-mono-num",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TrendingUp, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
-										currentLv === 0 ? "Thuê" : `Nâng Lv.${currentLv + 1}`,
-										" ·",
-										" ",
-										formatNumber(cost.gold),
-										"V",
-										cost.coins > 0 ? ` + ${formatNumber(cost.coins)} Xu` : ""
-									] })]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "grid grid-cols-2 lg:grid-cols-4 gap-2 pt-2",
+						children: [
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+								type: "button",
+								onClick: () => setActiveSubTab("treasury"),
+								className: `flex items-center gap-2.5 px-4 py-3 rounded-xl border text-left transition-all cursor-pointer ${activeSubTab === "treasury" ? "bg-emerald-600 text-white border-emerald-600 shadow-xs" : "bg-[#FAFDF8] text-slate-700 border-[#DCE7D3] hover:bg-emerald-50/70"}`,
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Landmark, { className: "w-4 h-4 shrink-0" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "min-w-0",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: "text-xs font-bold truncate",
+										children: "1. Quản Lý Quỹ & Phòng Ban"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: `text-[10px] font-mono-num truncate ${activeSubTab === "treasury" ? "text-emerald-100" : "text-slate-500"}`,
+										children: [
+											"Quỹ: ",
+											formatNumber(ent.corporateFund),
+											"V"
+										]
+									})]
 								})]
-							})]
-						}, emp.id);
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+								type: "button",
+								onClick: () => setActiveSubTab("goods"),
+								className: `flex items-center gap-2.5 px-4 py-3 rounded-xl border text-left transition-all cursor-pointer ${activeSubTab === "goods" ? "bg-emerald-600 text-white border-emerald-600 shadow-xs" : "bg-[#FAFDF8] text-slate-700 border-[#DCE7D3] hover:bg-emerald-50/70"}`,
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(PackageCheck, { className: "w-4 h-4 shrink-0" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "min-w-0",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: "text-xs font-bold truncate",
+										children: "2. Quản Lý Hàng Hóa & B2B"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: `text-[10px] font-mono-num truncate ${activeSubTab === "goods" ? "text-emerald-100" : "text-slate-500"}`,
+										children: [
+											"Đã giao: ",
+											ent.totalContractsDone,
+											" lô sỉ"
+										]
+									})]
+								})]
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+								type: "button",
+								onClick: () => setActiveSubTab("operations"),
+								className: `flex items-center gap-2.5 px-4 py-3 rounded-xl border text-left transition-all cursor-pointer ${activeSubTab === "operations" ? "bg-emerald-600 text-white border-emerald-600 shadow-xs" : "bg-[#FAFDF8] text-slate-700 border-[#DCE7D3] hover:bg-emerald-50/70"}`,
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Briefcase, { className: "w-4 h-4 shrink-0" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "min-w-0",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: "text-xs font-bold truncate",
+										children: "3. Hoạt Động KD & Đội Xe"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: `text-[10px] truncate ${activeSubTab === "operations" ? "text-emerald-100" : "text-slate-500"}`,
+										children: activeCampaignDef ? `Đang chạy: ${activeCampaignDef.name}` : "Sẵn sàng mở chiến dịch"
+									})]
+								})]
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+								type: "button",
+								onClick: () => setActiveSubTab("payroll"),
+								className: `flex items-center gap-2.5 px-4 py-3 rounded-xl border text-left transition-all cursor-pointer ${activeSubTab === "payroll" ? "bg-emerald-600 text-white border-emerald-600 shadow-xs" : "bg-[#FAFDF8] text-slate-700 border-[#DCE7D3] hover:bg-emerald-50/70"}`,
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Receipt, { className: "w-4 h-4 shrink-0" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "min-w-0",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: "text-xs font-bold truncate",
+										children: "4. Tiền Lương Hàng Tháng"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: `text-[10px] font-mono-num truncate ${activeSubTab === "payroll" ? "text-emerald-100" : "text-slate-500"}`,
+										children: [
+											formatNumber(payrollInfo.netSalary),
+											"V/tháng ·",
+											" ",
+											isCurrentMonthPaid ? "Đã trả" : "Chờ chi lương"
+										]
+									})]
+								})]
+							})
+						]
 					})
-				})]
+				]
 			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("section", {
-				className: "space-y-3.5",
+			activeSubTab === "treasury" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "space-y-6",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "flex flex-wrap items-center justify-between gap-2",
+					className: "grid grid-cols-1 lg:grid-cols-12 gap-6",
 					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "flex items-center gap-2",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Truck, { className: "w-5 h-5 text-sky-700" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h2", {
-							className: "text-lg font-bold text-slate-900",
-							children: [
-								"Showroom Xe Vận Tải & Siêu Xe DOPI (",
-								user.vehicles?.length || 0,
-								"/",
-								VEHICLES.length,
-								")"
-							]
-						})]
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-						className: "text-xs text-slate-500",
-						children: "Mỗi xe cộng dồn Tài Phú · Xe mạnh nhất áp dụng ưu đãi đơn hàng NPC"
-					})]
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-					className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4",
-					children: VEHICLES.map((v) => {
-						const owned = (user.vehicles ?? []).includes(v.id);
-						const locked = user.level < v.minLevel;
-						const canAfford = !owned && !locked && user.gold >= v.priceGold && user.dopiCoins >= v.priceCoins;
-						const isBestOwned = bonuses.bestVehicleId === v.id;
-						return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: `rounded-2xl border p-5 flex flex-col justify-between gap-4 transition-all ${owned ? "bg-[#F4FAF0] border-emerald-300" : locked ? "bg-slate-50/80 border-slate-200 opacity-75" : "bg-white border-[#DCE7D3]"}`,
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								className: "space-y-2.5",
+						className: "lg:col-span-7 bg-white rounded-2xl border border-[#DCE7D3] p-5 space-y-4",
+						children: [
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex flex-wrap items-center justify-between gap-2",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "flex items-center gap-2",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Wallet, { className: "w-5 h-5 text-emerald-700" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+										className: "text-base sm:text-lg font-bold text-slate-900",
+										children: "Quỹ Vốn Lưu Động Doanh Nghiệp (Corporate Treasury)"
+									})]
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+									className: "text-xs font-mono-num text-slate-500",
+									children: ["Vàng cá nhân hiện có: ", /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("strong", {
+										className: "text-amber-700",
+										children: [formatNumber(user.gold), " V"]
+									})]
+								})]
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+								className: "text-xs text-slate-600 leading-relaxed",
+								children: [
+									"Quỹ Doanh Nghiệp dùng để chi trả ",
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "Tiền lương hàng tháng" }),
+									", nâng cấp ",
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "3 Phòng Ban Chuyên Môn" }),
+									" và kích hoạt ",
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "Chiến dịch Kinh doanh" }),
+									". Ngoài ra 10% giá trị Quỹ được cộng trực tiếp vào Điểm Tài Phú của bạn."
+								]
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "grid grid-cols-1 sm:grid-cols-3 gap-3",
 								children: [
 									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "flex items-start justify-between gap-2",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-											className: "text-4xl leading-none",
-											children: v.emoji
-										}), owned ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-											className: "inline-flex items-center gap-1 text-xs font-bold text-emerald-700",
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleCheck, { className: "w-4 h-4" }), isBestOwned ? "Đang vận hành chính" : "Đã sở hữu"]
-										}) : locked ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-											className: "inline-flex items-center gap-1 text-xs font-semibold text-slate-500",
-											children: [
-												/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, { className: "w-3.5 h-3.5" }),
-												"Yêu cầu Lv.",
-												v.minLevel
-											]
-										}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-											className: "inline-flex items-center gap-1 text-xs font-mono-num font-bold text-amber-700",
-											children: [
-												/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Sparkles, { className: "w-3.5 h-3.5" }),
-												"+",
-												formatNumber(v.wealthBonus),
-												" Tài Phú"
-											]
+										className: "rounded-xl bg-emerald-50/80 border border-emerald-200 p-3.5",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+											className: "text-[11px] text-emerald-800 font-medium",
+											children: "Số dư Quỹ hiện tại"
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "text-xl font-mono-num font-bold text-emerald-800 mt-1",
+											children: [formatNumber(ent.corporateFund), " V"]
 										})]
 									}),
-									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
-										className: "text-base font-bold text-slate-900",
-										children: v.name
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-										className: "text-xs text-slate-500 mt-0.5",
-										children: v.description
-									})] }),
 									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "grid grid-cols-2 gap-2 text-[11px] font-mono-num",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-											className: "rounded-lg bg-white border border-slate-200 px-2.5 py-1.5 text-emerald-700 font-semibold",
-											children: [
-												"+",
-												v.orderRewardBonusPct,
-												"% Thưởng đơn"
-											]
+										className: "rounded-xl bg-amber-50/80 border border-amber-200 p-3.5",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+											className: "text-[11px] text-amber-800 font-medium",
+											children: "Tổng Doanh Thu B2B & Quỹ"
 										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-											className: "rounded-lg bg-white border border-slate-200 px-2.5 py-1.5 text-sky-700 font-semibold",
-											children: [
-												"-",
-												v.orderRefreshReductionPct,
-												"% Thời gian làm mới"
-											]
+											className: "text-xl font-mono-num font-bold text-amber-800 mt-1",
+											children: [formatNumber(ent.totalRevenueGold), " V"]
+										})]
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "rounded-xl bg-sky-50/80 border border-sky-200 p-3.5",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+											className: "text-[11px] text-sky-800 font-medium",
+											children: "Tổng Quỹ Lương Đã Chi"
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "text-xl font-mono-num font-bold text-sky-800 mt-1",
+											children: [formatNumber(ent.totalPayrollPaidGold), " V"]
 										})]
 									})
 								]
-							}), owned ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								className: "text-xs font-mono-num text-emerald-800 font-semibold pt-2 border-t border-emerald-200/70",
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "rounded-xl bg-[#FAFDF8] border border-[#DCE7D3] p-4 space-y-3",
 								children: [
-									"Đóng góp +",
-									formatNumber(v.wealthBonus),
-									" điểm Tài Phú"
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: "text-xs font-bold text-slate-800",
+										children: "Nạp / Rút Vốn Nhanh Hoặc Nhập Số Tiền Tùy Chọn"
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "flex flex-wrap items-center gap-2",
+										children: [[
+											2e3,
+											1e4,
+											5e4
+										].map((amt) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+											type: "button",
+											disabled: user.gold < amt,
+											onClick: () => onDepositFund(amt),
+											className: "inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-semibold font-mono-num hover:bg-emerald-700 disabled:opacity-40 cursor-pointer",
+											children: [
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArrowDownLeft, { className: "w-3.5 h-3.5" }),
+												"Nạp +",
+												formatNumber(amt),
+												"V"
+											]
+										}, `dep-${amt}`)), [2e3, 1e4].map((amt) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+											type: "button",
+											disabled: ent.corporateFund < amt,
+											onClick: () => onWithdrawFund(amt),
+											className: "inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-amber-300 bg-amber-50 text-amber-900 text-xs font-semibold font-mono-num hover:bg-amber-100 disabled:opacity-40 cursor-pointer",
+											children: [
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArrowUpRight, { className: "w-3.5 h-3.5" }),
+												"Rút -",
+												formatNumber(amt),
+												"V"
+											]
+										}, `wit-${amt}`))]
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "flex flex-wrap items-center gap-2 pt-2 border-t border-slate-200/70",
+										children: [
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
+												type: "number",
+												min: 100,
+												step: 500,
+												value: customFundInput,
+												onChange: (e) => setCustomFundInput(e.target.value),
+												"aria-label": "Số Vàng muốn nạp hoặc rút quỹ doanh nghiệp",
+												className: "w-40 px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-mono-num font-bold text-slate-800",
+												placeholder: "Nhập số Vàng..."
+											}),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+												type: "button",
+												disabled: parsedCustomAmount <= 0 || user.gold < parsedCustomAmount,
+												onClick: () => onDepositFund(parsedCustomAmount),
+												className: "px-3.5 py-2 rounded-xl bg-emerald-700 text-white text-xs font-semibold hover:bg-emerald-800 disabled:opacity-40 cursor-pointer",
+												children: [
+													"Nạp vào Quỹ (",
+													formatNumber(parsedCustomAmount),
+													"V)"
+												]
+											}),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+												type: "button",
+												disabled: parsedCustomAmount <= 0 || ent.corporateFund < parsedCustomAmount,
+												onClick: () => onWithdrawFund(parsedCustomAmount),
+												className: "px-3.5 py-2 rounded-xl border border-slate-300 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 disabled:opacity-40 cursor-pointer",
+												children: "Rút về Ví cá nhân"
+											})
+										]
+									})
 								]
-							}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
-								type: "button",
-								disabled: !canAfford,
-								onClick: () => onBuyVehicle(v.id),
-								className: `w-full py-2.5 rounded-xl text-xs font-semibold font-mono-num transition-colors cursor-pointer ${canAfford ? "bg-amber-500 text-white hover:bg-amber-600" : "bg-slate-200 text-slate-500 cursor-not-allowed"}`,
-								children: locked ? `Mở khóa ở Lv.${v.minLevel}` : `Mua xe · ${formatNumber(v.priceGold)}V${v.priceCoins > 0 ? ` + ${formatNumber(v.priceCoins)} Xu` : ""}`
+							})
+						]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "lg:col-span-5 bg-white rounded-2xl border border-[#DCE7D3] p-5 flex flex-col justify-between space-y-3",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex items-center justify-between",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex items-center gap-2",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FileSpreadsheet, { className: "w-5 h-5 text-sky-700" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+									className: "text-base font-bold text-slate-900",
+									children: "Sổ Cái Thu Chi Doanh Nghiệp"
+								})]
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+								className: "text-[11px] text-slate-400 font-mono-num",
+								children: [ent.ledger.length, " bút toán gần nhất"]
 							})]
-						}, v.id);
-					})
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "space-y-2 max-h-[290px] overflow-y-auto pr-1",
+							children: ent.ledger.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+								className: "text-xs text-slate-500 py-8 text-center",
+								children: "Chưa có giao dịch quỹ nào được ghi nhận."
+							}) : ent.ledger.map((entry) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "rounded-xl border border-slate-100 bg-[#FAFDF8] px-3 py-2.5 flex items-center justify-between gap-2 text-xs",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "min-w-0",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: "font-semibold text-slate-800 truncate",
+										children: entry.title
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: "text-[10px] text-slate-400 font-mono-num",
+										children: new Date(entry.createdAt).toLocaleString("vi-VN", {
+											hour: "2-digit",
+											minute: "2-digit",
+											day: "2-digit",
+											month: "2-digit"
+										})
+									})]
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+									className: `font-mono-num font-bold shrink-0 ${entry.isPositive ? "text-emerald-700" : "text-rose-600"}`,
+									children: [
+										entry.isPositive ? "+" : "-",
+										formatNumber(entry.amountGold),
+										"V"
+									]
+								})]
+							}, entry.id))
+						})]
+					})]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("section", {
+					className: "space-y-3",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "flex flex-wrap items-center justify-between gap-2",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex items-center gap-2",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Layers, { className: "w-5 h-5 text-emerald-700" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+								className: "text-lg font-bold text-slate-900",
+								children: "Khối Phòng Ban Chuyên Môn (Nâng Cấp Bằng Quỹ Doanh Nghiệp)"
+							})]
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							className: "text-xs text-slate-500",
+							children: "Mỗi cấp phòng ban cộng +2.200 Điểm Tài Phú và cường hóa toàn bộ hoạt động kinh doanh"
+						})]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "grid grid-cols-1 md:grid-cols-3 gap-4",
+						children: departments.map((dept) => {
+							const isMax = dept.level >= 10;
+							const upgradeCost = calculateDepartmentUpgradeCost(dept.level);
+							const canAfford = !isMax && ent.corporateFund >= upgradeCost;
+							return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "bg-white rounded-2xl border border-[#DCE7D3] p-5 flex flex-col justify-between gap-4",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "space-y-2",
+									children: [
+										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "flex items-center justify-between",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+												className: "text-3xl",
+												children: dept.emoji
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+												className: "px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-mono-num font-bold",
+												children: [
+													"Lv.",
+													dept.level,
+													"/10"
+												]
+											})]
+										}),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+											className: "text-base font-bold text-slate-900",
+											children: dept.name
+										}),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+											className: "text-xs text-slate-500",
+											children: dept.description
+										}),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "rounded-xl bg-[#F4FAF0] border border-emerald-200 px-3 py-2 text-xs font-semibold text-emerald-800",
+											children: ["Hiệu lực hiện tại: ", dept.perkText]
+										})
+									]
+								}), isMax ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "text-xs font-bold text-emerald-700 flex items-center gap-1.5 pt-2 border-t border-slate-100",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleCheck, { className: "w-4 h-4" }), "Phòng ban đã đạt cấp tối đa (Lv.10)"]
+								}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+									type: "button",
+									disabled: !canAfford,
+									onClick: () => onUpgradeDepartment(dept.key),
+									className: "w-full py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-semibold font-mono-num hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-400 cursor-pointer",
+									children: [
+										"Nâng lên Lv.",
+										dept.level + 1,
+										" · Trích Quỹ ",
+										formatNumber(upgradeCost),
+										"V"
+									]
+								})]
+							}, dept.key);
+						})
+					})]
 				})]
+			}),
+			activeSubTab === "goods" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "space-y-6",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "bg-white rounded-2xl border border-[#DCE7D3] p-5 space-y-4",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex flex-wrap items-center justify-between gap-2",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex items-center gap-2",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(PackageCheck, { className: "w-5 h-5 text-emerald-700" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+									className: "text-lg font-bold text-slate-900",
+									children: "Báo Cáo Kiểm Kê & Định Giá Tài Sản Hàng Hóa Tồn Kho"
+								})]
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+								className: "text-xs font-mono-num text-slate-500",
+								children: [
+									"Tổng sản lượng: ",
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("strong", { children: [formatNumber(totalStockUnits), " đơn vị"] }),
+									" / Sức chứa ",
+									formatNumber(user.storageCapacity)
+								]
+							})]
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "grid grid-cols-2 sm:grid-cols-4 gap-3",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "rounded-xl bg-emerald-50 border border-emerald-200 p-3.5",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: "text-xs text-emerald-800 font-medium",
+										children: "Tổng Giá Trị Tồn Kho"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "text-xl font-mono-num font-bold text-emerald-900 mt-1",
+										children: [formatNumber(stockValuation.totalMarketValue), " V"]
+									})]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "rounded-xl bg-[#FAFDF8] border border-[#DCE7D3] p-3.5",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: "text-xs text-slate-500",
+										children: "Nông Sản Thô (Raw Crops)"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "text-lg font-mono-num font-bold text-slate-800 mt-1",
+										children: [formatNumber(stockValuation.cropValue), " V"]
+									})]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "rounded-xl bg-[#FAFDF8] border border-[#DCE7D3] p-3.5",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: "text-xs text-slate-500",
+										children: "Thành Phẩm Chế Biến"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "text-lg font-mono-num font-bold text-amber-800 mt-1",
+										children: [formatNumber(stockValuation.productValue), " V"]
+									})]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "rounded-xl bg-[#FAFDF8] border border-[#DCE7D3] p-3.5",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: "text-xs text-slate-500",
+										children: "Vật Tư Nông Nghiệp"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "text-lg font-mono-num font-bold text-sky-800 mt-1",
+										children: [formatNumber(stockValuation.boosterValue), " V"]
+									})]
+								})
+							]
+						}),
+						inventoryItems.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "overflow-x-auto border border-slate-200 rounded-xl",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("table", {
+								className: "w-full text-left border-collapse text-xs",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("thead", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("tr", {
+									className: "bg-[#F4FAF0] text-slate-700 border-b border-slate-200",
+									children: [
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", {
+											className: "py-2.5 px-3 font-bold",
+											children: "Mặt Hàng (SKU)"
+										}),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", {
+											className: "py-2.5 px-3 font-bold",
+											children: "Phân Loại"
+										}),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", {
+											className: "py-2.5 px-3 font-bold text-right",
+											children: "Tồn Kho"
+										}),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", {
+											className: "py-2.5 px-3 font-bold text-right",
+											children: "Đơn Giá Chuẩn"
+										}),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", {
+											className: "py-2.5 px-3 font-bold text-right",
+											children: "Thành Tiền"
+										})
+									]
+								}) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tbody", {
+									className: "divide-y divide-slate-100",
+									children: inventoryItems.map((row) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("tr", {
+										className: "hover:bg-slate-50/80",
+										children: [
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("td", {
+												className: "py-2 px-3 font-semibold text-slate-900",
+												children: [
+													row.emoji,
+													" ",
+													row.name
+												]
+											}),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", {
+												className: "py-2 px-3 text-slate-500",
+												children: row.category === "crop" ? "Nông sản thô" : row.category === "product" ? "Thành phẩm nhà máy" : "Vật tư hỗ trợ"
+											}),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", {
+												className: "py-2 px-3 text-right font-mono-num font-bold text-slate-800",
+												children: formatNumber(row.qty)
+											}),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("td", {
+												className: "py-2 px-3 text-right font-mono-num text-slate-600",
+												children: [formatNumber(row.unitValue), " V"]
+											}),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("td", {
+												className: "py-2 px-3 text-right font-mono-num font-bold text-emerald-700",
+												children: [formatNumber(row.totalValue), " V"]
+											})
+										]
+									}, row.itemId))
+								})]
+							})
+						})
+					]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "bg-white rounded-2xl border border-[#DCE7D3] p-5 space-y-4",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "flex flex-wrap items-center justify-between gap-2",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+							className: "text-lg font-bold text-slate-900",
+							children: "Hợp Đồng Cung Ứng Sỉ B2B (Xuất Khẩu & Chuỗi Siêu Thị)"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+							className: "text-xs text-slate-500 mt-0.5",
+							children: "Xuất kho lô hàng lớn cho đối tác B2B để nhận doanh thu Vàng cao, cộng thẳng Quỹ Doanh Nghiệp và lượng lớn EXP tăng Level."
+						})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+							className: "px-3 py-1 rounded-xl bg-amber-50 border border-amber-200 text-xs font-mono-num font-bold text-amber-800",
+							children: [
+								"Thưởng doanh thu hiện tại: +",
+								bonuses.wholesaleBonusPct,
+								"%"
+							]
+						})]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "grid grid-cols-1 md:grid-cols-2 gap-4",
+						children: WHOLESALE_CONTRACTS.map((contract) => {
+							const locked = user.level < contract.minLevel;
+							const reqEntries = Object.entries(contract.items);
+							const canFulfill = !locked && reqEntries.every(([itemId, needed]) => (user.inventory[itemId] || 0) >= needed);
+							const boostedGold = Math.round(contract.rewardGold * (1 + bonuses.wholesaleBonusPct / 100));
+							return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: `rounded-2xl border p-4 flex flex-col justify-between gap-3 ${canFulfill ? "bg-[#F4FAF0] border-emerald-300" : "bg-[#FAFDF8] border-[#DCE7D3]"}`,
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "space-y-2.5",
+									children: [
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+											className: "flex items-start justify-between gap-2",
+											children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "flex items-center gap-2.5",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "text-3xl",
+													children: contract.emoji
+												}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+													className: "text-sm sm:text-base font-bold text-slate-900",
+													children: contract.title
+												}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "text-xs text-slate-500",
+													children: [
+														"Đối tác: ",
+														/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: contract.partnerName }),
+														" · Yêu cầu Lv.",
+														contract.minLevel
+													]
+												})] })]
+											})
+										}),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+											className: "flex flex-wrap gap-2 pt-1",
+											children: reqEntries.map(([itemId, needed]) => {
+												const meta = ITEM_CATALOG[itemId];
+												const have = user.inventory[itemId] || 0;
+												return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+													className: `inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl border text-xs font-mono-num font-semibold ${have >= needed ? "bg-emerald-50 border-emerald-200 text-emerald-800" : "bg-white border-slate-200 text-slate-600"}`,
+													children: [
+														/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: meta?.emoji || "📦" }),
+														/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [meta?.name || itemId, ":"] }),
+														/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("strong", { children: [
+															have,
+															"/",
+															needed
+														] })
+													]
+												}, itemId);
+											})
+										}),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-[11px] font-mono-num",
+											children: [
+												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "rounded-lg bg-white border border-slate-200 px-2.5 py-1.5 font-bold text-amber-700",
+													children: [
+														"+",
+														formatNumber(boostedGold),
+														" Vàng"
+													]
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "rounded-lg bg-white border border-slate-200 px-2.5 py-1.5 font-bold text-emerald-700",
+													children: [
+														"+",
+														formatNumber(contract.corporateFundBonus),
+														"V vào Quỹ"
+													]
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "rounded-lg bg-white border border-slate-200 px-2.5 py-1.5 font-bold text-sky-700",
+													children: [
+														"+",
+														formatNumber(contract.rewardExp),
+														" EXP"
+													]
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "rounded-lg bg-white border border-slate-200 px-2.5 py-1.5 font-bold text-purple-700",
+													children: [
+														"+",
+														contract.rewardReputation,
+														" Danh vọng"
+													]
+												})
+											]
+										})
+									]
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+									type: "button",
+									disabled: !canFulfill,
+									onClick: () => onFulfillWholesaleContract(contract.id),
+									className: "w-full py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-400 cursor-pointer",
+									children: locked ? `Yêu cầu đạt Lv.${contract.minLevel}` : canFulfill ? "Ký & Xuất Kho Giao Hàng B2B Ngay" : "Chưa đủ số lượng hàng hóa trong kho"
+								})]
+							}, contract.id);
+						})
+					})]
+				})]
+			}),
+			activeSubTab === "operations" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "space-y-6",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("section", {
+						className: "bg-white rounded-2xl border border-[#DCE7D3] p-5 space-y-4",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex flex-wrap items-center justify-between gap-2",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex items-center gap-2",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Megaphone, { className: "w-5 h-5 text-amber-600" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+									className: "text-lg font-bold text-slate-900",
+									children: "Chiến Dịch Xúc Tiến Kinh Doanh (Trích Quỹ Doanh Nghiệp)"
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+									className: "text-xs text-slate-500",
+									children: "Kích hoạt chiến dịch để bứt phá doanh thu Đơn hàng NPC, Hợp đồng B2B và khích lệ tinh thần nhân viên."
+								})] })]
+							}), activeCampaignDef && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "px-3.5 py-2 rounded-xl bg-emerald-50 border border-emerald-300 text-xs font-semibold text-emerald-900",
+								children: [
+									"Đang chạy: ",
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: activeCampaignDef.name }),
+									" · Còn lại:",
+									" ",
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										className: "font-mono-num font-bold",
+										children: formatRemainingDuration(ent.activeCampaignUntil - nowMs)
+									})
+								]
+							})]
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "grid grid-cols-1 md:grid-cols-3 gap-4",
+							children: ENTERPRISE_CAMPAIGNS.map((camp) => {
+								const isRunningThis = activeCampaignDef?.id === camp.id;
+								const canAfford = ent.corporateFund >= camp.costGold;
+								return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: `rounded-2xl border p-4 flex flex-col justify-between gap-3 ${isRunningThis ? "bg-[#F4FAF0] border-emerald-400" : "bg-[#FAFDF8] border-[#DCE7D3]"}`,
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "space-y-2",
+										children: [
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "flex items-center justify-between",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "text-3xl",
+													children: camp.emoji
+												}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+													className: "px-2.5 py-0.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs font-mono-num font-bold",
+													children: [
+														"+",
+														camp.orderBonusPct,
+														"% Đơn / +",
+														camp.wholesaleBonusPct,
+														"% B2B"
+													]
+												})]
+											}),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+												className: "text-base font-bold text-slate-900",
+												children: camp.name
+											}),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+												className: "text-xs text-slate-500",
+												children: camp.description
+											}),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "text-[11px] font-mono-num text-emerald-700 font-semibold",
+												children: [
+													"Hiệu lực: ",
+													camp.durationHours,
+													" giờ · +",
+													camp.moraleBoost,
+													"% Tinh thần nhân sự"
+												]
+											})
+										]
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+										type: "button",
+										disabled: isRunningThis || !canAfford,
+										onClick: () => onLaunchCampaign(camp.id),
+										className: "w-full py-2.5 rounded-xl bg-amber-500 text-white text-xs font-semibold font-mono-num hover:bg-amber-600 disabled:bg-slate-200 disabled:text-slate-400 cursor-pointer",
+										children: isRunningThis ? "Đang triển khai chiến dịch này" : `Kích hoạt · Trích Quỹ ${formatNumber(camp.costGold)}V`
+									})]
+								}, camp.id);
+							})
+						})]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("section", {
+						className: "space-y-3.5",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex flex-wrap items-center justify-between gap-2",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex items-center gap-2",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Users, { className: "w-5 h-5 text-emerald-700" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+									className: "text-lg font-bold text-slate-900",
+									children: "Đội Ngũ Nhân Viên Chuyên Nghiệp"
+								})]
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "text-xs text-slate-500",
+								children: "Chi phí nâng cấp tăng 1.8× mỗi cấp · Từ Lv.4 kết hợp thêm Xu DOPI"
+							})]
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "grid grid-cols-1 md:grid-cols-2 gap-4",
+							children: EMPLOYEES.map((emp) => {
+								const currentLv = user.employees?.[emp.id] || 0;
+								const isMax = currentLv >= emp.maxLevel;
+								const cost = calculateEmployeeUpgradeCost(emp.id, currentLv);
+								const canAfford = !isMax && user.gold >= cost.gold && user.dopiCoins >= cost.coins;
+								return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "bg-white rounded-2xl border border-[#DCE7D3] p-5 flex flex-col justify-between gap-4",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: "flex items-start justify-between gap-3",
+										children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "flex items-start gap-3",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+												className: "w-12 h-12 rounded-2xl bg-[#F4FAF0] border border-[#DCE7D3] flex items-center justify-center text-2xl shrink-0",
+												children: emp.emoji
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
+												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "flex items-center gap-2",
+													children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+														className: "text-base font-bold text-slate-900",
+														children: emp.name
+													}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+														className: "font-mono-num text-xs font-bold text-emerald-700",
+														children: [
+															"Lv.",
+															currentLv,
+															"/",
+															emp.maxLevel
+														]
+													})]
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+													className: "text-xs font-semibold text-amber-700 mt-0.5",
+													children: emp.role
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+													className: "text-xs text-slate-500 mt-1",
+													children: emp.description
+												})
+											] })]
+										})
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "text-xs text-slate-500 font-mono-num",
+											children: [
+												"Tài Phú: +",
+												formatNumber(emp.wealthPerLevel),
+												"/cấp"
+											]
+										}), isMax ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+											className: "inline-flex items-center gap-1 text-xs font-bold text-emerald-700",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleCheck, { className: "w-4 h-4" }), "Đạt cấp tối đa"]
+										}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+											type: "button",
+											disabled: !canAfford,
+											onClick: () => onUpgradeEmployee(emp.id),
+											className: "inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap font-mono-num",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TrendingUp, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
+												currentLv === 0 ? "Thuê" : `Nâng Lv.${currentLv + 1}`,
+												" ·",
+												" ",
+												formatNumber(cost.gold),
+												"V",
+												cost.coins > 0 ? ` + ${formatNumber(cost.coins)} Xu` : ""
+											] })]
+										})]
+									})]
+								}, emp.id);
+							})
+						})]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("section", {
+						className: "space-y-3.5",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex flex-wrap items-center justify-between gap-2",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex items-center gap-2",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Truck, { className: "w-5 h-5 text-sky-700" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h2", {
+									className: "text-lg font-bold text-slate-900",
+									children: [
+										"Showroom Xe Vận Tải & Siêu Xe DOPI (",
+										user.vehicles?.length || 0,
+										"/",
+										VEHICLES.length,
+										")"
+									]
+								})]
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "text-xs text-slate-500",
+								children: "Mỗi xe cộng dồn Tài Phú · Xe mạnh nhất áp dụng ưu đãi đơn hàng NPC"
+							})]
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4",
+							children: VEHICLES.map((v) => {
+								const owned = (user.vehicles ?? []).includes(v.id);
+								const locked = user.level < v.minLevel;
+								const canAfford = !owned && !locked && user.gold >= v.priceGold && user.dopiCoins >= v.priceCoins;
+								const isBestOwned = bonuses.bestVehicleId === v.id;
+								return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: `rounded-2xl border p-5 flex flex-col justify-between gap-4 transition-all ${owned ? "bg-[#F4FAF0] border-emerald-300" : locked ? "bg-slate-50/80 border-slate-200 opacity-75" : "bg-white border-[#DCE7D3]"}`,
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "space-y-2.5",
+										children: [
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "flex items-start justify-between gap-2",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "text-4xl leading-none",
+													children: v.emoji
+												}), owned ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+													className: "inline-flex items-center gap-1 text-xs font-bold text-emerald-700",
+													children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleCheck, { className: "w-4 h-4" }), isBestOwned ? "Đang vận hành chính" : "Đã sở hữu"]
+												}) : locked ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+													className: "inline-flex items-center gap-1 text-xs font-semibold text-slate-500",
+													children: [
+														/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, { className: "w-3.5 h-3.5" }),
+														"Yêu cầu Lv.",
+														v.minLevel
+													]
+												}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+													className: "inline-flex items-center gap-1 text-xs font-mono-num font-bold text-amber-700",
+													children: [
+														/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Sparkles, { className: "w-3.5 h-3.5" }),
+														"+",
+														formatNumber(v.wealthBonus),
+														" Tài Phú"
+													]
+												})]
+											}),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+												className: "text-base font-bold text-slate-900",
+												children: v.name
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+												className: "text-xs text-slate-500 mt-0.5",
+												children: v.description
+											})] }),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "grid grid-cols-2 gap-2 text-[11px] font-mono-num",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "rounded-lg bg-white border border-slate-200 px-2.5 py-1.5 text-emerald-700 font-semibold",
+													children: [
+														"+",
+														v.orderRewardBonusPct,
+														"% Thưởng đơn"
+													]
+												}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "rounded-lg bg-white border border-slate-200 px-2.5 py-1.5 text-sky-700 font-semibold",
+													children: [
+														"-",
+														v.orderRefreshReductionPct,
+														"% Thời gian làm mới"
+													]
+												})]
+											})
+										]
+									}), owned ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "text-xs font-mono-num text-emerald-800 font-semibold pt-2 border-t border-emerald-200/70",
+										children: [
+											"Đóng góp +",
+											formatNumber(v.wealthBonus),
+											" điểm Tài Phú"
+										]
+									}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+										type: "button",
+										disabled: !canAfford,
+										onClick: () => onBuyVehicle(v.id),
+										className: `w-full py-2.5 rounded-xl text-xs font-semibold font-mono-num transition-colors cursor-pointer ${canAfford ? "bg-amber-500 text-white hover:bg-amber-600" : "bg-slate-200 text-slate-500 cursor-not-allowed"}`,
+										children: locked ? `Mở khóa ở Lv.${v.minLevel}` : `Mua xe · ${formatNumber(v.priceGold)}V${v.priceCoins > 0 ? ` + ${formatNumber(v.priceCoins)} Xu` : ""}`
+									})]
+								}, v.id);
+							})
+						})]
+					})
+				]
+			}),
+			activeSubTab === "payroll" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "space-y-6",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "grid grid-cols-1 lg:grid-cols-12 gap-6",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "lg:col-span-7 bg-white rounded-2xl border border-[#DCE7D3] p-5 space-y-4",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex flex-wrap items-center justify-between gap-2",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex items-center gap-2",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Receipt, { className: "w-5 h-5 text-emerald-700" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h2", {
+									className: "text-lg font-bold text-slate-900",
+									children: [
+										"Bảng Kê Tiền Lương Hàng Tháng (Kỳ ",
+										currentPeriodKey,
+										")"
+									]
+								})]
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: `px-3 py-1 rounded-xl text-xs font-bold ${isCurrentMonthPaid ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"}`,
+								children: isCurrentMonthPaid ? `Đã quyết toán kỳ ${currentPeriodKey}` : `Chờ thanh toán kỳ ${currentPeriodKey}`
+							})]
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "overflow-x-auto border border-slate-200 rounded-xl",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("table", {
+								className: "w-full text-left border-collapse text-xs",
+								children: [
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("thead", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("tr", {
+										className: "bg-[#F4FAF0] text-slate-700 border-b border-slate-200",
+										children: [
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", {
+												className: "py-2.5 px-3 font-bold",
+												children: "Nhân Sự"
+											}),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", {
+												className: "py-2.5 px-3 font-bold",
+												children: "Chức Vụ"
+											}),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", {
+												className: "py-2.5 px-3 font-bold text-center",
+												children: "Cấp Bậc"
+											}),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", {
+												className: "py-2.5 px-3 font-bold text-right",
+												children: "Lương Tháng"
+											})
+										]
+									}) }),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("tbody", {
+										className: "divide-y divide-slate-100",
+										children: payrollInfo.breakdown.map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("tr", {
+											className: "hover:bg-slate-50/80",
+											children: [
+												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("td", {
+													className: "py-2.5 px-3 font-semibold text-slate-900",
+													children: [
+														item.emoji,
+														" ",
+														item.name
+													]
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", {
+													className: "py-2.5 px-3 text-slate-500",
+													children: item.role
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", {
+													className: "py-2.5 px-3 text-center font-mono-num font-bold text-emerald-700",
+													children: item.level > 0 ? `Lv.${item.level}` : "Chưa thuê"
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("td", {
+													className: "py-2.5 px-3 text-right font-mono-num font-bold text-slate-800",
+													children: [formatNumber(item.monthlySalary), " V"]
+												})
+											]
+										}, item.id))
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("tfoot", {
+										className: "bg-[#FAFDF8] border-t border-slate-200 font-mono-num text-xs",
+										children: [
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("tr", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("td", {
+												colSpan: 3,
+												className: "py-2 px-3 text-slate-500",
+												children: [
+													"Tổng quỹ lương gốc (",
+													payrollInfo.headcount,
+													" nhân sự):"
+												]
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("td", {
+												className: "py-2 px-3 text-right font-semibold text-slate-700",
+												children: [formatNumber(payrollInfo.grossSalary), " V"]
+											})] }),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("tr", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("td", {
+												colSpan: 3,
+												className: "py-2 px-3 text-emerald-700",
+												children: [
+													"Giảm trừ từ Phòng Vận Hành & HR (-",
+													payrollInfo.discountPct,
+													"%):"
+												]
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("td", {
+												className: "py-2 px-3 text-right font-semibold text-emerald-700",
+												children: [
+													"-",
+													formatNumber(payrollInfo.grossSalary - payrollInfo.netSalary),
+													" V"
+												]
+											})] }),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("tr", {
+												className: "border-t border-slate-200 text-sm",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", {
+													colSpan: 3,
+													className: "py-2.5 px-3 font-bold text-slate-900",
+													children: "Thực Chi Lương Hàng Tháng:"
+												}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("td", {
+													className: "py-2.5 px-3 text-right font-bold text-amber-700",
+													children: [formatNumber(payrollInfo.netSalary), " V"]
+												})]
+											})
+										]
+									})
+								]
+							})
+						})]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "lg:col-span-5 bg-white rounded-2xl border border-[#DCE7D3] p-5 space-y-4 flex flex-col justify-between",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "space-y-4",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "flex items-center gap-2",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(HeartHandshake, { className: "w-5 h-5 text-rose-600" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+										className: "text-lg font-bold text-slate-900",
+										children: "Chỉ Số Tinh Thần & Phúc Lợi Nhân Sự"
+									})]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "rounded-xl bg-[#FAFDF8] border border-[#DCE7D3] p-4 space-y-2.5",
+									children: [
+										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "flex items-center justify-between text-xs",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+												className: "font-semibold text-slate-700",
+												children: "Tinh thần đội ngũ (Employee Morale)"
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+												className: "font-mono-num font-bold text-emerald-700",
+												children: [ent.morale, "% / 100%"]
+											})]
+										}),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+											className: "w-full h-3 rounded-full bg-slate-200 overflow-hidden",
+											children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+												className: `h-full transition-all duration-300 ${ent.morale >= 90 ? "bg-emerald-500" : ent.morale >= 60 ? "bg-amber-500" : "bg-rose-500"}`,
+												style: { width: `${Math.min(100, Math.max(0, ent.morale))}%` }
+											})
+										}),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+											className: "text-[11px] text-slate-500",
+											children: ent.morale >= 90 ? "🔥 Tinh thần Rất Cao (>=90%): Toàn bộ chỉ số nhân viên được cộng thêm +15% hiệu suất!" : "💡 Khi tinh thần đạt từ 90% trở lên, toàn bộ nhân viên được kích hoạt +15% hiệu suất làm việc."
+										})
+									]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "rounded-xl border border-slate-200 p-3.5 flex items-center justify-between gap-3",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: "text-xs font-bold text-slate-900",
+										children: "Tự động trích Quỹ Doanh Nghiệp trả lương"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "text-[11px] text-slate-500",
+										children: [
+											"Ưu tiên trừ từ Quỹ Doanh Nghiệp (",
+											formatNumber(ent.corporateFund),
+											"V) khi đến kỳ lương"
+										]
+									})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+										type: "button",
+										onClick: onToggleAutoPaySalary,
+										className: `px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer transition-colors ${ent.autoPaySalary ? "bg-emerald-600 text-white" : "bg-slate-200 text-slate-600"}`,
+										children: ent.autoPaySalary ? "Đang BẬT" : "Đang TẮT"
+									})]
+								})
+							]
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "space-y-2.5 pt-2 border-t border-slate-100",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+								type: "button",
+								disabled: payrollInfo.netSalary <= 0 || ent.corporateFund < payrollInfo.netSalary && user.gold < payrollInfo.netSalary,
+								onClick: onPayMonthlySalary,
+								className: "w-full py-3 rounded-xl bg-emerald-600 text-white text-xs sm:text-sm font-bold font-mono-num hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-400 cursor-pointer flex items-center justify-center gap-2",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Coins, { className: "w-4 h-4" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: isCurrentMonthPaid ? `Chi Trả Trước Kỳ Lương Kế Tiếp (${formatNumber(payrollInfo.netSalary)}V · +8% Tinh thần)` : `Thanh Toán Lương Kỳ ${currentPeriodKey} (${formatNumber(payrollInfo.netSalary)}V · +10% Tinh thần)` })]
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+								type: "button",
+								disabled: ent.morale >= 100 || ent.corporateFund < 1500 && user.gold < 1500,
+								onClick: onBonusEmployeeMorale,
+								className: "w-full py-2.5 rounded-xl border border-amber-300 bg-amber-50 text-amber-900 text-xs font-bold font-mono-num hover:bg-amber-100 disabled:opacity-40 cursor-pointer",
+								children: "🎁 Thưởng Nóng Nhân Sự 1.500V (+12% Tinh thần & +60 EXP)"
+							})]
+						})]
+					})]
+				})
 			})
 		]
 	});
@@ -43845,7 +45446,216 @@ var FarmVisitModal = ({ farm, currentUser, nowMs, onClose, onWaterPlot, onFarmUp
 	});
 };
 // src/components/FriendsView.tsx
-var FriendsView = ({ user, nowMs, friendsFarms, suggestedFarms = [], incomingRequests, outgoingRequests, onSearchPlayer, onSendFriendRequest, onRespondRequest, onWaterFriendPlot, onCopyUid }) => {
+var QUICK_CHAT_PRESETS = [
+	"👋 Chào bạn! Chúc một ngày bội thu nhé!",
+	"💧 Mình vừa ghé tưới cây giúp nông trại bạn đó!",
+	"🤝 Giao lưu nông sản trên Chợ P2P không bạn ơi?",
+	"📈 Hôm nay trên Sàn Đầu Tư có mã nào ngon không?"
+];
+/**
+* Memoized Chat Panel isolated from the 1-second `nowMs` game timer to guarantee
+* zero input lag and smooth 60fps scrolling when chatting with friends.
+*/
+var FriendChatPanel = import_react.memo(({ myUid, friendsFarms, activeChatFriendUid, chatMessages, onSelectChatFriend, onSendChatMessage }) => {
+	const [draftText, setDraftText] = (0, import_react.useState)("");
+	const [sending, setSending] = (0, import_react.useState)(false);
+	const messagesEndRef = (0, import_react.useRef)(null);
+	const activeFriend = friendsFarms.find((f) => f.uid === activeChatFriendUid) || friendsFarms[0] || null;
+	(0, import_react.useEffect)(() => {
+		if (!activeChatFriendUid && friendsFarms.length > 0) onSelectChatFriend(friendsFarms[0].uid);
+	}, [
+		activeChatFriendUid,
+		friendsFarms,
+		onSelectChatFriend
+	]);
+	(0, import_react.useEffect)(() => {
+		messagesEndRef.current?.scrollIntoView({
+			behavior: "smooth",
+			block: "nearest"
+		});
+	}, [chatMessages.length, activeFriend?.uid]);
+	const handleSend = async (textToSend) => {
+		const cleaned = textToSend.trim();
+		if (!cleaned || !activeFriend || sending) return;
+		setSending(true);
+		setDraftText("");
+		try {
+			await onSendChatMessage(activeFriend.uid, cleaned);
+		} finally {
+			setSending(false);
+		}
+	};
+	const handleFormSubmit = async (e) => {
+		e.preventDefault();
+		await handleSend(draftText);
+	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("section", {
+		id: "friend-chat-panel",
+		className: "bg-white rounded-2xl border border-[#DCE7D3] overflow-hidden shadow-xs",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			className: "px-5 py-4 bg-gradient-to-r from-[#F4FAF0] to-[#ECF6E5] border-b border-[#DCE7D3] flex flex-wrap items-center justify-between gap-3",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex items-center gap-2.5",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MessageCircle, { className: "w-4 h-4" })
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "flex items-center gap-2",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+						className: "text-base font-bold text-slate-900",
+						children: "Trò Chuyện Bạn Bè Trực Tuyến (Zero-Lag Realtime)"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+						className: "inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[10px] font-bold",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" }), "Mượt 60FPS"]
+					})]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+					className: "text-xs text-slate-500",
+					children: "Trao đổi mua bán P2P, nhờ tưới cây hoặc bàn chiến thuật đầu tư cổ phiếu ngay trong game."
+				})] })]
+			})
+		}), friendsFarms.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			className: "p-8 text-center text-sm text-slate-500",
+			children: "Hãy kết bạn với ít nhất 1 nông trại để bắt đầu trò chuyện trực tuyến!"
+		}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "grid grid-cols-1 md:grid-cols-12",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "md:col-span-4 border-b md:border-b-0 md:border-r border-[#E2ECDA] bg-[#FAFDF8] p-3 space-y-1.5 max-h-[420px] overflow-y-auto",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-400",
+					children: [
+						"Chọn Bạn Bè (",
+						friendsFarms.length,
+						")"
+					]
+				}), friendsFarms.map((friend) => {
+					const isSelected = activeFriend?.uid === friend.uid;
+					return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+						type: "button",
+						onClick: () => onSelectChatFriend(friend.uid),
+						className: `w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left transition-all cursor-pointer ${isSelected ? "bg-emerald-600 text-white shadow-xs" : "hover:bg-emerald-50/80 text-slate-800"}`,
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(VipAvatarFrame, {
+							avatarEmoji: friend.avatarEmoji || "🧑‍🌾",
+							vipLevel: friend.vipLevel || 0,
+							size: "sm"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "min-w-0 flex-1",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+								className: `text-xs font-bold truncate ${isSelected ? "text-white" : "text-slate-900"}`,
+								children: friend.businessName || "Nông Trại DOPI"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: `text-[11px] truncate ${isSelected ? "text-emerald-100" : "text-slate-500"}`,
+								children: [
+									"Lv.",
+									friend.level || 1,
+									" · VIP ",
+									friend.vipLevel || 0
+								]
+							})]
+						})]
+					}, friend.uid);
+				})]
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "md:col-span-8 flex flex-col h-[420px]",
+				children: [
+					activeFriend && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "px-4 py-2.5 border-b border-slate-100 flex items-center justify-between gap-2 bg-white",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex items-center gap-2.5 min-w-0",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(VipAvatarFrame, {
+								avatarEmoji: activeFriend.avatarEmoji || "🧑‍🌾",
+								vipLevel: activeFriend.vipLevel || 0,
+								size: "sm"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "min-w-0",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+									className: "text-sm font-bold text-slate-900 truncate",
+									children: activeFriend.businessName
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "text-[11px] text-emerald-700 font-medium",
+									children: ["Đang kết nối kênh chat riêng · Lv.", activeFriend.level]
+								})]
+							})]
+						})
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "flex-1 p-4 overflow-y-auto space-y-3 bg-[#FCFDFB]",
+						children: [chatMessages.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "h-full flex flex-col items-center justify-center text-center px-4 text-xs text-slate-400 space-y-1",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MessageCircle, { className: "w-7 h-7 text-slate-300 mb-1" }),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+									className: "font-semibold text-slate-600",
+									children: [
+										"Chưa có tin nhắn nào với ",
+										activeFriend?.businessName,
+										"."
+									]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Chọn câu chào nhanh bên dưới hoặc nhập tin nhắn để bắt đầu!" })
+							]
+						}) : chatMessages.map((msg) => {
+							const isMine = msg.senderUid === myUid;
+							const timeStr = new Date(msg.createdAt).toLocaleTimeString("vi-VN", {
+								hour: "2-digit",
+								minute: "2-digit"
+							});
+							return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: `flex flex-col ${isMine ? "items-end" : "items-start"}`,
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "flex items-center gap-1.5 mb-1 px-1",
+									children: [!isMine && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+										className: "text-[11px] font-bold text-slate-700",
+										children: [
+											msg.senderAvatar || "🧑‍🌾",
+											" ",
+											msg.senderName
+										]
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										className: "text-[10px] text-slate-400 font-mono-num",
+										children: timeStr
+									})]
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+									className: `max-w-[82%] px-3.5 py-2 rounded-2xl text-xs sm:text-sm leading-relaxed break-words ${isMine ? "bg-emerald-600 text-white rounded-br-xs" : "bg-white border border-[#DCE7D3] text-slate-800 rounded-bl-xs"}`,
+									children: msg.text
+								})]
+							}, msg.id);
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { ref: messagesEndRef })]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "px-3 py-1.5 bg-[#F7FAF3] border-t border-[#E2ECDA] flex items-center gap-1.5 overflow-x-auto no-scrollbar",
+						children: QUICK_CHAT_PRESETS.map((preset) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+							type: "button",
+							disabled: !activeFriend || sending,
+							onClick: () => handleSend(preset),
+							className: "px-2.5 py-1 rounded-lg bg-white border border-[#DCE7D3] hover:border-emerald-400 hover:bg-emerald-50 text-[11px] font-medium text-slate-700 whitespace-nowrap transition-colors cursor-pointer shrink-0",
+							children: preset
+						}, preset))
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("form", {
+						onSubmit: handleFormSubmit,
+						className: "p-3 bg-white border-t border-[#DCE7D3] flex items-center gap-2",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
+							type: "text",
+							value: draftText,
+							onChange: (e) => setDraftText(e.target.value),
+							maxLength: 280,
+							placeholder: activeFriend ? `Nhắn tin cho ${activeFriend.businessName}...` : "Chọn một người bạn để nhắn tin...",
+							disabled: !activeFriend,
+							"aria-label": "Nhập nội dung tin nhắn chat bạn bè",
+							className: "flex-1 px-3.5 py-2 rounded-xl border border-slate-200 bg-[#FAFDF8] text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+							type: "submit",
+							disabled: !activeFriend || !draftText.trim() || sending,
+							className: "inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs sm:text-sm font-semibold hover:bg-emerald-700 disabled:opacity-40 cursor-pointer shrink-0",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Send, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Gửi" })]
+						})]
+					})
+				]
+			})]
+		})]
+	});
+});
+var FriendsView = ({ user, nowMs, friendsFarms, suggestedFarms = [], incomingRequests, outgoingRequests, chatMessages, activeChatFriendUid, onSelectChatFriend, onSendChatMessage, onSearchPlayer, onSendFriendRequest, onRespondRequest, onWaterFriendPlot, onCopyUid }) => {
 	const [searchInput, setSearchInput] = (0, import_react.useState)("");
 	const [searching, setSearching] = (0, import_react.useState)(false);
 	const [searchResult, setSearchResult] = (0, import_react.useState)(null);
@@ -43890,6 +45700,13 @@ var FriendsView = ({ user, nowMs, friendsFarms, suggestedFarms = [], incomingReq
 			setProcessingReqId(null);
 		}
 	};
+	const handleOpenChatWithFriend = (friendUid) => {
+		onSelectChatFriend(friendUid);
+		document.getElementById("friend-chat-panel")?.scrollIntoView({
+			behavior: "smooth",
+			block: "nearest"
+		});
+	};
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "space-y-6",
 		children: [
@@ -43897,7 +45714,7 @@ var FriendsView = ({ user, nowMs, friendsFarms, suggestedFarms = [], incomingReq
 				className: "bg-white rounded-2xl border border-[#DCE7D3] p-5 flex flex-wrap items-center justify-between gap-4",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", {
 					className: "text-xl sm:text-2xl font-bold text-slate-900",
-					children: "Bạn Bè & Ghé Thăm Nông Trại"
+					children: "Bạn Bè, Chat Trực Tuyến & Ghé Thăm Nông Trại"
 				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
 					className: "text-xs text-slate-500 mt-1",
 					children: [
@@ -43905,7 +45722,7 @@ var FriendsView = ({ user, nowMs, friendsFarms, suggestedFarms = [], incomingReq
 						20,
 						" Vàng/lần (tối đa ",
 						5,
-						" lần/ngày)."
+						" lần/ngày) và trò chuyện thời gian thực không giật lag."
 					]
 				})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 					className: "flex flex-wrap items-center gap-3 text-xs",
@@ -43931,6 +45748,14 @@ var FriendsView = ({ user, nowMs, friendsFarms, suggestedFarms = [], incomingReq
 						})]
 					})]
 				})]
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FriendChatPanel, {
+				myUid: user.uid,
+				friendsFarms,
+				activeChatFriendUid,
+				chatMessages,
+				onSelectChatFriend,
+				onSendChatMessage
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 				className: "grid grid-cols-1 lg:grid-cols-12 gap-6 items-start",
@@ -44157,11 +45982,19 @@ var FriendsView = ({ user, nowMs, friendsFarms, suggestedFarms = [], incomingReq
 											})
 										]
 									})]
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
-									type: "button",
-									onClick: () => setVisitingFarm(friend),
-									className: "w-full inline-flex items-center justify-center gap-1.5 py-2 rounded-xl bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 transition-colors cursor-pointer",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(House, { className: "w-3.5 h-3.5" }), "Ghé thăm nông trại"]
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "grid grid-cols-2 gap-2",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+										type: "button",
+										onClick: () => handleOpenChatWithFriend(friend.uid),
+										className: "inline-flex items-center justify-center gap-1.5 py-2 rounded-xl border border-emerald-300 bg-white text-emerald-800 text-xs font-semibold hover:bg-emerald-50 transition-colors cursor-pointer",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MessageCircle, { className: "w-3.5 h-3.5" }), "Nhắn tin"]
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+										type: "button",
+										onClick: () => setVisitingFarm(friend),
+										className: "inline-flex items-center justify-center gap-1.5 py-2 rounded-xl bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 transition-colors cursor-pointer",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(House, { className: "w-3.5 h-3.5" }), "Ghé thăm"]
+									})]
 								})]
 							}, friend.uid);
 						})
@@ -44184,49 +46017,44 @@ var ALL_TABS = [
 	{
 		id: "farm",
 		label: "Nông Trại",
-		description: "Gieo hạt, bón phân & thu hoạch",
+		description: "Gieo hạt, bón phân & thu hoạch nông sản",
 		icon: Sprout,
-		group: "production",
-		quickPin: true
+		group: "production"
 	},
 	{
 		id: "factory",
 		label: "Nhà Máy & Đơn",
 		description: "Chế biến bánh, cà phê, sữa & giao đơn NPC",
 		icon: Factory,
-		group: "production",
-		quickPin: true
+		group: "production"
 	},
 	{
 		id: "shop",
 		label: "Cửa Hàng & Kho",
-		description: "Mua vật phẩm, báu vật & lọc kho lưu trữ",
+		description: "Mua vật phẩm, báu vật & bán nhanh nông sản",
 		icon: ShoppingBag,
-		group: "production",
-		quickPin: true
+		group: "production"
 	},
 	{
 		id: "business",
 		label: "Doanh Nghiệp",
-		description: "Thuê nhân sự tự động & sắm đội xe vận tải",
+		description: "Quản lý quỹ, hợp đồng sỉ, chiến dịch & lương tháng",
 		icon: Briefcase,
 		group: "production"
 	},
 	{
 		id: "market",
 		label: "Chợ P2P",
-		description: "Mua bán vật phẩm tự do giữa người chơi",
+		description: "Mua bán nông sản tự do giữa người chơi",
 		icon: Store,
-		group: "finance",
-		quickPin: true
+		group: "finance"
 	},
 	{
 		id: "invest",
 		label: "Đầu Tư",
 		description: "Sàn chứng khoán 6 mã ngành & gọi vốn IPO",
 		icon: TrendingUp,
-		group: "finance",
-		quickPin: true
+		group: "finance"
 	},
 	{
 		id: "events",
@@ -44237,8 +46065,8 @@ var ALL_TABS = [
 	},
 	{
 		id: "friends",
-		label: "Bạn Bè",
-		description: "Kết bạn, ghé thăm & tưới cây nhận Vàng",
+		label: "Bạn Bè & Chat",
+		description: "Kết bạn, trò chuyện trực tuyến & tưới cây",
 		icon: Users,
 		group: "community"
 	},
@@ -44252,14 +46080,14 @@ var ALL_TABS = [
 	{
 		id: "quests",
 		label: "Nhiệm Vụ & VIP",
-		description: "Nhiệm vụ ngày, thành tựu & đặc quyền VIP",
+		description: "Nhiệm vụ ngày, thành tựu & đặc quyền VIP 1–20",
 		icon: Award,
 		group: "community"
 	},
 	{
 		id: "guide",
 		label: "Hướng Dẫn Chơi",
-		description: "Cẩm nang tân thủ & bí quyết làm giàu",
+		description: "Cẩm nang tân thủ & bí quyết vận hành doanh nghiệp",
 		icon: BookOpen,
 		group: "support"
 	},
@@ -44296,9 +46124,10 @@ var HudHeader = ({ user, activeTab, isAdmin, pendingFriendRequests, claimableQue
 	const [draftAvatar, setDraftAvatar] = (0, import_react.useState)(user.profile.avatarEmoji);
 	const [savingProfile, setSavingProfile] = (0, import_react.useState)(false);
 	const expNeeded = getExpRequiredForLevel(user.level);
-	const expPct = Math.min(100, Math.round(user.exp / expNeeded * 100));
+	const expPct = user.level >= 999 ? 100 : Math.min(100, Math.round(user.exp / Math.max(1, expNeeded) * 100));
 	const usedStorage = getTotalInventoryCount(user.inventory);
 	const storageFull = usedStorage >= user.storageCapacity;
+	const corporateFund = user.enterprise?.corporateFund ?? 0;
 	const getBadgeCount = (tabId) => {
 		if (tabId === "friends") return pendingFriendRequests;
 		if (tabId === "quests") return claimableQuestsCount;
@@ -44308,8 +46137,6 @@ var HudHeader = ({ user, activeTab, isAdmin, pendingFriendRequests, claimableQue
 	const totalMenuBadges = pendingFriendRequests + claimableQuestsCount + claimableEventsCount;
 	const activeTabDef = ALL_TABS.find((t) => t.id === activeTab) ?? ALL_TABS[0];
 	const ActiveIcon = activeTabDef.icon;
-	const quickTabs = ALL_TABS.filter((t) => t.quickPin);
-	const isCurrentInQuick = quickTabs.some((t) => t.id === activeTab);
 	const handleSaveProfile = async (e) => {
 		e.preventDefault();
 		const cleaned = draftName.trim();
@@ -44329,33 +46156,40 @@ var HudHeader = ({ user, activeTab, isAdmin, pendingFriendRequests, claimableQue
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("header", {
 		className: "bg-white border-b border-[#DCE7D3] shadow-[0_1px_2px_rgba(20,50,20,0.04)] sticky top-0 z-30",
 		children: [
-			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 				className: "max-w-7xl mx-auto px-4 sm:px-6",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 					className: "py-2.5 flex flex-wrap items-center justify-between gap-3",
 					children: [
 						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "flex items-center gap-2.5 sm:gap-3 min-w-0",
+							className: "flex items-center gap-2 sm:gap-2.5 min-w-0",
 							children: [
 								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
 									type: "button",
 									onClick: () => setMenuOpen((prev) => !prev),
 									"aria-expanded": menuOpen,
 									"aria-label": "Mở menu điều hướng",
-									className: `relative inline-flex items-center gap-2 px-3 py-2 rounded-xl border text-xs sm:text-sm font-bold transition-colors cursor-pointer shrink-0 ${menuOpen ? "bg-emerald-700 text-white border-emerald-700" : "bg-[#F4FAF0] text-emerald-950 border-[#CDE0C1] hover:bg-emerald-100/70"}`,
+									className: `relative inline-flex items-center gap-2 px-3 py-2 rounded-xl border text-xs sm:text-sm font-bold transition-colors cursor-pointer shrink-0 ${menuOpen ? "bg-emerald-700 text-white border-emerald-700 shadow-xs" : "bg-[#F4FAF0] text-emerald-950 border-[#CDE0C1] hover:bg-emerald-100/70"}`,
 									children: [
 										menuOpen ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "w-4 h-4 shrink-0" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Menu, { className: "w-4 h-4 shrink-0" }),
 										/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Menu" }),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+											className: `hidden sm:inline-flex items-center gap-1 pl-2 ml-0.5 border-l text-xs font-semibold ${menuOpen ? "border-emerald-500 text-emerald-50" : "border-emerald-300/80 text-emerald-800"}`,
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ActiveIcon, { className: "w-3.5 h-3.5 shrink-0" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+												className: "max-w-[115px] truncate",
+												children: activeTabDef.label
+											})]
+										}),
 										/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronDown, { className: `w-3.5 h-3.5 transition-transform ${menuOpen ? "rotate-180" : ""}` }),
 										totalMenuBadges > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-											className: "font-mono-num text-[11px] font-bold px-1.5 py-0.2 rounded-md bg-rose-600 text-white",
+											className: "font-mono-num text-[11px] font-bold px-1.5 py-0.5 rounded-md bg-rose-600 text-white leading-none",
 											children: totalMenuBadges
 										})
 									]
 								}),
 								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(BrandCrest, {
-									size: 36,
-									className: "hidden md:block shrink-0"
+									size: 34,
+									className: "hidden xl:block shrink-0"
 								}),
 								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(VipAvatarFrame, {
 									avatarEmoji: user.profile.avatarEmoji,
@@ -44367,7 +46201,7 @@ var HudHeader = ({ user, activeTab, isAdmin, pendingFriendRequests, claimableQue
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 										className: "flex items-center gap-1.5",
 										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-											className: "font-display font-bold text-sm sm:text-base text-slate-900 truncate max-w-[135px] sm:max-w-[200px]",
+											className: "font-display font-bold text-sm sm:text-base text-slate-900 truncate max-w-[130px] sm:max-w-[185px]",
 											children: user.businessName
 										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
 											type: "button",
@@ -44385,24 +46219,20 @@ var HudHeader = ({ user, activeTab, isAdmin, pendingFriendRequests, claimableQue
 										children: [
 											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
 												className: "font-semibold text-emerald-700 font-mono-num",
+												title: `Cấp độ tối đa: Lv.999 · VIP tối đa: VIP 20`,
 												children: ["Lv.", user.level]
 											}),
 											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 												className: "w-16 sm:w-24 h-1.5 bg-slate-100 rounded-full overflow-hidden",
-												title: `EXP: ${user.exp} / ${expNeeded}`,
+												title: user.level >= 999 ? `Đã đạt cấp tối đa Lv.999` : `EXP: ${formatNumber(user.exp)} / ${formatNumber(expNeeded)} (${expPct}%)`,
 												children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 													className: "h-full bg-emerald-500 rounded-full transition-all duration-300",
 													style: { width: `${expPct}%` }
 												})
 											}),
-											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-												className: "hidden xl:inline font-mono-num text-[11px]",
-												children: [
-													user.exp,
-													"/",
-													expNeeded,
-													" EXP"
-												]
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+												className: "hidden 2xl:inline font-mono-num text-[11px]",
+												children: user.level >= 999 ? "MAX LV.999" : `${formatNumber(user.exp)}/${formatNumber(expNeeded)} EXP`
 											})
 										]
 									})]
@@ -44410,7 +46240,7 @@ var HudHeader = ({ user, activeTab, isAdmin, pendingFriendRequests, claimableQue
 							]
 						}),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "flex items-center gap-4 sm:gap-6 text-sm order-3 lg:order-2 w-full lg:w-auto justify-between lg:justify-center border-t lg:border-t-0 border-slate-100 pt-2 lg:pt-0",
+							className: "flex items-center gap-3 sm:gap-5 text-sm order-3 lg:order-2 w-full lg:w-auto justify-between lg:justify-center border-t lg:border-t-0 border-slate-100 pt-2 lg:pt-0",
 							children: [
 								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 									className: "flex items-center gap-2",
@@ -44440,9 +46270,27 @@ var HudHeader = ({ user, activeTab, isAdmin, pendingFriendRequests, claimableQue
 										children: formatNumber(user.dopiCoins)
 									})] })]
 								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-									className: "flex items-center gap-2",
-									title: "Sức chứa kho nông sản",
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+									type: "button",
+									onClick: () => handlePickTab("business"),
+									title: "Quỹ Vận Hành Doanh Nghiệp (Nhấn để quản lý Quỹ & Lương)",
+									className: "hidden sm:flex items-center gap-2 text-left hover:opacity-85 transition-opacity cursor-pointer",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										className: "w-7 h-7 rounded-lg bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-700 shrink-0",
+										children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Building2, { className: "w-4 h-4" })
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: "text-[11px] text-slate-500 leading-none",
+										children: "Quỹ DN"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: "font-mono-num font-bold text-sky-800 leading-tight",
+										children: formatNumber(corporateFund)
+									})] })]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+									type: "button",
+									onClick: () => handlePickTab("shop"),
+									title: "Sức chứa kho nông sản (Nhấn để mở Kho & Bán nhanh)",
+									className: "flex items-center gap-2 text-left hover:opacity-85 transition-opacity cursor-pointer",
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 										className: `w-7 h-7 rounded-lg border flex items-center justify-center shrink-0 ${storageFull ? "bg-rose-50 border-rose-200 text-rose-600" : "bg-emerald-50 border-emerald-200 text-emerald-700"}`,
 										children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Package, { className: "w-4 h-4" })
@@ -44496,7 +46344,7 @@ var HudHeader = ({ user, activeTab, isAdmin, pendingFriendRequests, claimableQue
 											children: "Admin"
 										}),
 										pendingTopupCount > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-											className: "font-mono-num text-[11px] font-bold px-1.5 py-0.2 rounded-md bg-rose-600 text-white",
+											className: "font-mono-num text-[11px] font-bold px-1.5 py-0.5 rounded-md bg-rose-600 text-white leading-none",
 											children: pendingTopupCount
 										})
 									]
@@ -44512,82 +46360,37 @@ var HudHeader = ({ user, activeTab, isAdmin, pendingFriendRequests, claimableQue
 							]
 						})
 					]
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("nav", {
-					"aria-label": "Điều hướng chính",
-					className: "flex items-center justify-between gap-2 pb-2 pt-0.5 overflow-x-auto",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "flex items-center gap-1.5",
-						children: [quickTabs.map((tab) => {
-							const Icon = tab.icon;
-							const active = activeTab === tab.id;
-							return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
-								type: "button",
-								role: "tab",
-								"aria-selected": active,
-								onClick: () => handlePickTab(tab.id),
-								className: `inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap shrink-0 transition-colors cursor-pointer ${active ? "bg-emerald-600 text-white shadow-xs" : "text-slate-600 hover:bg-[#EDF5E7] hover:text-emerald-900"}`,
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Icon, { className: "w-3.5 h-3.5 shrink-0" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: tab.label })]
-							}, tab.id);
-						}), !isCurrentInQuick && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
-							type: "button",
-							role: "tab",
-							"aria-selected": true,
-							onClick: () => setMenuOpen(true),
-							className: "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap shrink-0 bg-emerald-600 text-white shadow-xs cursor-pointer",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ActiveIcon, { className: "w-3.5 h-3.5 shrink-0" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: activeTabDef.label })]
-						})]
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "hidden md:flex items-center gap-1.5 shrink-0",
-						children: [
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
-								type: "button",
-								role: "tab",
-								"aria-selected": activeTab === "guide",
-								onClick: () => handlePickTab("guide"),
-								className: `inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${activeTab === "guide" ? "bg-emerald-600 text-white" : "text-slate-600 hover:bg-[#EDF5E7] hover:text-emerald-900"}`,
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(BookOpen, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Hướng Dẫn" })]
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
-								type: "button",
-								role: "tab",
-								"aria-selected": activeTab === "donate",
-								onClick: () => handlePickTab("donate"),
-								className: `inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${activeTab === "donate" ? "bg-rose-600 text-white" : "text-rose-700 bg-rose-50/70 hover:bg-rose-100"}`,
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Heart, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Donate" })]
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
-								type: "button",
-								onClick: () => setMenuOpen((prev) => !prev),
-								className: "inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-emerald-800 bg-[#F4FAF0] border border-[#DCE7D3] hover:bg-emerald-100/70 cursor-pointer",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Menu, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Tất cả (12)" })]
-							})
-						]
-					})]
-				})]
+				})
 			}),
 			menuOpen && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				className: "fixed inset-0 z-40 bg-slate-900/30",
+				className: "fixed inset-0 z-40 bg-slate-900/35",
 				onClick: () => setMenuOpen(false)
 			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 				role: "dialog",
 				"aria-label": "Danh mục tính năng DOPI TOWNE",
 				className: "relative z-50 bg-white border-t border-b border-[#DCE7D3] shadow-xl",
 				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "max-w-7xl mx-auto px-4 sm:px-6 py-5 space-y-5 max-h-[80vh] overflow-y-auto",
+					className: "max-w-7xl mx-auto px-4 sm:px-6 py-5 space-y-5 max-h-[82vh] overflow-y-auto",
 					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "flex items-center justify-between border-b border-slate-100 pb-3",
+						className: "flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3",
 						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
 							className: "text-base font-bold text-slate-900",
-							children: "Danh Mục Hệ Thống DOPI TOWNE"
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+							children: "Danh Mục Hệ Thống DOPI TOWNE (12 Phân Khu)"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
 							className: "text-xs text-slate-500",
-							children: "Chọn nhanh phân khu chức năng bạn muốn truy cập"
-						})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+							children: [
+								"Cấp tối đa Lv.",
+								999,
+								" · Đặc quyền VIP 1–",
+								20,
+								" · Chọn phân khu bạn muốn điều hành"
+							]
+						})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
 							type: "button",
 							onClick: () => setMenuOpen(false),
 							"aria-label": "Đóng menu",
-							className: "p-2 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-100 cursor-pointer",
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "w-4 h-4" })
+							className: "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "w-4 h-4" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Đóng" })]
 						})]
 					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 						className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5",
@@ -45273,7 +47076,7 @@ var InvestmentView = ({ user, nowMs, p2pCompanies, myP2PCompany, onBuyNpcStock, 
 						" ",
 						"(VIP ",
 						user.vipLevel,
-						") · Khóa lệnh T+30 phút sau khi mua"
+						") · Khớp lệnh T+0 mua bán tức thì"
 					]
 				})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 					role: "tablist",
@@ -47236,7 +49039,7 @@ var QuestsVipView = ({ user, onClaimDailyQuest, onClaimAchievement, onOpenRedeem
 							type: "button",
 							onClick: () => setSubTab("vip"),
 							className: `inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${subTab === "vip" ? "bg-white text-violet-900 shadow-xs" : "text-slate-600 hover:text-slate-900"}`,
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Crown, { className: "w-3.5 h-3.5" }), "Bảng VIP 1–10"]
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Crown, { className: "w-3.5 h-3.5" }), "Bảng VIP 1–20"]
 						})
 					]
 				})]
@@ -47420,7 +49223,7 @@ var QuestsVipView = ({ user, onClaimDailyQuest, onClaimAchievement, onOpenRedeem
 										children: [formatNumber(user.totalRechargedCoins), " Xu"]
 									}),
 									" ",
-									nextVip ? `· Cần thêm ${formatNumber(Math.max(0, nextVip.requiredCoins - user.totalRechargedCoins))} Xu để lên VIP ${nextVip.level}` : "· Bạn đã chạm đỉnh VIP 10!"
+									nextVip ? `· Cần thêm ${formatNumber(Math.max(0, nextVip.requiredCoins - user.totalRechargedCoins))} Xu để lên VIP ${nextVip.level}` : "· Bạn đã chạm đỉnh VIP 20!"
 								]
 							})
 						]
@@ -48133,7 +49936,7 @@ var TreasureShopCard = import_react.memo(({ treasure, owned, playerLevel, gold, 
 	});
 });
 TreasureShopCard.displayName = "TreasureShopCard";
-var ShopStorageView = ({ user, nowMs, onBuyBooster, onBuyTreasure, onActivateUtilityItem, onExpandStorage, onSellToNpc, onGoToMarketWithItem }) => {
+var ShopStorageView = ({ user, nowMs, onBuyBooster, onBuyTreasure, onActivateUtilityItem, onExpandStorage, onSellToNpc, onBulkSellToNpc, onGoToMarketWithItem }) => {
 	const [expanding, setExpanding] = (0, import_react.useState)(false);
 	const [selectedGroup, setSelectedGroup] = (0, import_react.useState)("all");
 	const [selectedChildItem, setSelectedChildItem] = (0, import_react.useState)("ALL");
@@ -48144,6 +49947,10 @@ var ShopStorageView = ({ user, nowMs, onBuyBooster, onBuyTreasure, onActivateUti
 	const surge = getHourlyMarketSurge(nowMs);
 	const storageHasRoom = usedStorage + 1 <= user.storageCapacity;
 	const inventoryEntries = (0, import_react.useMemo)(() => Object.entries(user.inventory).filter(([itemId, qty]) => qty > 0 && Boolean(ITEM_CATALOG[itemId])), [user.inventory]);
+	const ownedCropsAndProducts = (0, import_react.useMemo)(() => inventoryEntries.filter(([itemId]) => {
+		const cat = ITEM_CATALOG[itemId]?.category;
+		return cat === "crop" || cat === "product";
+	}), [inventoryEntries]);
 	const groupUnitCounts = (0, import_react.useMemo)(() => {
 		const counts = { all: usedStorage };
 		for (const grp of STORAGE_CATEGORY_GROUPS) counts[grp.id] = 0;
@@ -48177,10 +49984,11 @@ var ShopStorageView = ({ user, nowMs, onBuyBooster, onBuyTreasure, onActivateUti
 			return {
 				group: grp,
 				items,
-				totalQty: items.reduce((sum, [, qty]) => sum + qty, 0)
+				totalQty: items.reduce((sum, [, qty]) => sum + qty, 0),
+				totalValue: items.reduce((sum, [itemId, qty]) => sum + getItemSellPriceWithSurge(itemId, surge) * qty, 0)
 			};
 		}).filter((section) => section.items.length > 0);
-	}, [filteredEntries]);
+	}, [filteredEntries, surge]);
 	const toggleGroupCollapse = (groupId) => {
 		setCollapsedGroups((prev) => ({
 			...prev,
@@ -48210,9 +50018,10 @@ var ShopStorageView = ({ user, nowMs, onBuyBooster, onBuyTreasure, onActivateUti
 		if (!item) return null;
 		const isSurging = surge.itemId === itemId;
 		const livePrice = getItemSellPriceWithSurge(itemId, surge);
+		const stackValue = livePrice * qty;
 		const isActivatableUtility = itemId === "auto_sprinkler_2h" || itemId === "premium_storage_card";
 		return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			className: "py-3 first:pt-0 last:pb-0 flex flex-wrap items-center justify-between gap-3",
+			className: "py-3 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3",
 			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 				className: "flex items-center gap-3 min-w-0",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
@@ -48230,20 +50039,32 @@ var ShopStorageView = ({ user, nowMs, onBuyBooster, onBuyTreasure, onActivateUti
 							children: ["×", qty]
 						})]
 					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "flex items-center gap-1.5 text-xs text-slate-500 font-mono-num",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
-							"Giá thu mua: ",
-							formatNumber(livePrice),
-							" V"
-						] }), isSurging && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-							className: "inline-flex items-center gap-0.5 text-amber-700 font-sans font-semibold",
-							children: [
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TrendingUp, { className: "w-3 h-3" }),
-								"+",
-								surge.bonusPercent,
-								"%"
-							]
-						})]
+						className: "flex flex-wrap items-center gap-1.5 text-xs text-slate-500 font-mono-num",
+						children: [
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
+								"Đơn giá: ",
+								formatNumber(livePrice),
+								" V"
+							] }),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "·" }),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+								className: "text-amber-700 font-semibold",
+								children: [
+									"Tổng: ",
+									formatNumber(stackValue),
+									" V"
+								]
+							}),
+							isSurging && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+								className: "inline-flex items-center gap-0.5 text-amber-700 font-sans font-semibold",
+								children: [
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TrendingUp, { className: "w-3 h-3" }),
+									"+",
+									surge.bonusPercent,
+									"%"
+								]
+							})
+						]
 					})]
 				})]
 			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
@@ -48258,14 +50079,20 @@ var ShopStorageView = ({ user, nowMs, onBuyBooster, onBuyTreasure, onActivateUti
 					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
 						type: "button",
 						onClick: () => onSellToNpc(itemId, 1),
-						className: "inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-amber-200 bg-amber-50 text-amber-900 text-xs font-semibold hover:bg-amber-100 cursor-pointer whitespace-nowrap",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Coins, { className: "w-3.5 h-3.5" }), "Bán 1"]
+						className: "inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-100 cursor-pointer whitespace-nowrap",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Coins, { className: "w-3.5 h-3.5 text-amber-600" }), "Bán 1"]
 					}),
-					qty > 1 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
 						type: "button",
-						onClick: () => onSellToNpc(itemId, qty),
-						className: "px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-100 cursor-pointer whitespace-nowrap",
-						children: "Bán hết"
+						onClick: () => onBulkSellToNpc({ [itemId]: qty }, `nông sản loại ${item.name}`),
+						className: "inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-amber-500 text-white text-xs font-semibold hover:bg-amber-600 cursor-pointer whitespace-nowrap shadow-2xs",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Zap, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
+							"Nhanh chóng bán tất cả ",
+							item.name,
+							" (×",
+							qty,
+							")"
+						] })]
 					}),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
 						type: "button",
@@ -48504,11 +50331,50 @@ var ShopStorageView = ({ user, nowMs, onBuyBooster, onBuyTreasure, onActivateUti
 					]
 				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
 					className: "text-xs text-slate-500 mt-0.5",
-					children: "Chọn danh mục lớn (ví dụ: Trái cây, Lương thực, Bánh & Đồ uống) để lọc nhanh các sản phẩm con bên trong."
+					children: "Dọn kho 1 chạm với nút “Nhanh chóng bán tất cả nông sản loại X” mà không cần nhập số lượng thủ công."
 				})] })
 			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 				className: "bg-white rounded-2xl border border-[#DCE7D3] p-5 space-y-4",
 				children: [
+					ownedCropsAndProducts.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "rounded-xl bg-[#FFFDF5] border border-amber-200 p-3.5 space-y-2.5",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex items-center justify-between gap-2",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex items-center gap-1.5 text-xs font-bold text-amber-950",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Zap, { className: "w-4 h-4 text-amber-600 shrink-0" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Dọn Kho Nhanh Theo Từng Loại Nông Sản (1 Chạm)" })]
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+								className: "text-[11px] text-amber-800 font-mono-num",
+								children: [ownedCropsAndProducts.length, " loại sẵn sàng"]
+							})]
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "flex flex-wrap gap-1.5",
+							children: ownedCropsAndProducts.map(([itemId, qty]) => {
+								const item = ITEM_CATALOG[itemId];
+								if (!item) return null;
+								const val = getItemSellPriceWithSurge(itemId, surge) * qty;
+								return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+									type: "button",
+									onClick: () => onBulkSellToNpc({ [itemId]: qty }, `nông sản loại ${item.name}`),
+									className: "inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-amber-100/90 hover:bg-amber-500 text-amber-950 hover:text-white border border-amber-300 text-xs font-semibold transition-colors cursor-pointer",
+									children: [
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: item.emoji }),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: ["Nhanh chóng bán tất cả nông sản loại ", item.name] }),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+											className: "font-mono-num text-[11px] font-bold",
+											children: [
+												"(×",
+												qty,
+												" · +",
+												formatNumber(val),
+												"V)"
+											]
+										})
+									]
+								}, `quick_sell_${itemId}`);
+							})
+						})]
+					}),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 						className: "relative",
 						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Search, { className: "w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
@@ -48638,16 +50504,18 @@ var ShopStorageView = ({ user, nowMs, onBuyBooster, onBuyTreasure, onActivateUti
 						})]
 					}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 						className: "space-y-3",
-						children: groupedFilteredSections.map(({ group, items, totalQty }) => {
+						children: groupedFilteredSections.map(({ group, items, totalQty, totalValue }) => {
 							const isCollapsed = selectedGroup === "all" && Boolean(collapsedGroups[group.id]);
+							const canBulkSellGroup = group.id !== "boosters" && totalQty > 0;
+							const groupItemsRecord = Object.fromEntries(items);
 							return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 								className: "rounded-xl border border-[#E2ECDA] bg-[#FCFEFA] overflow-hidden",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
-									type: "button",
-									onClick: () => toggleGroupCollapse(group.id),
-									className: "w-full px-3.5 py-2.5 bg-[#F4FAF0] border-b border-[#E2ECDA] flex items-center justify-between gap-2 text-left cursor-pointer hover:bg-[#EAF5E4] transition-colors",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "flex items-center gap-2 min-w-0",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "px-3.5 py-2.5 bg-[#F4FAF0] border-b border-[#E2ECDA] flex flex-wrap items-center justify-between gap-2",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+										type: "button",
+										onClick: () => toggleGroupCollapse(group.id),
+										className: "flex items-center gap-2 min-w-0 text-left cursor-pointer",
 										children: [
 											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 												className: "text-base",
@@ -48666,11 +50534,23 @@ var ShopStorageView = ({ user, nowMs, onBuyBooster, onBuyTreasure, onActivateUti
 													totalQty,
 													" món)"
 												]
+											}),
+											selectedGroup === "all" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+												className: "text-slate-500 shrink-0",
+												children: isCollapsed ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronRight, { className: "w-4 h-4" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronDown, { className: "w-4 h-4" })
 											})
 										]
-									}), selectedGroup === "all" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-										className: "text-slate-500 shrink-0",
-										children: isCollapsed ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronRight, { className: "w-4 h-4" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronDown, { className: "w-4 h-4" })
+									}), canBulkSellGroup && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+										type: "button",
+										onClick: () => onBulkSellToNpc(groupItemsRecord, `nhóm ${group.label}`),
+										className: "inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500 text-white text-[11px] font-semibold hover:bg-amber-600 cursor-pointer whitespace-nowrap",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Zap, { className: "w-3 h-3" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
+											"Bán tất cả nhóm (",
+											totalQty,
+											" · +",
+											formatNumber(totalValue),
+											"V)"
+										] })]
 									})]
 								}), !isCollapsed && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 									className: "p-3.5 divide-y divide-slate-100",
@@ -49088,6 +50968,8 @@ function App() {
 	const [allTopupRequests, setAllTopupRequests] = (0, import_react.useState)(() => initialSandbox ? initialSandbox.topupRequests : []);
 	const [p2pCompanies, setP2pCompanies] = (0, import_react.useState)(() => initialSandbox ? initialSandbox.p2pCompanies : []);
 	const [myP2PCompany, setMyP2PCompany] = (0, import_react.useState)(null);
+	const [activeChatFriendUid, setActiveChatFriendUid] = (0, import_react.useState)(() => initialSandbox && initialSandbox.friendsFarms.length > 0 ? initialSandbox.friendsFarms[0].uid : null);
+	const [chatMessages, setChatMessages] = (0, import_react.useState)(() => initialSandbox ? initialSandbox.friendMessages : []);
 	const [activeTab, setActiveTab] = (0, import_react.useState)("farm");
 	const [preselectedMarketItem, setPreselectedMarketItem] = (0, import_react.useState)(null);
 	const [showRedeemModal, setShowRedeemModal] = (0, import_react.useState)(false);
@@ -49246,6 +51128,15 @@ function App() {
 			cancelled = true;
 		};
 	}, [isVerifiedAuthenticated, userData?.friends.join(",")]);
+	(0, import_react.useEffect)(() => {
+		if (!isVerifiedAuthenticated || !userData || !activeChatFriendUid) return;
+		const unsub = subscribeFriendChatMessages(userData.uid, activeChatFriendUid, setChatMessages);
+		return () => unsub();
+	}, [
+		isVerifiedAuthenticated,
+		userData?.uid,
+		activeChatFriendUid
+	]);
 	const handleRefreshLeaderboard = (0, import_react.useCallback)(async () => {
 		if (isSandboxMode) {
 			pushToast("info", "Đã làm mới Bảng Xếp Hạng.");
@@ -49927,18 +51818,53 @@ function App() {
 		if (sellQty <= 0) return;
 		const totalGold = getItemSellPriceWithSurge(itemId, getHourlyMarketSurge(Date.now())) * sellQty;
 		const item = ITEM_CATALOG[itemId];
+		const bonusExp = Math.max(3, sellQty * 2);
+		const expRes = applyExpAndLevelUp(userData.level, userData.exp, bonusExp);
 		await commitUserUpdate((prev) => {
 			const nextInv = { ...prev.inventory };
 			if (owned - sellQty <= 0) delete nextInv[itemId];
 			else nextInv[itemId] = owned - sellQty;
 			return {
 				...prev,
+				level: expRes.level,
+				exp: expRes.exp,
 				gold: prev.gold + totalGold,
 				inventory: nextInv
 			};
 		});
 		soundEngine.playCoin();
-		pushToast("success", `Đã bán ${sellQty} ${item?.name ?? itemId} thu về +${formatNumber(totalGold)} Vàng!`);
+		pushToast("success", `Đã bán ${sellQty} ${item?.name ?? itemId} thu về +${formatNumber(totalGold)} Vàng (+${bonusExp} EXP)!`);
+	};
+	const handleBulkSellToNpc = async (itemsToSell, label) => {
+		if (!userData) return;
+		const entries = Object.entries(itemsToSell).filter(([, q]) => q > 0);
+		if (entries.length === 0) return;
+		const surge = getHourlyMarketSurge(Date.now());
+		let totalGold = 0;
+		let totalUnits = 0;
+		const nextInv = { ...userData.inventory };
+		for (const [itemId, requestedQty] of entries) {
+			const owned = nextInv[itemId] || 0;
+			const sellQty = Math.min(owned, Math.max(0, Math.floor(requestedQty)));
+			if (sellQty <= 0) continue;
+			const unitPrice = getItemSellPriceWithSurge(itemId, surge);
+			totalGold += unitPrice * sellQty;
+			totalUnits += sellQty;
+			if (owned - sellQty <= 0) delete nextInv[itemId];
+			else nextInv[itemId] = owned - sellQty;
+		}
+		if (totalUnits <= 0) return;
+		const bonusExp = Math.max(5, totalUnits * 2);
+		const expRes = applyExpAndLevelUp(userData.level, userData.exp, bonusExp);
+		await commitUserUpdate((prev) => ({
+			...prev,
+			level: expRes.level,
+			exp: expRes.exp,
+			gold: prev.gold + totalGold,
+			inventory: nextInv
+		}));
+		soundEngine.playCoin();
+		pushToast("success", `Đã bán nhanh ${label} (×${formatNumber(totalUnits)}) thu về +${formatNumber(totalGold)} Vàng (+${bonusExp} EXP)${expRes.leveledUp ? ` · Lên cấp Lv.${expRes.level}!` : "!"}`);
 	};
 	const handleClaimCheckIn = async () => {
 		if (!userData) return;
@@ -50126,6 +52052,311 @@ function App() {
 		}));
 		soundEngine.playFanfare();
 		pushToast("success", `🎉 Đã rước ${vehicle.emoji} ${vehicle.name} về Showroom (+${formatNumber(vehicle.wealthBonus)} Tài Phú)!`);
+	};
+	const handleDepositCorporateFund = async (amountGold) => {
+		if (!userData) return;
+		const amt = Math.max(100, Math.floor(amountGold));
+		if (userData.gold < amt) {
+			soundEngine.playError();
+			pushToast("error", `Ví cá nhân không đủ ${formatNumber(amt)} Vàng.`);
+			return;
+		}
+		const now = Date.now();
+		await commitUserUpdate((prev) => {
+			const ent = prev.enterprise ?? createInitialEnterpriseState(now);
+			const nextFund = ent.corporateFund + amt;
+			const entry = {
+				id: `led_${now}`,
+				type: "deposit",
+				title: `Nạp vốn lưu động vào Quỹ Doanh Nghiệp`,
+				amountGold: amt,
+				isPositive: true,
+				createdAt: now
+			};
+			return {
+				...prev,
+				gold: prev.gold - amt,
+				enterprise: {
+					...ent,
+					corporateFund: nextFund,
+					ledger: [entry, ...ent.ledger].slice(0, 15)
+				}
+			};
+		});
+		soundEngine.playCoin();
+		pushToast("success", `Đã nạp +${formatNumber(amt)} Vàng vào Quỹ Doanh Nghiệp!`);
+	};
+	const handleWithdrawCorporateFund = async (amountGold) => {
+		if (!userData) return;
+		const entCurrent = userData.enterprise ?? createInitialEnterpriseState(Date.now());
+		const amt = Math.max(100, Math.floor(amountGold));
+		if (entCurrent.corporateFund < amt) {
+			soundEngine.playError();
+			pushToast("error", `Quỹ Doanh Nghiệp không đủ ${formatNumber(amt)} Vàng.`);
+			return;
+		}
+		const now = Date.now();
+		await commitUserUpdate((prev) => {
+			const ent = prev.enterprise ?? createInitialEnterpriseState(now);
+			const nextFund = Math.max(0, ent.corporateFund - amt);
+			const entry = {
+				id: `led_${now}`,
+				type: "withdraw",
+				title: `Rút vốn từ Quỹ Doanh Nghiệp về Ví cá nhân`,
+				amountGold: amt,
+				isPositive: false,
+				createdAt: now
+			};
+			return {
+				...prev,
+				gold: prev.gold + amt,
+				enterprise: {
+					...ent,
+					corporateFund: nextFund,
+					ledger: [entry, ...ent.ledger].slice(0, 15)
+				}
+			};
+		});
+		soundEngine.playCoin();
+		pushToast("info", `Đã rút ${formatNumber(amt)} Vàng từ Quỹ Doanh Nghiệp về Ví cá nhân.`);
+	};
+	const handleUpgradeEnterpriseDept = async (dept) => {
+		if (!userData) return;
+		const now = Date.now();
+		const entCurrent = userData.enterprise ?? createInitialEnterpriseState(now);
+		const currentLv = dept === "rd" ? entCurrent.rdLevel : dept === "marketing" ? entCurrent.marketingLevel : entCurrent.operationsLevel;
+		if (currentLv >= 10) return;
+		const cost = calculateDepartmentUpgradeCost(currentLv);
+		if (entCurrent.corporateFund < cost) {
+			soundEngine.playError();
+			pushToast("error", `Quỹ Doanh Nghiệp cần ít nhất ${formatNumber(cost)} Vàng để nâng cấp phòng ban này.`);
+			return;
+		}
+		const deptLabel = dept === "rd" ? "Phòng R&D Nông Nghiệp" : dept === "marketing" ? "Phòng Marketing & Thương Hiệu" : "Phòng Vận Hành & Nhân Sự";
+		const expRes = applyExpAndLevelUp(userData.level, userData.exp, 150);
+		await commitUserUpdate((prev) => {
+			const ent = prev.enterprise ?? createInitialEnterpriseState(now);
+			const nextFund = Math.max(0, ent.corporateFund - cost);
+			const entry = {
+				id: `led_${now}`,
+				type: "dept_upgrade",
+				title: `Nâng cấp ${deptLabel} lên Lv.${currentLv + 1}`,
+				amountGold: cost,
+				isPositive: false,
+				createdAt: now
+			};
+			return {
+				...prev,
+				level: expRes.level,
+				exp: expRes.exp,
+				enterprise: {
+					...ent,
+					corporateFund: nextFund,
+					rdLevel: dept === "rd" ? currentLv + 1 : ent.rdLevel,
+					marketingLevel: dept === "marketing" ? currentLv + 1 : ent.marketingLevel,
+					operationsLevel: dept === "operations" ? currentLv + 1 : ent.operationsLevel,
+					ledger: [entry, ...ent.ledger].slice(0, 15)
+				}
+			};
+		});
+		soundEngine.playFanfare();
+		pushToast("success", `🏢 Đã nâng cấp ${deptLabel} lên Lv.${currentLv + 1} (+2.200 Tài Phú, +150 EXP)!`);
+	};
+	const handleLaunchEnterpriseCampaign = async (campaignId) => {
+		if (!userData) return;
+		const camp = ENTERPRISE_CAMPAIGNS.find((c) => c.id === campaignId);
+		if (!camp) return;
+		const now = Date.now();
+		if ((userData.enterprise ?? createInitialEnterpriseState(now)).corporateFund < camp.costGold) {
+			soundEngine.playError();
+			pushToast("error", `Quỹ Doanh Nghiệp cần ${formatNumber(camp.costGold)} Vàng để triển khai chiến dịch này.`);
+			return;
+		}
+		const expRes = applyExpAndLevelUp(userData.level, userData.exp, 120);
+		await commitUserUpdate((prev) => {
+			const ent = prev.enterprise ?? createInitialEnterpriseState(now);
+			const nextFund = Math.max(0, ent.corporateFund - camp.costGold);
+			const entry = {
+				id: `led_${now}`,
+				type: "campaign",
+				title: `Triển khai ${camp.name} (${camp.durationHours}h)`,
+				amountGold: camp.costGold,
+				isPositive: false,
+				createdAt: now
+			};
+			return {
+				...prev,
+				level: expRes.level,
+				exp: expRes.exp,
+				enterprise: {
+					...ent,
+					corporateFund: nextFund,
+					activeCampaignId: camp.id,
+					activeCampaignName: camp.name,
+					activeCampaignUntil: now + camp.durationHours * 36e5,
+					morale: Math.min(100, ent.morale + camp.moraleBoost),
+					ledger: [entry, ...ent.ledger].slice(0, 15)
+				}
+			};
+		});
+		soundEngine.playFanfare();
+		pushToast("success", `📣 Đã kích hoạt "${camp.name}": +${camp.orderBonusPct}% Đơn NPC / +${camp.wholesaleBonusPct}% B2B trong ${camp.durationHours} giờ!`);
+	};
+	const handleFulfillWholesaleContract = async (contractId) => {
+		if (!userData) return;
+		const contract = WHOLESALE_CONTRACTS.find((c) => c.id === contractId);
+		if (!contract) return;
+		if (userData.level < contract.minLevel) {
+			soundEngine.playError();
+			pushToast("warning", `Cần đạt Lv.${contract.minLevel} để ký hợp đồng B2B này.`);
+			return;
+		}
+		for (const [itemId, need] of Object.entries(contract.items)) if ((userData.inventory[itemId] || 0) < need) {
+			soundEngine.playError();
+			pushToast("error", "Kho hàng chưa đủ số lượng cho Hợp đồng B2B này.");
+			return;
+		}
+		const now = Date.now();
+		const bonuses = getBusinessBonuses(userData, now);
+		const boostedGold = Math.round(contract.rewardGold * (1 + bonuses.wholesaleBonusPct / 100));
+		const expRes = applyExpAndLevelUp(userData.level, userData.exp, contract.rewardExp);
+		await commitUserUpdate((prev) => {
+			const nextInv = { ...prev.inventory };
+			for (const [itemId, need] of Object.entries(contract.items)) {
+				const rem = (nextInv[itemId] || 0) - need;
+				if (rem <= 0) delete nextInv[itemId];
+				else nextInv[itemId] = rem;
+			}
+			const ent = prev.enterprise ?? createInitialEnterpriseState(now);
+			const nextFund = ent.corporateFund + contract.corporateFundBonus;
+			const entry = {
+				id: `led_${now}`,
+				type: "wholesale",
+				title: `Thưởng Quỹ từ ${contract.title} (${contract.partnerName})`,
+				amountGold: contract.corporateFundBonus,
+				isPositive: true,
+				createdAt: now
+			};
+			return {
+				...prev,
+				level: expRes.level,
+				exp: expRes.exp,
+				gold: prev.gold + boostedGold,
+				reputation: (prev.reputation || 0) + contract.rewardReputation,
+				inventory: nextInv,
+				enterprise: {
+					...ent,
+					corporateFund: nextFund,
+					totalRevenueGold: ent.totalRevenueGold + boostedGold + contract.corporateFundBonus,
+					totalContractsDone: ent.totalContractsDone + 1,
+					ledger: [entry, ...ent.ledger].slice(0, 15)
+				},
+				stats: {
+					...prev.stats,
+					totalOrdersDone: (prev.stats?.totalOrdersDone || 0) + 1
+				}
+			};
+		});
+		soundEngine.playFanfare();
+		pushToast("success", `🚢 Xuất kho B2B "${contract.title}" thành công: +${formatNumber(boostedGold)}V, +${formatNumber(contract.corporateFundBonus)}V vào Quỹ, +${contract.rewardExp} EXP!${expRes.leveledUp ? ` · Thăng cấp Lv.${expRes.level}!` : ""}`);
+	};
+	const handlePayMonthlySalary = async () => {
+		if (!userData) return;
+		const now = Date.now();
+		const entCurrent = userData.enterprise ?? createInitialEnterpriseState(now);
+		const amount = calculateMonthlyPayroll(userData.employees, entCurrent.operationsLevel).netSalary;
+		if (amount <= 0) return;
+		if (!(entCurrent.corporateFund >= amount) && userData.gold < amount) {
+			soundEngine.playError();
+			pushToast("error", `Cần ${formatNumber(amount)} Vàng trong Quỹ Doanh Nghiệp hoặc Ví cá nhân để thanh toán lương tháng.`);
+			return;
+		}
+		const periodKey = new Date(now).toISOString().slice(0, 7);
+		const expRes = applyExpAndLevelUp(userData.level, userData.exp, 100);
+		await commitUserUpdate((prev) => {
+			const ent = prev.enterprise ?? createInitialEnterpriseState(now);
+			const useFund = ent.corporateFund >= amount;
+			const nextFund = useFund ? ent.corporateFund - amount : ent.corporateFund;
+			const entry = {
+				id: `led_${now}`,
+				type: "payroll",
+				title: `Chi trả bảng lương nhân sự kỳ ${periodKey}${useFund ? " (Trích Quỹ DN)" : " (Từ Ví cá nhân)"}`,
+				amountGold: amount,
+				isPositive: false,
+				createdAt: now
+			};
+			return {
+				...prev,
+				level: expRes.level,
+				exp: expRes.exp,
+				gold: useFund ? prev.gold : prev.gold - amount,
+				enterprise: {
+					...ent,
+					corporateFund: nextFund,
+					lastPayrollPaidAt: now,
+					lastPayrollMonth: periodKey,
+					morale: Math.min(100, ent.morale + 10),
+					totalPayrollPaidGold: ent.totalPayrollPaidGold + amount,
+					ledger: [entry, ...ent.ledger].slice(0, 15)
+				}
+			};
+		});
+		soundEngine.playFanfare();
+		pushToast("success", `💼 Đã thanh toán ${formatNumber(amount)} Vàng lương nhân sự kỳ ${periodKey} (+10% Tinh thần, +100 EXP)!`);
+	};
+	const handleBonusEmployeeMorale = async () => {
+		if (!userData) return;
+		const now = Date.now();
+		const bonusCost = 1500;
+		if (!((userData.enterprise ?? createInitialEnterpriseState(now)).corporateFund >= bonusCost) && userData.gold < bonusCost) {
+			soundEngine.playError();
+			pushToast("error", "Cần 1.500 Vàng trong Quỹ hoặc Ví để thưởng nóng nhân sự.");
+			return;
+		}
+		const expRes = applyExpAndLevelUp(userData.level, userData.exp, 60);
+		await commitUserUpdate((prev) => {
+			const ent = prev.enterprise ?? createInitialEnterpriseState(now);
+			const fromFund = ent.corporateFund >= bonusCost;
+			const nextFund = fromFund ? ent.corporateFund - bonusCost : ent.corporateFund;
+			const entry = {
+				id: `led_${now}`,
+				type: "bonus",
+				title: `Thưởng nóng khích lệ tinh thần toàn bộ nhân sự (+12% Morale)`,
+				amountGold: bonusCost,
+				isPositive: false,
+				createdAt: now
+			};
+			return {
+				...prev,
+				level: expRes.level,
+				exp: expRes.exp,
+				gold: fromFund ? prev.gold : prev.gold - bonusCost,
+				enterprise: {
+					...ent,
+					corporateFund: nextFund,
+					morale: Math.min(100, ent.morale + 12),
+					totalPayrollPaidGold: ent.totalPayrollPaidGold + bonusCost,
+					ledger: [entry, ...ent.ledger].slice(0, 15)
+				}
+			};
+		});
+		soundEngine.playFanfare();
+		pushToast("success", "🎁 Đã thưởng nóng nhân sự: +12% Tinh thần làm việc & +60 EXP!");
+	};
+	const handleToggleAutoPaySalary = async () => {
+		if (!userData) return;
+		const now = Date.now();
+		await commitUserUpdate((prev) => {
+			const ent = prev.enterprise ?? createInitialEnterpriseState(now);
+			return {
+				...prev,
+				enterprise: {
+					...ent,
+					autoPaySalary: !ent.autoPaySalary
+				}
+			};
+		});
+		soundEngine.playClick();
 	};
 	const handleCreateListing = async (itemId, quantity, currency, price) => {
 		if (!userData) return;
@@ -50616,6 +52847,40 @@ function App() {
 			return null;
 		}
 	};
+	const handleSendChatMessage = (0, import_react.useCallback)(async (recipientUid, text) => {
+		if (!userData) return;
+		const cleaned = text.trim().slice(0, 280);
+		if (!cleaned) return;
+		const now = Date.now();
+		const optimisticMsg = {
+			id: `msg_${now}_${Math.random().toString(36).slice(2, 6)}`,
+			chatId: buildFriendChatId(userData.uid, recipientUid),
+			senderUid: userData.uid,
+			senderName: userData.businessName || userData.profile?.displayName || "Nông Trại DOPI",
+			senderAvatar: userData.profile?.avatarEmoji || "🧑‍🌾",
+			recipientUid,
+			text: cleaned,
+			createdAt: now
+		};
+		setChatMessages((prev) => [...prev, optimisticMsg]);
+		soundEngine.playClick();
+		if (!isSandboxMode) try {
+			await sendFriendChatMessage({
+				senderUid: userData.uid,
+				senderName: userData.businessName || userData.profile?.displayName || "Nông Trại DOPI",
+				senderAvatar: userData.profile?.avatarEmoji || "🧑‍🌾",
+				recipientUid,
+				text: cleaned
+			});
+		} catch (err) {
+			console.error("Send friend chat error:", err);
+			pushToast("error", "Không thể gửi tin nhắn lúc này.");
+		}
+	}, [
+		userData,
+		isSandboxMode,
+		pushToast
+	]);
 	const handleClaimDailyQuest = async (questId) => {
 		if (!userData) return;
 		const quest = userData.dailyQuests.find((q) => q.id === questId);
@@ -50965,6 +53230,7 @@ function App() {
 						onActivateUtilityItem: handleActivateUtilityItem,
 						onExpandStorage: handleExpandStorage,
 						onSellToNpc: handleSellToNpc,
+						onBulkSellToNpc: handleBulkSellToNpc,
 						onGoToMarketWithItem: (itemId) => {
 							setPreselectedMarketItem(itemId);
 							setActiveTab("market");
@@ -51006,8 +53272,17 @@ function App() {
 					}),
 					activeTab === "business" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(BusinessView, {
 						user: userData,
+						nowMs,
 						onUpgradeEmployee: handleUpgradeEmployee,
-						onBuyVehicle: handleBuyVehicle
+						onBuyVehicle: handleBuyVehicle,
+						onDepositFund: handleDepositCorporateFund,
+						onWithdrawFund: handleWithdrawCorporateFund,
+						onUpgradeDepartment: handleUpgradeEnterpriseDept,
+						onLaunchCampaign: handleLaunchEnterpriseCampaign,
+						onFulfillWholesaleContract: handleFulfillWholesaleContract,
+						onPayMonthlySalary: handlePayMonthlySalary,
+						onBonusEmployeeMorale: handleBonusEmployeeMorale,
+						onToggleAutoPaySalary: handleToggleAutoPaySalary
 					}),
 					activeTab === "leaderboard" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LeaderboardView, {
 						user: userData,
@@ -51025,6 +53300,10 @@ function App() {
 						suggestedFarms: serverLeaderboard,
 						incomingRequests: incomingReqs,
 						outgoingRequests: outgoingReqs,
+						chatMessages: chatMessages.filter((m) => !activeChatFriendUid || m.chatId === buildFriendChatId(userData.uid, activeChatFriendUid)),
+						activeChatFriendUid,
+						onSelectChatFriend: setActiveChatFriendUid,
+						onSendChatMessage: handleSendChatMessage,
 						onSearchPlayer: handleSearchPlayer,
 						onSendFriendRequest: handleSendFriendRequest,
 						onRespondRequest: handleRespondRequest,

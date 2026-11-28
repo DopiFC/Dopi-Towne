@@ -4,11 +4,15 @@ import {
   CROPS,
   EMPLOYEES,
   EMPLOYEE_UPGRADE_EXP_BASE,
+  ENTERPRISE_CAMPAIGNS,
+  ENTERPRISE_SPECIALISTS,
   EXPONENTIAL_GROWTH_BASE,
   FACTORIES,
   INITIAL_PLOTS,
   INITIAL_STORAGE_CAPACITY,
   ITEM_CATALOG,
+  MAX_PLAYER_LEVEL,
+  MAX_VIP_LEVEL,
   RECIPES,
   STORAGE_UPGRADE_STEP,
   TREASURES,
@@ -22,6 +26,9 @@ import {
 import type {
   DailyQuest,
   EmployeeId,
+  EnterpriseLedgerEntry,
+  EnterpriseSpecialistId,
+  EnterpriseState,
   FarmPlot,
   MarketSurgeEvent,
   NpcOrder,
@@ -40,16 +47,16 @@ export function calculateVipLevel(totalRechargedCoins: number): number {
       tier = v.level;
     }
   }
-  return tier;
+  return Math.min(MAX_VIP_LEVEL, tier);
 }
 
 export function getVipPerks(vipLevel: number): VipTier {
-  const clamped = Math.max(0, Math.min(10, Math.floor(vipLevel)));
+  const clamped = Math.max(0, Math.min(MAX_VIP_LEVEL, Math.floor(vipLevel)));
   return VIP_TIERS[clamped] ?? VIP_TIERS[0];
 }
 
 export function getNextVipTier(vipLevel: number): VipTier | null {
-  if (vipLevel >= 10) return null;
+  if (vipLevel >= MAX_VIP_LEVEL) return null;
   return VIP_TIERS[vipLevel + 1] ?? null;
 }
 
@@ -86,13 +93,212 @@ export function calculateEmployeeUpgradeCost(
   return { gold, coins };
 }
 
-export function getBusinessBonuses(user: Pick<UserGameData, 'employees' | 'vehicles'>): {
+export function createInitialSpecialists(): Record<EnterpriseSpecialistId, number> {
+  return {
+    lean_engineer: 0,
+    cost_auditor: 0,
+    bio_agronomist: 0,
+    b2b_director: 0,
+    logistics_architect: 0,
+    cfo_treasurer: 0,
+  };
+}
+
+export function calculateSpecialistHireOrUpgradeCost(
+  specialistId: EnterpriseSpecialistId,
+  currentLevel: number,
+  headhuntDiscountPct: number = 0
+): { rawCost: number; finalCost: number; discountSaved: number } {
+  const def = ENTERPRISE_SPECIALISTS.find((s) => s.id === specialistId);
+  if (!def) {
+    return { rawCost: 999_999, finalCost: 999_999, discountSaved: 0 };
+  }
+  const safeLevel = Math.max(0, Math.floor(currentLevel || 0));
+  const rawCost = Math.round(def.baseHireFundCost * Math.pow(1.62, safeLevel));
+  const safeDiscount = Math.max(0, Math.min(35, Math.floor(headhuntDiscountPct || 0)));
+  const finalCost = Math.max(100, Math.round(rawCost * (1 - safeDiscount / 100)));
+  return {
+    rawCost,
+    finalCost,
+    discountSaved: Math.max(0, rawCost - finalCost),
+  };
+}
+
+export function calculateDepartmentUpgradeCost(
+  currentLevel: number,
+  cfoDiscountPct: number = 0
+): number {
+  const safeLv = Math.max(1, Math.floor(currentLevel));
+  const baseCost = Math.round(3200 * Math.pow(1.55, safeLv - 1));
+  const safeDisc = Math.max(0, Math.min(35, Math.floor(cfoDiscountPct || 0)));
+  return Math.max(500, Math.round(baseCost * (1 - safeDisc / 100)));
+}
+
+export function calculateMonthlyPayroll(
+  employees: Record<EmployeeId, number>,
+  operationsLevel: number = 1,
+  specialists?: Partial<Record<EnterpriseSpecialistId, number>> | null
+): {
+  grossSalary: number;
+  discountPct: number;
+  opsDiscountPct: number;
+  auditorDiscountPct: number;
+  netSalary: number;
+  headcount: number;
+  breakdown: {
+    id: string;
+    name: string;
+    emoji: string;
+    role: string;
+    level: number;
+    monthlySalary: number;
+    isSpecialist?: boolean;
+  }[];
+} {
+  const safeOps = Math.max(1, Math.min(10, Math.floor(operationsLevel || 1)));
+  const opsDiscountPct = (safeOps - 1) * 3; // Up to 27% overhead savings at Lv 10
+  const auditorLv = Math.max(0, Math.min(5, Math.floor(specialists?.cost_auditor || 0)));
+  const auditorDiscountPct = auditorLv * 5; // Up to 25% extra operating & payroll cost savings
+  const discountPct = Math.min(50, opsDiscountPct + auditorDiscountPct);
+
+  const baseMonthlyRate: Record<EmployeeId, number> = {
+    diligent_farmer: 420,
+    agri_engineer: 650,
+    factory_manager: 880,
+    sales_director: 1150,
+  };
+
+  let grossSalary = 0;
+  let headcount = 0;
+  const breakdown: {
+    id: string;
+    name: string;
+    emoji: string;
+    role: string;
+    level: number;
+    monthlySalary: number;
+    isSpecialist?: boolean;
+  }[] = EMPLOYEES.map((def) => {
+    const lv = Math.max(0, Math.floor(employees?.[def.id] || 0));
+    if (lv > 0) headcount += 1;
+    const monthlySalary =
+      lv > 0 ? Math.round(baseMonthlyRate[def.id] * lv * (1 + (lv - 1) * 0.12)) : 0;
+    grossSalary += monthlySalary;
+    return {
+      id: def.id,
+      name: def.name,
+      emoji: def.emoji,
+      role: def.role,
+      level: lv,
+      monthlySalary,
+      isSpecialist: false,
+    };
+  });
+
+  for (const spec of ENTERPRISE_SPECIALISTS) {
+    const lv = Math.max(0, Math.min(spec.maxLevel, Math.floor(specialists?.[spec.id] || 0)));
+    if (lv > 0) headcount += 1;
+    const monthlySalary =
+      lv > 0 ? Math.round(spec.monthlySalaryGold * lv * (1 + (lv - 1) * 0.08)) : 0;
+    grossSalary += monthlySalary;
+    breakdown.push({
+      id: spec.id,
+      name: spec.name,
+      emoji: spec.emoji,
+      role: `Chuyên Gia · ${spec.skillBadge}`,
+      level: lv,
+      monthlySalary,
+      isSpecialist: true,
+    });
+  }
+
+  const netSalary = Math.max(
+    0,
+    Math.round(grossSalary * (1 - discountPct / 100))
+  );
+
+  return {
+    grossSalary,
+    discountPct,
+    opsDiscountPct,
+    auditorDiscountPct,
+    netSalary,
+    headcount,
+    breakdown,
+  };
+}
+
+export function calculateInventoryValuation(
+  inventory: Record<string, number>,
+  nowMs: number = Date.now()
+): {
+  totalMarketValue: number;
+  cropValue: number;
+  productValue: number;
+  boosterValue: number;
+  cropUnits: number;
+  productUnits: number;
+  boosterUnits: number;
+} {
+  const surge = getHourlyMarketSurge(nowMs);
+  let cropValue = 0;
+  let productValue = 0;
+  let boosterValue = 0;
+  let cropUnits = 0;
+  let productUnits = 0;
+  let boosterUnits = 0;
+
+  for (const [itemId, rawQty] of Object.entries(inventory || {})) {
+    const qty = Math.max(0, Math.floor(rawQty || 0));
+    if (qty <= 0) continue;
+    const entry = ITEM_CATALOG[itemId];
+    if (!entry) continue;
+    const unitPrice = getItemSellPriceWithSurge(itemId, surge);
+    const val = unitPrice * qty;
+    if (entry.category === 'crop') {
+      cropValue += val;
+      cropUnits += qty;
+    } else if (entry.category === 'product') {
+      productValue += val;
+      productUnits += qty;
+    } else {
+      boosterValue += val;
+      boosterUnits += qty;
+    }
+  }
+
+  return {
+    totalMarketValue: cropValue + productValue + boosterValue,
+    cropValue,
+    productValue,
+    boosterValue,
+    cropUnits,
+    productUnits,
+    boosterUnits,
+  };
+}
+
+export function getBusinessBonuses(
+  user: Pick<UserGameData, 'employees' | 'vehicles' | 'enterprise'>,
+  nowMs: number = Date.now()
+): {
   autoHarvestEnabled: boolean;
   extraYieldChancePct: number;
   factorySpeedReductionPct: number;
   orderRewardBonusPct: number;
+  wholesaleBonusPct: number;
   orderRefreshReductionPct: number;
+  moraleEfficiencyPct: number;
   bestVehicleId: string | null;
+  operatingCostReductionPct: number;
+  campaignCostReductionPct: number;
+  cropSpeedReductionPct: number;
+  seedDiscountPct: number;
+  corporateFundContractBonusPct: number;
+  quickSellBonusPct: number;
+  deptUpgradeDiscountPct: number;
+  specialistsCount: number;
+  totalSpecialistLevels: number;
 } {
   const emp = user.employees ?? {
     diligent_farmer: 0,
@@ -101,6 +307,22 @@ export function getBusinessBonuses(user: Pick<UserGameData, 'employees' | 'vehic
     sales_director: 0,
   };
   const ownedVehicles = user.vehicles ?? [];
+  const ent = user.enterprise;
+  const specs = ent?.specialists ?? createInitialSpecialists();
+
+  const leanLv = Math.max(0, Math.min(5, Math.floor(specs.lean_engineer || 0)));
+  const auditorLv = Math.max(0, Math.min(5, Math.floor(specs.cost_auditor || 0)));
+  const bioLv = Math.max(0, Math.min(5, Math.floor(specs.bio_agronomist || 0)));
+  const b2bLv = Math.max(0, Math.min(5, Math.floor(specs.b2b_director || 0)));
+  const logisticsLv = Math.max(0, Math.min(5, Math.floor(specs.logistics_architect || 0)));
+  const cfoLv = Math.max(0, Math.min(5, Math.floor(specs.cfo_treasurer || 0)));
+
+  let specialistsCount = 0;
+  let totalSpecialistLevels = 0;
+  for (const lv of [leanLv, auditorLv, bioLv, b2bLv, logisticsLv, cfoLv]) {
+    if (lv > 0) specialistsCount += 1;
+    totalSpecialistLevels += lv;
+  }
 
   let bestVehicleRewardPct = 0;
   let bestVehicleRefreshPct = 0;
@@ -116,20 +338,78 @@ export function getBusinessBonuses(user: Pick<UserGameData, 'employees' | 'vehic
     }
   }
 
+  const rdBonusPct = ent ? Math.max(0, (ent.rdLevel - 1) * 3) : 0;
+  const mktBonusPct = ent ? Math.max(0, (ent.marketingLevel - 1) * 4) : 0;
+  const opsBonusPct = ent ? Math.max(0, (ent.operationsLevel - 1) * 3) : 0;
+  const morale = ent?.morale ?? 85;
+  const baseMoraleEff =
+    morale >= 90 ? 115 : morale >= 70 ? 100 : morale >= 45 ? 85 : 70;
+  const moraleEfficiencyPct = baseMoraleEff + auditorLv * 2;
+
+  let campOrderBonus = 0;
+  let campWholesaleBonus = 0;
+  if (ent && ent.activeCampaignId && ent.activeCampaignUntil > nowMs) {
+    const camp = ENTERPRISE_CAMPAIGNS.find((c) => c.id === ent.activeCampaignId);
+    if (camp) {
+      campOrderBonus = camp.orderBonusPct;
+      campWholesaleBonus = camp.wholesaleBonusPct;
+    }
+  }
+
+  const empScale = moraleEfficiencyPct / 100;
+
   return {
     autoHarvestEnabled: (emp.diligent_farmer || 0) >= 1,
-    extraYieldChancePct: Math.min(80, (emp.agri_engineer || 0) * 8),
-    factorySpeedReductionPct: Math.min(50, (emp.factory_manager || 0) * 6),
-    orderRewardBonusPct: (emp.sales_director || 0) * 7 + bestVehicleRewardPct,
-    orderRefreshReductionPct: bestVehicleRefreshPct,
+    extraYieldChancePct: Math.min(
+      90,
+      Math.round((emp.agri_engineer || 0) * 8 * empScale + rdBonusPct + leanLv * 3)
+    ),
+    factorySpeedReductionPct: Math.min(
+      65,
+      Math.round(
+        (emp.factory_manager || 0) * 6 * empScale +
+          Math.floor(rdBonusPct / 2) +
+          leanLv * 5
+      )
+    ),
+    orderRewardBonusPct:
+      Math.round((emp.sales_director || 0) * 7 * empScale) +
+      bestVehicleRewardPct +
+      mktBonusPct +
+      campOrderBonus +
+      b2bLv * 6,
+    wholesaleBonusPct:
+      bestVehicleRewardPct +
+      mktBonusPct +
+      rdBonusPct +
+      campWholesaleBonus +
+      b2bLv * 6,
+    orderRefreshReductionPct: Math.min(60, bestVehicleRefreshPct + logisticsLv * 3),
+    moraleEfficiencyPct,
     bestVehicleId,
+    operatingCostReductionPct: Math.min(50, opsBonusPct + auditorLv * 5),
+    campaignCostReductionPct: auditorLv * 5,
+    cropSpeedReductionPct: bioLv * 4,
+    seedDiscountPct: bioLv * 4,
+    corporateFundContractBonusPct: b2bLv * 5,
+    quickSellBonusPct: logisticsLv * 4,
+    deptUpgradeDiscountPct: cfoLv * 5,
+    specialistsCount,
+    totalSpecialistLevels,
   };
 }
 
 export function calculateWealthScore(
   user: Pick<
     UserGameData,
-    'level' | 'farmPlots' | 'employees' | 'vehicles' | 'treasures' | 'vipLevel' | 'reputation'
+    | 'level'
+    | 'farmPlots'
+    | 'employees'
+    | 'vehicles'
+    | 'treasures'
+    | 'vipLevel'
+    | 'reputation'
+    | 'enterprise'
   >
 ): number {
   const levelScore = (user.level || 1) * 500;
@@ -148,6 +428,14 @@ export function calculateWealthScore(
     empScore += (empMap[def.id] || 0) * def.wealthPerLevel;
   }
 
+  let specialistScore = 0;
+  const specMap = user.enterprise?.specialists;
+  if (specMap) {
+    for (const def of ENTERPRISE_SPECIALISTS) {
+      specialistScore += Math.max(0, Math.floor(specMap[def.id] || 0)) * def.wealthPerLevel;
+    }
+  }
+
   let vehicleScore = 0;
   for (const vId of user.vehicles ?? []) {
     const v = VEHICLES.find((item) => item.id === vId);
@@ -160,22 +448,40 @@ export function calculateWealthScore(
     if (t) treasureScore += t.wealthBonus;
   }
 
+  const enterpriseScore = user.enterprise
+    ? Math.floor((user.enterprise.corporateFund || 0) * 0.25) +
+      ((user.enterprise.rdLevel || 1) - 1) * 1500 +
+      ((user.enterprise.marketingLevel || 1) - 1) * 1500 +
+      ((user.enterprise.operationsLevel || 1) - 1) * 1500 +
+      specialistScore
+    : 0;
+
   return Math.round(
-    levelScore + plotScore + vipScore + repScore + empScore + vehicleScore + treasureScore
+    levelScore +
+      plotScore +
+      vipScore +
+      repScore +
+      empScore +
+      vehicleScore +
+      treasureScore +
+      enterpriseScore
   );
 }
 
 export function calculateGrowthDurationMs(
   cropId: string,
   vipLevel: number,
-  autoSprinklerActive = false
+  autoSprinklerActive = false,
+  extraCropSpeedReductionPct = 0
 ): number {
   const crop = CROPS.find((c) => c.id === cropId);
   if (!crop) return 60_000;
   const perks = getVipPerks(vipLevel);
   const totalReductionPct = Math.min(
-    45,
-    perks.growthReductionPct + (autoSprinklerActive ? 15 : 0)
+    60,
+    perks.growthReductionPct +
+      (autoSprinklerActive ? 15 : 0) +
+      Math.max(0, extraCropSpeedReductionPct)
   );
   const multiplier = 1 - totalReductionPct / 100;
   return Math.max(5_000, Math.round(crop.growthSeconds * 1000 * multiplier));
@@ -229,7 +535,9 @@ export function getTotalInventoryCount(inventory: Record<string, number>): numbe
 }
 
 export function getExpRequiredForLevel(level: number): number {
-  return Math.round(100 * Math.pow(1.32, Math.max(0, level - 1)));
+  const safeLv = Math.max(1, Math.min(MAX_PLAYER_LEVEL, Math.floor(level || 1)));
+  // Đường cong EXP mượt mà từ Lv.1 đến Lv.999 (không bao giờ tràn số như hàm mũ 1.32^level cũ)
+  return Math.round(100 + Math.pow(Math.max(0, safeLv - 1), 1.45) * 35);
 }
 
 export function applyExpAndLevelUp(
@@ -237,10 +545,10 @@ export function applyExpAndLevelUp(
   currentExp: number,
   gainedExp: number
 ): { level: number; exp: number; leveledUp: boolean } {
-  let level = Math.max(1, currentLevel);
-  let exp = Math.max(0, currentExp) + Math.max(0, gainedExp);
+  let level = Math.max(1, Math.min(MAX_PLAYER_LEVEL, Math.floor(currentLevel || 1)));
+  let exp = Math.max(0, Math.floor(currentExp || 0)) + Math.max(0, Math.floor(gainedExp || 0));
   let leveledUp = false;
-  while (level < 200) {
+  while (level < MAX_PLAYER_LEVEL) {
     const needed = getExpRequiredForLevel(level);
     if (exp >= needed) {
       exp -= needed;
@@ -545,6 +853,121 @@ export function normalizeFarmPlots(
   }));
 }
 
+export function createInitialEnterpriseState(nowMs: number = Date.now()): EnterpriseState {
+  return {
+    corporateFund: 2500,
+    payrollReserveRatio: 40,
+    rdLevel: 1,
+    marketingLevel: 1,
+    operationsLevel: 1,
+    morale: 92,
+    lastPayrollMonth: getCurrentMonthKey(nowMs),
+    lastPayrollPaidAt: nowMs,
+    autoPaySalary: true,
+    totalRevenueGold: 2500,
+    totalPayrollPaidGold: 0,
+    totalContractsDone: 0,
+    activeCampaignId: null,
+    activeCampaignName: '',
+    activeCampaignUntil: 0,
+    specialists: createInitialSpecialists(),
+    headhuntDiscountPct: 0,
+    headhuntCount: 0,
+    ledger: [
+      {
+        id: `ldg_init_${nowMs}`,
+        type: 'deposit',
+        title: 'Vốn điều lệ khởi tạo Quỹ Doanh Nghiệp',
+        amountGold: 2500,
+        isPositive: true,
+        createdAt: nowMs,
+      },
+    ],
+  };
+}
+
+export function normalizeEnterpriseState(
+  raw?: Partial<EnterpriseState> | null,
+  nowMs: number = Date.now()
+): EnterpriseState {
+  if (!raw || typeof raw !== 'object') {
+    return createInitialEnterpriseState(nowMs);
+  }
+  const cleanLedger: EnterpriseLedgerEntry[] = Array.isArray(raw.ledger)
+    ? raw.ledger
+        .filter((e): e is EnterpriseLedgerEntry => Boolean(e && typeof e === 'object'))
+        .slice(0, 20)
+        .map((e, idx) => ({
+          id: typeof e.id === 'string' && e.id ? e.id : `ldg_${nowMs}_${idx}`,
+          type: e.type || 'deposit',
+          title: (e.title || 'Giao dịch quỹ').slice(0, 120),
+          amountGold: Math.max(0, Math.floor(Number(e.amountGold) || 0)),
+          isPositive: Boolean(e.isPositive ?? true),
+          createdAt: Number(e.createdAt) || nowMs,
+        }))
+    : [];
+
+  const rawSpecs = (raw.specialists ?? {}) as Partial<Record<EnterpriseSpecialistId, number>>;
+  const normalizedSpecialists: Record<EnterpriseSpecialistId, number> = {
+    lean_engineer: Math.max(0, Math.min(5, Math.floor(Number(rawSpecs.lean_engineer) || 0))),
+    cost_auditor: Math.max(0, Math.min(5, Math.floor(Number(rawSpecs.cost_auditor) || 0))),
+    bio_agronomist: Math.max(0, Math.min(5, Math.floor(Number(rawSpecs.bio_agronomist) || 0))),
+    b2b_director: Math.max(0, Math.min(5, Math.floor(Number(rawSpecs.b2b_director) || 0))),
+    logistics_architect: Math.max(
+      0,
+      Math.min(5, Math.floor(Number(rawSpecs.logistics_architect) || 0))
+    ),
+    cfo_treasurer: Math.max(0, Math.min(5, Math.floor(Number(rawSpecs.cfo_treasurer) || 0))),
+  };
+
+  return {
+    corporateFund: Math.max(0, Math.floor(Number(raw.corporateFund ?? 2500))),
+    payrollReserveRatio: Math.max(
+      10,
+      Math.min(80, Math.floor(Number(raw.payrollReserveRatio ?? 40)))
+    ),
+    rdLevel: Math.max(1, Math.min(10, Math.floor(Number(raw.rdLevel) || 1))),
+    marketingLevel: Math.max(
+      1,
+      Math.min(10, Math.floor(Number(raw.marketingLevel) || 1))
+    ),
+    operationsLevel: Math.max(
+      1,
+      Math.min(10, Math.floor(Number(raw.operationsLevel) || 1))
+    ),
+    morale: Math.max(0, Math.min(100, Math.floor(Number(raw.morale ?? 92)))),
+    lastPayrollMonth:
+      typeof raw.lastPayrollMonth === 'string' && raw.lastPayrollMonth
+        ? raw.lastPayrollMonth
+        : getCurrentMonthKey(nowMs),
+    lastPayrollPaidAt: Math.max(0, Number(raw.lastPayrollPaidAt) || nowMs),
+    autoPaySalary: Boolean(raw.autoPaySalary ?? true),
+    totalRevenueGold: Math.max(0, Math.floor(Number(raw.totalRevenueGold ?? 2500))),
+    totalPayrollPaidGold: Math.max(
+      0,
+      Math.floor(Number(raw.totalPayrollPaidGold) || 0)
+    ),
+    totalContractsDone: Math.max(
+      0,
+      Math.floor(Number(raw.totalContractsDone) || 0)
+    ),
+    activeCampaignId:
+      typeof raw.activeCampaignId === 'string' && raw.activeCampaignId
+        ? raw.activeCampaignId
+        : null,
+    activeCampaignName:
+      typeof raw.activeCampaignName === 'string' ? raw.activeCampaignName : '',
+    activeCampaignUntil: Math.max(0, Number(raw.activeCampaignUntil) || 0),
+    specialists: normalizedSpecialists,
+    headhuntDiscountPct: Math.max(
+      0,
+      Math.min(35, Math.floor(Number(raw.headhuntDiscountPct) || 0))
+    ),
+    headhuntCount: Math.max(0, Math.floor(Number(raw.headhuntCount) || 0)),
+    ledger: cleanLedger,
+  };
+}
+
 export function normalizePublicFarmData(
   raw: Partial<PublicFarmData> & { uid?: string },
   nowMs: number = Date.now()
@@ -561,8 +984,14 @@ export function normalizePublicFarmData(
     businessName: safeBusinessName.length >= 2 ? safeBusinessName : 'Nông Trại DOPI',
     displayName: safeDisplayName.length >= 1 ? safeDisplayName : 'Nông Dân',
     avatarEmoji: safeAvatar,
-    level: Math.max(1, Math.floor(Number(raw.level) || 1)),
-    vipLevel: Math.max(0, Math.min(10, Math.floor(Number(raw.vipLevel) || 0))),
+    level: Math.max(
+      1,
+      Math.min(MAX_PLAYER_LEVEL, Math.floor(Number(raw.level) || 1))
+    ),
+    vipLevel: Math.max(
+      0,
+      Math.min(MAX_VIP_LEVEL, Math.floor(Number(raw.vipLevel) || 0))
+    ),
     totalRechargedCoins: Math.max(0, Math.floor(Number(raw.totalRechargedCoins) || 0)),
     wealthScore: Math.max(0, Math.round(Number(raw.wealthScore) || 0)),
     vehicles: Array.isArray(raw.vehicles)
@@ -620,6 +1049,20 @@ export function normalizeUserData(
       ).slice(0, 100)
     : [];
 
+  const rawLevel = Math.max(
+    1,
+    Math.min(MAX_PLAYER_LEVEL, Math.floor(Number(raw.level) || 1))
+  );
+  const rawExp = Math.max(0, Math.floor(Number(raw.exp) || 0));
+  const rolledExp = applyExpAndLevelUp(rawLevel, rawExp, 0);
+
+  const totalRecharged = Math.max(0, Math.floor(Number(raw.totalRechargedCoins) || 0));
+  const computedVip = calculateVipLevel(totalRecharged);
+  const rawVip = Math.max(
+    0,
+    Math.min(MAX_VIP_LEVEL, Math.floor(Number(raw.vipLevel) || 0))
+  );
+
   const normalized: UserGameData = {
     uid: raw.uid,
     email: safeEmail,
@@ -629,12 +1072,12 @@ export function normalizeUserData(
       joinedAt: Number(raw.profile?.joinedAt) || nowMs,
     },
     businessName: safeBusinessName,
-    level: Math.max(1, Math.floor(Number(raw.level) || 1)),
-    exp: Math.max(0, Math.floor(Number(raw.exp) || 0)),
+    level: rolledExp.level,
+    exp: rolledExp.exp,
     gold: Math.max(0, Math.floor(Number(raw.gold ?? 450))),
     dopiCoins: Math.max(0, Math.floor(Number(raw.dopiCoins ?? 15))),
-    totalRechargedCoins: Math.max(0, Math.floor(Number(raw.totalRechargedCoins) || 0)),
-    vipLevel: Math.max(0, Math.min(10, Math.floor(Number(raw.vipLevel) || 0))),
+    totalRechargedCoins: totalRecharged,
+    vipLevel: Math.max(rawVip, computedVip),
     farmPlots: normalizeFarmPlots(raw.farmPlots, nowMs),
     factories: normalizedFactories,
     inventory: raw.inventory && typeof raw.inventory === 'object' ? { ...raw.inventory } : {},
@@ -652,7 +1095,7 @@ export function normalizeUserData(
     npcOrders:
       Array.isArray(raw.npcOrders) && raw.npcOrders.length > 0
         ? raw.npcOrders
-        : generateNpcOrders(raw.level ?? 1, nowMs),
+        : generateNpcOrders(rolledExp.level, nowMs),
     lastDailyReset: raw.lastDailyReset || getTodayDateKey(nowMs),
     helpCountToday: Math.max(0, Math.floor(Number(raw.helpCountToday) || 0)),
     helpedFriendsToday: Array.isArray(raw.helpedFriendsToday)
@@ -679,7 +1122,7 @@ export function normalizeUserData(
     rushOrder:
       raw.rushOrder && raw.rushOrder.expiresAt > nowMs
         ? raw.rushOrder
-        : generateRushOrder(raw.level ?? 1, nowMs),
+        : generateRushOrder(rolledExp.level, nowMs),
     reputation: Math.max(0, Math.floor(Number(raw.reputation) || 0)),
     autoWaterUntil: Math.max(0, Number(raw.autoWaterUntil) || 0),
     treasures: Array.isArray(raw.treasures)
@@ -696,6 +1139,7 @@ export function normalizeUserData(
       : [],
     wealthScore: Math.max(0, Math.round(Number(raw.wealthScore) || 0)),
     investments: normalizeUserInvestments(raw.investments),
+    enterprise: normalizeEnterpriseState(raw.enterprise, nowMs),
     createdAt: Number(raw.createdAt) || nowMs,
     updatedAt: Number(raw.updatedAt) || nowMs,
   };
@@ -787,6 +1231,7 @@ export function createInitialUserData(
     vehicles: [],
     wealthScore: 0,
     investments: createEmptyInvestments(),
+    enterprise: createInitialEnterpriseState(nowMs),
     createdAt: nowMs,
     updatedAt: nowMs,
   };

@@ -12,10 +12,13 @@ import {
   CHECKIN_REWARDS,
   CROPS,
   EMPLOYEES,
+  ENTERPRISE_CAMPAIGNS,
+  ENTERPRISE_SPECIALISTS,
   EVENT_SHOP_ITEMS,
   FACTORIES,
   FRIEND_HELP_REWARD_GOLD,
   FRIEND_WATER_REDUCTION_RATIO,
+  HEADHUNT_COST_GOLD,
   ITEM_CATALOG,
   MAX_FRIEND_HELPS_PER_DAY,
   MAX_PLOTS,
@@ -25,16 +28,22 @@ import {
   STORAGE_UPGRADE_STEP,
   TREASURES,
   VEHICLES,
+  WHOLESALE_CONTRACTS,
 } from './game/constants';
 import {
   applyExpAndLevelUp,
+  calculateDepartmentUpgradeCost,
   calculateEmployeeUpgradeCost,
   calculateGrowthDurationMs,
   calculateMarketTax,
+  calculateMonthlyPayroll,
   calculatePlotCost,
+  calculateSpecialistHireOrUpgradeCost,
   calculateStorageUpgradeCost,
   calculateVipLevel,
   calculateWealthScore,
+  createInitialEnterpriseState,
+  createInitialSpecialists,
   formatNumber,
   generateNpcOrders,
   generateRushOrder,
@@ -64,7 +73,10 @@ import { createSandboxBundle } from './game/sandboxSeed';
 import type {
   CurrencyType,
   EmployeeId,
+  EnterpriseLedgerEntry,
+  EnterpriseSpecialistId,
   FactoryId,
+  FriendChatMessage,
   FriendRequestDoc,
   GameTab,
   MarketListing,
@@ -79,6 +91,7 @@ import type {
   UserGameData,
 } from './game/types';
 import {
+  buildFriendChatId,
   createRedeemCode,
   createTopupRequest,
   deleteRedeemCode,
@@ -87,13 +100,16 @@ import {
   fetchPublicFarmsByUids,
   fetchServerLeaderboard,
   findPlayerByUidOrEmail,
+  flushPendingUserSave,
   rejectTopupRequest,
   respondFriendRequest,
   saveUserState,
+  sendFriendChatMessage,
   sendFriendRequest,
   subscribeActiveMarketListings,
   subscribeAllRedeemCodes,
   subscribeAllTopupRequests,
+  subscribeFriendChatMessages,
   subscribeFriendRequests,
   subscribeListedP2PCompanies,
   subscribeMyP2PCompany,
@@ -185,6 +201,14 @@ export default function App() {
     initialSandbox ? initialSandbox.p2pCompanies : []
   );
   const [myP2PCompany, setMyP2PCompany] = useState<P2PCompanyDoc | null>(null);
+  const [activeChatFriendUid, setActiveChatFriendUid] = useState<string | null>(() =>
+    initialSandbox && initialSandbox.friendsFarms.length > 0
+      ? initialSandbox.friendsFarms[0].uid
+      : null
+  );
+  const [chatMessages, setChatMessages] = useState<FriendChatMessage[]>(() =>
+    initialSandbox ? initialSandbox.friendMessages : []
+  );
 
   const [activeTab, setActiveTab] = useState<GameTab>('farm');
   const [preselectedMarketItem, setPreselectedMarketItem] = useState<string | null>(
@@ -198,6 +222,7 @@ export default function App() {
   const [sfxEnabled, setSfxEnabled] = useState(() => soundEngine.isSfxEnabled());
 
   const autoHarvestLockRef = useRef<number>(0);
+  const lastLocalCommitAtRef = useRef<number>(0);
 
   const pushToast = useCallback(
     (type: ToastMessage['type'], message: string) => {
@@ -229,9 +254,10 @@ export default function App() {
     };
   }, []);
 
-  // Single master 1-second timer for all live countdowns
+  // Master 1-second timer (pauses when tab is hidden to save CPU)
   useEffect(() => {
     const timer = window.setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
       setNowMs(Date.now());
     }, 1000);
     return () => window.clearInterval(timer);
@@ -278,6 +304,13 @@ export default function App() {
 
     const uid = firebaseUser.uid;
     const unsubUser = subscribeUserData(uid, (data) => {
+      // Prevent stale intermediate Firestore snapshot echoes from overwriting newer optimistic state
+      if (
+        Date.now() - lastLocalCommitAtRef.current < 750 &&
+        (data.updatedAt || 0) < lastLocalCommitAtRef.current
+      ) {
+        return;
+      }
       setUserData(data);
     });
     const unsubMarket = subscribeActiveMarketListings(setMarketListings);
@@ -395,6 +428,17 @@ export default function App() {
     };
   }, [isVerifiedAuthenticated, userData?.friends.join(',')]);
 
+  // Real-time Friend Chat subscription (only active for the selected friend to prevent lag)
+  useEffect(() => {
+    if (!isVerifiedAuthenticated || !userData || !activeChatFriendUid) return;
+    const unsub = subscribeFriendChatMessages(
+      userData.uid,
+      activeChatFriendUid,
+      setChatMessages
+    );
+    return () => unsub();
+  }, [isVerifiedAuthenticated, userData?.uid, activeChatFriendUid]);
+
   const handleRefreshLeaderboard = useCallback(async () => {
     if (isSandboxMode) {
       pushToast('info', 'Đã làm mới Bảng Xếp Hạng.');
@@ -432,11 +476,13 @@ export default function App() {
   const commitUserUpdate = useCallback(
     async (updater: (prev: UserGameData) => UserGameData) => {
       if (!userData) return;
+      const now = Date.now();
+      lastLocalCommitAtRef.current = now;
       const rawNext = updater(userData);
       const next: UserGameData = {
         ...rawNext,
         wealthScore: calculateWealthScore(rawNext),
-        updatedAt: Date.now(),
+        updatedAt: now,
       };
       setUserData(next);
       if (!isSandboxMode) {
@@ -568,25 +614,31 @@ export default function App() {
       pushToast('warning', `Cần đạt Level ${crop.unlockLevel} để trồng ${crop.name}.`);
       return;
     }
-    if (userData.gold < crop.seedPrice) {
+    const now = Date.now();
+    const bonuses = getBusinessBonuses(userData, now);
+    const effectiveSeedPrice = Math.max(
+      1,
+      Math.round(crop.seedPrice * (1 - bonuses.seedDiscountPct / 100))
+    );
+    if (userData.gold < effectiveSeedPrice) {
       soundEngine.playError();
-      pushToast('error', `Không đủ Vàng (cần ${formatNumber(crop.seedPrice)} Vàng).`);
+      pushToast('error', `Không đủ Vàng (cần ${formatNumber(effectiveSeedPrice)} Vàng).`);
       return;
     }
     const target = userData.farmPlots.find((p) => p.id === plotId);
     if (!target || target.cropId) return;
 
-    const now = Date.now();
     const sprinklerActive = (userData.autoWaterUntil || 0) > now;
     const duration = calculateGrowthDurationMs(
       crop.id,
       userData.vipLevel,
-      sprinklerActive
+      sprinklerActive,
+      bonuses.cropSpeedReductionPct
     );
 
     await commitUserUpdate((prev) => ({
       ...prev,
-      gold: prev.gold - crop.seedPrice,
+      gold: prev.gold - effectiveSeedPrice,
       farmPlots: prev.farmPlots.map((p) =>
         p.id === plotId
           ? {
@@ -608,7 +660,14 @@ export default function App() {
       ),
     }));
     soundEngine.playPlant();
-    pushToast('info', `Đã gieo ${crop.emoji} ${crop.name} ở ô #${plotId + 1}.`);
+    pushToast(
+      'info',
+      `Đã gieo ${crop.emoji} ${crop.name} ở ô #${plotId + 1}${
+        bonuses.seedDiscountPct > 0
+          ? ` (Giảm -${bonuses.seedDiscountPct}% giá giống & -${bonuses.cropSpeedReductionPct}% TG chín)`
+          : '.'
+      }`
+    );
   };
 
   const handleHarvestPlot = async (plotId: number) => {
@@ -1328,10 +1387,16 @@ export default function App() {
     const sellQty = Math.min(owned, Math.max(1, quantity));
     if (sellQty <= 0) return;
 
-    const surge = getHourlyMarketSurge(Date.now());
+    const now = Date.now();
+    const surge = getHourlyMarketSurge(now);
+    const bonuses = getBusinessBonuses(userData, now);
     const unitPrice = getItemSellPriceWithSurge(itemId, surge);
-    const totalGold = unitPrice * sellQty;
+    const totalGold = Math.round(
+      unitPrice * sellQty * (1 + bonuses.quickSellBonusPct / 100)
+    );
     const item = ITEM_CATALOG[itemId];
+    const bonusExp = Math.max(3, sellQty * 2);
+    const expRes = applyExpAndLevelUp(userData.level, userData.exp, bonusExp);
 
     await commitUserUpdate((prev) => {
       const nextInv = { ...prev.inventory };
@@ -1339,6 +1404,8 @@ export default function App() {
       else nextInv[itemId] = owned - sellQty;
       return {
         ...prev,
+        level: expRes.level,
+        exp: expRes.exp,
         gold: prev.gold + totalGold,
         inventory: nextInv,
       };
@@ -1347,7 +1414,63 @@ export default function App() {
     soundEngine.playCoin();
     pushToast(
       'success',
-      `Đã bán ${sellQty} ${item?.name ?? itemId} thu về +${formatNumber(totalGold)} Vàng!`
+      `Đã bán ${sellQty} ${item?.name ?? itemId} thu về +${formatNumber(totalGold)} Vàng (+${bonusExp} EXP)${
+        bonuses.quickSellBonusPct > 0
+          ? ` [Thưởng Kho Vận +${bonuses.quickSellBonusPct}%]`
+          : '!'
+      }`
+    );
+  };
+
+  const handleBulkSellToNpc = async (
+    itemsToSell: Record<string, number>,
+    label: string
+  ) => {
+    if (!userData) return;
+    const entries = Object.entries(itemsToSell).filter(([, q]) => q > 0);
+    if (entries.length === 0) return;
+
+    const now = Date.now();
+    const surge = getHourlyMarketSurge(now);
+    const bonuses = getBusinessBonuses(userData, now);
+    let rawGold = 0;
+    let totalUnits = 0;
+    const nextInv = { ...userData.inventory };
+
+    for (const [itemId, requestedQty] of entries) {
+      const owned = nextInv[itemId] || 0;
+      const sellQty = Math.min(owned, Math.max(0, Math.floor(requestedQty)));
+      if (sellQty <= 0) continue;
+
+      const unitPrice = getItemSellPriceWithSurge(itemId, surge);
+      rawGold += unitPrice * sellQty;
+      totalUnits += sellQty;
+
+      if (owned - sellQty <= 0) delete nextInv[itemId];
+      else nextInv[itemId] = owned - sellQty;
+    }
+
+    if (totalUnits <= 0) return;
+    const totalGold = Math.round(rawGold * (1 + bonuses.quickSellBonusPct / 100));
+    const bonusExp = Math.max(5, totalUnits * 2);
+    const expRes = applyExpAndLevelUp(userData.level, userData.exp, bonusExp);
+
+    await commitUserUpdate((prev) => ({
+      ...prev,
+      level: expRes.level,
+      exp: expRes.exp,
+      gold: prev.gold + totalGold,
+      inventory: nextInv,
+    }));
+
+    soundEngine.playCoin();
+    pushToast(
+      'success',
+      `Đã bán nhanh ${label} (×${formatNumber(totalUnits)}) thu về +${formatNumber(totalGold)} Vàng (+${bonusExp} EXP)${
+        bonuses.quickSellBonusPct > 0
+          ? ` [Thưởng Kho Vận +${bonuses.quickSellBonusPct}%]`
+          : ''
+      }${expRes.leveledUp ? ` · Lên cấp Lv.${expRes.level}!` : '!'}`
     );
   };
 
@@ -1598,6 +1721,546 @@ export default function App() {
       'success',
       `🎉 Đã rước ${vehicle.emoji} ${vehicle.name} về Showroom (+${formatNumber(vehicle.wealthBonus)} Tài Phú)!`
     );
+  };
+
+  // ==================== ENTERPRISE ERP SIMULATION HANDLERS ====================
+  const handleDepositCorporateFund = async (amountGold: number) => {
+    if (!userData) return;
+    const amt = Math.max(100, Math.floor(amountGold));
+    if (userData.gold < amt) {
+      soundEngine.playError();
+      pushToast('error', `Ví cá nhân không đủ ${formatNumber(amt)} Vàng.`);
+      return;
+    }
+
+    const now = Date.now();
+    await commitUserUpdate((prev) => {
+      const ent = prev.enterprise ?? createInitialEnterpriseState(now);
+      const nextFund = ent.corporateFund + amt;
+      const entry: EnterpriseLedgerEntry = {
+        id: `led_${now}`,
+        type: 'deposit',
+        title: `Nạp vốn lưu động vào Quỹ Doanh Nghiệp`,
+        amountGold: amt,
+        isPositive: true,
+        createdAt: now,
+      };
+      return {
+        ...prev,
+        gold: prev.gold - amt,
+        enterprise: {
+          ...ent,
+          corporateFund: nextFund,
+          ledger: [entry, ...ent.ledger].slice(0, 15),
+        },
+      };
+    });
+
+    soundEngine.playCoin();
+    pushToast(
+      'success',
+      `Đã nạp +${formatNumber(amt)} Vàng vào Quỹ Doanh Nghiệp!`
+    );
+  };
+
+  const handleWithdrawCorporateFund = async (amountGold: number) => {
+    if (!userData) return;
+    const entCurrent = userData.enterprise ?? createInitialEnterpriseState(Date.now());
+    const amt = Math.max(100, Math.floor(amountGold));
+    if (entCurrent.corporateFund < amt) {
+      soundEngine.playError();
+      pushToast('error', `Quỹ Doanh Nghiệp không đủ ${formatNumber(amt)} Vàng.`);
+      return;
+    }
+
+    const now = Date.now();
+    await commitUserUpdate((prev) => {
+      const ent = prev.enterprise ?? createInitialEnterpriseState(now);
+      const nextFund = Math.max(0, ent.corporateFund - amt);
+      const entry: EnterpriseLedgerEntry = {
+        id: `led_${now}`,
+        type: 'withdraw',
+        title: `Rút vốn từ Quỹ Doanh Nghiệp về Ví cá nhân`,
+        amountGold: amt,
+        isPositive: false,
+        createdAt: now,
+      };
+      return {
+        ...prev,
+        gold: prev.gold + amt,
+        enterprise: {
+          ...ent,
+          corporateFund: nextFund,
+          ledger: [entry, ...ent.ledger].slice(0, 15),
+        },
+      };
+    });
+
+    soundEngine.playCoin();
+    pushToast(
+      'info',
+      `Đã rút ${formatNumber(amt)} Vàng từ Quỹ Doanh Nghiệp về Ví cá nhân.`
+    );
+  };
+
+  const handleUpgradeEnterpriseDept = async (
+    dept: 'rd' | 'marketing' | 'operations'
+  ) => {
+    if (!userData) return;
+    const now = Date.now();
+    const entCurrent = userData.enterprise ?? createInitialEnterpriseState(now);
+    const bonuses = getBusinessBonuses(userData, now);
+    const currentLv =
+      dept === 'rd'
+        ? entCurrent.rdLevel
+        : dept === 'marketing'
+          ? entCurrent.marketingLevel
+          : entCurrent.operationsLevel;
+    if (currentLv >= 10) return;
+
+    const cost = calculateDepartmentUpgradeCost(
+      currentLv,
+      bonuses.deptUpgradeDiscountPct
+    );
+    if (entCurrent.corporateFund < cost) {
+      soundEngine.playError();
+      pushToast(
+        'error',
+        `Quỹ Doanh Nghiệp cần ít nhất ${formatNumber(cost)} Vàng để nâng cấp phòng ban này.`
+      );
+      return;
+    }
+
+    const deptLabel =
+      dept === 'rd'
+        ? 'Phòng R&D Nông Nghiệp'
+        : dept === 'marketing'
+          ? 'Phòng Marketing & Thương Hiệu'
+          : 'Phòng Vận Hành & Nhân Sự';
+
+    const expRes = applyExpAndLevelUp(userData.level, userData.exp, 150);
+
+    await commitUserUpdate((prev) => {
+      const ent = prev.enterprise ?? createInitialEnterpriseState(now);
+      const nextFund = Math.max(0, ent.corporateFund - cost);
+      const entry: EnterpriseLedgerEntry = {
+        id: `led_${now}`,
+        type: 'dept_upgrade',
+        title: `Nâng cấp ${deptLabel} lên Lv.${currentLv + 1}`,
+        amountGold: cost,
+        isPositive: false,
+        createdAt: now,
+      };
+      return {
+        ...prev,
+        level: expRes.level,
+        exp: expRes.exp,
+        enterprise: {
+          ...ent,
+          corporateFund: nextFund,
+          rdLevel: dept === 'rd' ? currentLv + 1 : ent.rdLevel,
+          marketingLevel:
+            dept === 'marketing' ? currentLv + 1 : ent.marketingLevel,
+          operationsLevel:
+            dept === 'operations' ? currentLv + 1 : ent.operationsLevel,
+          ledger: [entry, ...ent.ledger].slice(0, 15),
+        },
+      };
+    });
+
+    soundEngine.playFanfare();
+    pushToast(
+      'success',
+      `🏢 Đã nâng cấp ${deptLabel} lên Lv.${currentLv + 1} (+1.500 Tài Phú, +150 EXP)!`
+    );
+  };
+
+  const handleHireOrUpgradeSpecialist = async (
+    specialistId: EnterpriseSpecialistId
+  ) => {
+    if (!userData) return;
+    const def = ENTERPRISE_SPECIALISTS.find((s) => s.id === specialistId);
+    if (!def) return;
+    const now = Date.now();
+    const entCurrent = userData.enterprise ?? createInitialEnterpriseState(now);
+    const currentSpecs = entCurrent.specialists ?? createInitialSpecialists();
+    const currentLv = Math.max(0, Math.floor(currentSpecs[specialistId] || 0));
+    if (currentLv >= def.maxLevel) return;
+
+    const costInfo = calculateSpecialistHireOrUpgradeCost(
+      specialistId,
+      currentLv,
+      entCurrent.headhuntDiscountPct || 0
+    );
+
+    if (entCurrent.corporateFund < costInfo.finalCost) {
+      soundEngine.playError();
+      pushToast(
+        'error',
+        `Quỹ Doanh Nghiệp cần ${formatNumber(costInfo.finalCost)} Vàng để ${
+          currentLv === 0 ? 'tuyển dụng' : 'đào tạo'
+        } ${def.name}.`
+      );
+      return;
+    }
+
+    const expGain = 140 + currentLv * 45;
+    const expRes = applyExpAndLevelUp(userData.level, userData.exp, expGain);
+
+    await commitUserUpdate((prev) => {
+      const ent = prev.enterprise ?? createInitialEnterpriseState(now);
+      const specs = ent.specialists ?? createInitialSpecialists();
+      const nextFund = Math.max(0, ent.corporateFund - costInfo.finalCost);
+      const actionTitle =
+        currentLv === 0
+          ? `Tuyển dụng Chuyên gia ${def.name} (Kỹ năng: ${def.skillName})`
+          : `Đào tạo ${def.name} lên Lv.${currentLv + 1} (${def.skillName})`;
+      const entry: EnterpriseLedgerEntry = {
+        id: `led_spec_${now}`,
+        type: 'hire_specialist',
+        title: actionTitle,
+        amountGold: costInfo.finalCost,
+        isPositive: false,
+        createdAt: now,
+      };
+      return {
+        ...prev,
+        level: expRes.level,
+        exp: expRes.exp,
+        enterprise: {
+          ...ent,
+          corporateFund: nextFund,
+          specialists: {
+            ...specs,
+            [specialistId]: currentLv + 1,
+          },
+          headhuntDiscountPct: 0,
+          morale: Math.min(100, ent.morale + 3),
+          ledger: [entry, ...ent.ledger].slice(0, 15),
+        },
+      };
+    });
+
+    soundEngine.playFanfare();
+    pushToast(
+      'success',
+      `${def.emoji} ${
+        currentLv === 0 ? 'Đã tuyển dụng' : 'Đã đào tạo'
+      } ${def.name} Lv.${currentLv + 1} [Kỹ năng "${def.skillName}" kích hoạt, +${formatNumber(
+        def.wealthPerLevel
+      )} Tài Phú, +${expGain} EXP]!`
+    );
+  };
+
+  const handleHeadhuntSpecialist = async () => {
+    if (!userData) return;
+    const now = Date.now();
+    const entCurrent = userData.enterprise ?? createInitialEnterpriseState(now);
+    if (entCurrent.corporateFund < HEADHUNT_COST_GOLD) {
+      soundEngine.playError();
+      pushToast(
+        'error',
+        `Quỹ Doanh Nghiệp cần ${formatNumber(HEADHUNT_COST_GOLD)} Vàng để Săn Đầu Người.`
+      );
+      return;
+    }
+
+    const rolledDiscount = 14 + Math.floor(Math.random() * 17); // 14%..30%
+    const bestDiscount = Math.max(entCurrent.headhuntDiscountPct || 0, rolledDiscount);
+    const expRes = applyExpAndLevelUp(userData.level, userData.exp, 50);
+
+    await commitUserUpdate((prev) => {
+      const ent = prev.enterprise ?? createInitialEnterpriseState(now);
+      const nextFund = Math.max(0, ent.corporateFund - HEADHUNT_COST_GOLD);
+      const entry: EnterpriseLedgerEntry = {
+        id: `led_hh_${now}`,
+        type: 'headhunt',
+        title: `Chiến dịch Săn Đầu Người (Đàm phán giảm -${bestDiscount}% phí tuyển Chuyên gia)`,
+        amountGold: HEADHUNT_COST_GOLD,
+        isPositive: false,
+        createdAt: now,
+      };
+      return {
+        ...prev,
+        level: expRes.level,
+        exp: expRes.exp,
+        enterprise: {
+          ...ent,
+          corporateFund: nextFund,
+          headhuntDiscountPct: bestDiscount,
+          headhuntCount: (ent.headhuntCount || 0) + 1,
+          morale: Math.min(100, ent.morale + 4),
+          ledger: [entry, ...ent.ledger].slice(0, 15),
+        },
+      };
+    });
+
+    soundEngine.playCoin();
+    pushToast(
+      'success',
+      `🔍 Đã tìm được hồ sơ Chuyên gia xuất sắc: Giảm ngay -${bestDiscount}% chi phí Quỹ cho lượt Tuyển dụng / Đào tạo tiếp theo (+4% Tinh thần)!`
+    );
+  };
+
+  const handleLaunchEnterpriseCampaign = async (campaignId: string) => {
+    if (!userData) return;
+    const camp = ENTERPRISE_CAMPAIGNS.find((c) => c.id === campaignId);
+    if (!camp) return;
+    const now = Date.now();
+    const entCurrent = userData.enterprise ?? createInitialEnterpriseState(now);
+    const bonuses = getBusinessBonuses(userData, now);
+    const effectiveCost = Math.max(
+      500,
+      Math.round(camp.costGold * (1 - bonuses.campaignCostReductionPct / 100))
+    );
+    if (entCurrent.corporateFund < effectiveCost) {
+      soundEngine.playError();
+      pushToast(
+        'error',
+        `Quỹ Doanh Nghiệp cần ${formatNumber(effectiveCost)} Vàng để triển khai chiến dịch này.`
+      );
+      return;
+    }
+
+    const expRes = applyExpAndLevelUp(userData.level, userData.exp, 120);
+
+    await commitUserUpdate((prev) => {
+      const ent = prev.enterprise ?? createInitialEnterpriseState(now);
+      const nextFund = Math.max(0, ent.corporateFund - effectiveCost);
+      const entry: EnterpriseLedgerEntry = {
+        id: `led_${now}`,
+        type: 'campaign',
+        title: `Triển khai ${camp.name} (${camp.durationHours}h)`,
+        amountGold: effectiveCost,
+        isPositive: false,
+        createdAt: now,
+      };
+      return {
+        ...prev,
+        level: expRes.level,
+        exp: expRes.exp,
+        enterprise: {
+          ...ent,
+          corporateFund: nextFund,
+          activeCampaignId: camp.id,
+          activeCampaignName: camp.name,
+          activeCampaignUntil: now + camp.durationHours * 3_600_000,
+          morale: Math.min(100, ent.morale + camp.moraleBoost),
+          ledger: [entry, ...ent.ledger].slice(0, 15),
+        },
+      };
+    });
+
+    soundEngine.playFanfare();
+    pushToast(
+      'success',
+      `📣 Đã kích hoạt "${camp.name}": +${camp.orderBonusPct}% Đơn NPC / +${camp.wholesaleBonusPct}% B2B trong ${camp.durationHours} giờ!`
+    );
+  };
+
+  const handleFulfillWholesaleContract = async (contractId: string) => {
+    if (!userData) return;
+    const contract = WHOLESALE_CONTRACTS.find((c) => c.id === contractId);
+    if (!contract) return;
+    if (userData.level < contract.minLevel) {
+      soundEngine.playError();
+      pushToast('warning', `Cần đạt Lv.${contract.minLevel} để ký hợp đồng B2B này.`);
+      return;
+    }
+
+    for (const [itemId, need] of Object.entries(contract.items)) {
+      if ((userData.inventory[itemId] || 0) < need) {
+        soundEngine.playError();
+        pushToast('error', 'Kho hàng chưa đủ số lượng cho Hợp đồng B2B này.');
+        return;
+      }
+    }
+
+    const now = Date.now();
+    const bonuses = getBusinessBonuses(userData, now);
+    const boostedGold = Math.round(
+      contract.rewardGold * (1 + bonuses.wholesaleBonusPct / 100)
+    );
+    const boostedFundBonus = Math.round(
+      contract.corporateFundBonus *
+        (1 + bonuses.corporateFundContractBonusPct / 100)
+    );
+    const expRes = applyExpAndLevelUp(userData.level, userData.exp, contract.rewardExp);
+
+    await commitUserUpdate((prev) => {
+      const nextInv = { ...prev.inventory };
+      for (const [itemId, need] of Object.entries(contract.items)) {
+        const rem = (nextInv[itemId] || 0) - need;
+        if (rem <= 0) delete nextInv[itemId];
+        else nextInv[itemId] = rem;
+      }
+      const ent = prev.enterprise ?? createInitialEnterpriseState(now);
+      const nextFund = ent.corporateFund + boostedFundBonus;
+      const entry: EnterpriseLedgerEntry = {
+        id: `led_${now}`,
+        type: 'wholesale',
+        title: `Thưởng Quỹ từ ${contract.title} (${contract.partnerName})`,
+        amountGold: boostedFundBonus,
+        isPositive: true,
+        createdAt: now,
+      };
+
+      return {
+        ...prev,
+        level: expRes.level,
+        exp: expRes.exp,
+        gold: prev.gold + boostedGold,
+        reputation: (prev.reputation || 0) + contract.rewardReputation,
+        inventory: nextInv,
+        enterprise: {
+          ...ent,
+          corporateFund: nextFund,
+          totalRevenueGold:
+            ent.totalRevenueGold + boostedGold + boostedFundBonus,
+          totalContractsDone: ent.totalContractsDone + 1,
+          ledger: [entry, ...ent.ledger].slice(0, 15),
+        },
+        stats: {
+          ...prev.stats,
+          totalOrdersDone: (prev.stats?.totalOrdersDone || 0) + 1,
+        },
+      };
+    });
+
+    soundEngine.playFanfare();
+    pushToast(
+      'success',
+      `🚢 Xuất kho B2B "${contract.title}" thành công: +${formatNumber(boostedGold)}V, +${formatNumber(boostedFundBonus)}V vào Quỹ, +${contract.rewardExp} EXP!${
+        expRes.leveledUp ? ` · Thăng cấp Lv.${expRes.level}!` : ''
+      }`
+    );
+  };
+
+  const handlePayMonthlySalary = async () => {
+    if (!userData) return;
+    const now = Date.now();
+    const entCurrent = userData.enterprise ?? createInitialEnterpriseState(now);
+    const payroll = calculateMonthlyPayroll(
+      userData.employees,
+      entCurrent.operationsLevel,
+      entCurrent.specialists
+    );
+    const amount = payroll.netSalary;
+    if (amount <= 0) return;
+
+    const payFromFund = entCurrent.corporateFund >= amount;
+    if (!payFromFund && userData.gold < amount) {
+      soundEngine.playError();
+      pushToast(
+        'error',
+        `Cần ${formatNumber(amount)} Vàng trong Quỹ Doanh Nghiệp hoặc Ví cá nhân để thanh toán lương tháng.`
+      );
+      return;
+    }
+
+    const periodKey = new Date(now).toISOString().slice(0, 7);
+    const expRes = applyExpAndLevelUp(userData.level, userData.exp, 100);
+
+    await commitUserUpdate((prev) => {
+      const ent = prev.enterprise ?? createInitialEnterpriseState(now);
+      const useFund = ent.corporateFund >= amount;
+      const nextFund = useFund ? ent.corporateFund - amount : ent.corporateFund;
+      const entry: EnterpriseLedgerEntry = {
+        id: `led_${now}`,
+        type: 'payroll',
+        title: `Chi trả bảng lương nhân sự kỳ ${periodKey}${
+          useFund ? ' (Trích Quỹ DN)' : ' (Từ Ví cá nhân)'
+        }`,
+        amountGold: amount,
+        isPositive: false,
+        createdAt: now,
+      };
+      return {
+        ...prev,
+        level: expRes.level,
+        exp: expRes.exp,
+        gold: useFund ? prev.gold : prev.gold - amount,
+        enterprise: {
+          ...ent,
+          corporateFund: nextFund,
+          lastPayrollPaidAt: now,
+          lastPayrollMonth: periodKey,
+          morale: Math.min(100, ent.morale + 10),
+          totalPayrollPaidGold: ent.totalPayrollPaidGold + amount,
+          ledger: [entry, ...ent.ledger].slice(0, 15),
+        },
+      };
+    });
+
+    soundEngine.playFanfare();
+    pushToast(
+      'success',
+      `💼 Đã thanh toán ${formatNumber(amount)} Vàng lương nhân sự kỳ ${periodKey} (+10% Tinh thần, +100 EXP)!`
+    );
+  };
+
+  const handleBonusEmployeeMorale = async () => {
+    if (!userData) return;
+    const now = Date.now();
+    const bonusCost = 1500;
+    const entCurrent = userData.enterprise ?? createInitialEnterpriseState(now);
+    const useFund = entCurrent.corporateFund >= bonusCost;
+    if (!useFund && userData.gold < bonusCost) {
+      soundEngine.playError();
+      pushToast('error', 'Cần 1.500 Vàng trong Quỹ hoặc Ví để thưởng nóng nhân sự.');
+      return;
+    }
+
+    const expRes = applyExpAndLevelUp(userData.level, userData.exp, 60);
+
+    await commitUserUpdate((prev) => {
+      const ent = prev.enterprise ?? createInitialEnterpriseState(now);
+      const fromFund = ent.corporateFund >= bonusCost;
+      const nextFund = fromFund ? ent.corporateFund - bonusCost : ent.corporateFund;
+      const entry: EnterpriseLedgerEntry = {
+        id: `led_${now}`,
+        type: 'bonus',
+        title: `Thưởng nóng khích lệ tinh thần toàn bộ nhân sự (+12% Morale)`,
+        amountGold: bonusCost,
+        isPositive: false,
+        createdAt: now,
+      };
+      return {
+        ...prev,
+        level: expRes.level,
+        exp: expRes.exp,
+        gold: fromFund ? prev.gold : prev.gold - bonusCost,
+        enterprise: {
+          ...ent,
+          corporateFund: nextFund,
+          morale: Math.min(100, ent.morale + 12),
+          totalPayrollPaidGold: ent.totalPayrollPaidGold + bonusCost,
+          ledger: [entry, ...ent.ledger].slice(0, 15),
+        },
+      };
+    });
+
+    soundEngine.playFanfare();
+    pushToast(
+      'success',
+      '🎁 Đã thưởng nóng nhân sự: +12% Tinh thần làm việc & +60 EXP!'
+    );
+  };
+
+  const handleToggleAutoPaySalary = async () => {
+    if (!userData) return;
+    const now = Date.now();
+    await commitUserUpdate((prev) => {
+      const ent = prev.enterprise ?? createInitialEnterpriseState(now);
+      return {
+        ...prev,
+        enterprise: {
+          ...ent,
+          autoPaySalary: !ent.autoPaySalary,
+        },
+      };
+    });
+    soundEngine.playClick();
   };
 
   // ==================== P2P MARKETPLACE HANDLERS ====================
@@ -2294,6 +2957,50 @@ export default function App() {
     }
   };
 
+  const handleSendChatMessage = useCallback(
+    async (recipientUid: string, text: string) => {
+      if (!userData) return;
+      const cleaned = text.trim().slice(0, 280);
+      if (!cleaned) return;
+      const now = Date.now();
+      const optimisticMsg: FriendChatMessage = {
+        id: `msg_${now}_${Math.random().toString(36).slice(2, 6)}`,
+        chatId: buildFriendChatId(userData.uid, recipientUid),
+        senderUid: userData.uid,
+        senderName:
+          userData.businessName ||
+          userData.profile?.displayName ||
+          'Nông Trại DOPI',
+        senderAvatar: userData.profile?.avatarEmoji || '🧑‍🌾',
+        recipientUid,
+        text: cleaned,
+        createdAt: now,
+      };
+
+      setChatMessages((prev) => [...prev, optimisticMsg]);
+      soundEngine.playClick();
+
+      if (!isSandboxMode) {
+        try {
+          await sendFriendChatMessage({
+            senderUid: userData.uid,
+            senderName:
+              userData.businessName ||
+              userData.profile?.displayName ||
+              'Nông Trại DOPI',
+            senderAvatar: userData.profile?.avatarEmoji || '🧑‍🌾',
+            recipientUid,
+            text: cleaned,
+          });
+        } catch (err) {
+          console.error('Send friend chat error:', err);
+          pushToast('error', 'Không thể gửi tin nhắn lúc này.');
+        }
+      }
+    },
+    [userData, isSandboxMode, pushToast]
+  );
+
   // ==================== QUESTS & ACHIEVEMENTS HANDLERS ====================
   const handleClaimDailyQuest = async (questId: string) => {
     if (!userData) return;
@@ -2794,6 +3501,7 @@ export default function App() {
             onActivateUtilityItem={handleActivateUtilityItem}
             onExpandStorage={handleExpandStorage}
             onSellToNpc={handleSellToNpc}
+            onBulkSellToNpc={handleBulkSellToNpc}
             onGoToMarketWithItem={(itemId) => {
               setPreselectedMarketItem(itemId);
               setActiveTab('market');
@@ -2847,8 +3555,24 @@ export default function App() {
         {activeTab === 'business' && (
           <BusinessView
             user={userData}
+            nowMs={
+              userData.enterprise?.activeCampaignId &&
+              (userData.enterprise?.activeCampaignUntil || 0) > nowMs
+                ? nowMs
+                : Math.floor(nowMs / 15_000) * 15_000
+            }
             onUpgradeEmployee={handleUpgradeEmployee}
             onBuyVehicle={handleBuyVehicle}
+            onDepositFund={handleDepositCorporateFund}
+            onWithdrawFund={handleWithdrawCorporateFund}
+            onUpgradeDepartment={handleUpgradeEnterpriseDept}
+            onHireOrUpgradeSpecialist={handleHireOrUpgradeSpecialist}
+            onHeadhuntSpecialist={handleHeadhuntSpecialist}
+            onLaunchCampaign={handleLaunchEnterpriseCampaign}
+            onFulfillWholesaleContract={handleFulfillWholesaleContract}
+            onPayMonthlySalary={handlePayMonthlySalary}
+            onBonusEmployeeMorale={handleBonusEmployeeMorale}
+            onToggleAutoPaySalary={handleToggleAutoPaySalary}
           />
         )}
 
@@ -2872,6 +3596,14 @@ export default function App() {
             suggestedFarms={serverLeaderboard}
             incomingRequests={incomingReqs}
             outgoingRequests={outgoingReqs}
+            chatMessages={chatMessages.filter(
+              (m) =>
+                !activeChatFriendUid ||
+                m.chatId === buildFriendChatId(userData.uid, activeChatFriendUid)
+            )}
+            activeChatFriendUid={activeChatFriendUid}
+            onSelectChatFriend={setActiveChatFriendUid}
+            onSendChatMessage={handleSendChatMessage}
             onSearchPlayer={handleSearchPlayer}
             onSendFriendRequest={handleSendFriendRequest}
             onRespondRequest={handleRespondRequest}

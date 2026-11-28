@@ -9,6 +9,7 @@ import {
 } from './economy';
 import { calculateP2PCompanyValuation } from './investment';
 import type {
+  FriendChatMessage,
   FriendRequestDoc,
   MarketListing,
   P2PCompanyDoc,
@@ -30,6 +31,7 @@ export function createSandboxBundle(isAdminPreview: boolean): {
   redeemCodes: RedeemCodeDoc[];
   topupRequests: TopupRequestDoc[];
   p2pCompanies: P2PCompanyDoc[];
+  friendMessages: FriendChatMessage[];
 } {
   const now = Date.now();
   const base = createInitialUserData(
@@ -161,6 +163,59 @@ export function createSandboxBundle(isAdminPreview: boolean): {
       totalInvested: 23700,
       realizedProfit: 1450,
       lastDividendClaimAt: 0,
+    },
+    enterprise: {
+      corporateFund: 18500,
+      payrollReserveRatio: 40,
+      rdLevel: 2,
+      marketingLevel: 2,
+      operationsLevel: 2,
+      morale: 94,
+      lastPayrollMonth: getCurrentMonthKey(now),
+      lastPayrollPaidAt: now - 86_400_000 * 2,
+      autoPaySalary: true,
+      totalRevenueGold: 42800,
+      totalPayrollPaidGold: 4960,
+      totalContractsDone: 5,
+      activeCampaignId: 'camp_brand_festival',
+      activeCampaignName: 'Chiến Dịch Quảng Bá Thương Hiệu Nông Sản Sạch',
+      activeCampaignUntil: now + 4 * 3_600_000,
+      specialists: {
+        lean_engineer: 1,
+        cost_auditor: 1,
+        bio_agronomist: 0,
+        b2b_director: 0,
+        logistics_architect: 0,
+        cfo_treasurer: 0,
+      },
+      headhuntDiscountPct: 18,
+      headhuntCount: 1,
+      ledger: [
+        {
+          id: 'ldg_seed_1',
+          type: 'wholesale',
+          title: 'Hoàn tất Hợp đồng Sỉ: Chuỗi Siêu Thị DOPI Mart',
+          amountGold: 2260,
+          isPositive: true,
+          createdAt: now - 3_600_000 * 3,
+        },
+        {
+          id: 'ldg_seed_2',
+          type: 'payroll',
+          title: `Chi lương nhân sự kỳ ${getCurrentMonthKey(now)} (3 nhân sự)`,
+          amountGold: 2600,
+          isPositive: false,
+          createdAt: now - 86_400_000 * 2,
+        },
+        {
+          id: 'ldg_seed_3',
+          type: 'deposit',
+          title: 'Bổ sung vốn lưu động vào Quỹ Doanh Nghiệp',
+          amountGold: 15000,
+          isPositive: true,
+          createdAt: now - 86_400_000 * 3,
+        },
+      ],
     },
   };
   user.wealthScore = calculateWealthScore(user);
@@ -475,6 +530,39 @@ export function createSandboxBundle(isAdminPreview: boolean): {
     ),
   ];
 
+  const friendMessages: FriendChatMessage[] = [
+    {
+      id: 'msg_seed_1',
+      chatId: ['friend_linh_02', user.uid].sort().join('__'),
+      senderUid: 'friend_linh_02',
+      senderName: 'Vườn Dâu Thảo Nguyên',
+      senderAvatar: '🍓',
+      recipientUid: user.uid,
+      text: 'Chào Minh Khang! Mình vừa tưới ô Ngô Ngọt giúp nông trại bạn rồi nha 💧',
+      createdAt: now - 1_200_000,
+    },
+    {
+      id: 'msg_seed_2',
+      chatId: ['friend_linh_02', user.uid].sort().join('__'),
+      senderUid: user.uid,
+      senderName: user.businessName,
+      senderAvatar: user.profile.avatarEmoji,
+      recipientUid: 'friend_linh_02',
+      text: 'Cảm ơn Thảo Linh nhiều nhé! Để mình qua tưới vườn Dâu Tây cho bạn ngay 🌱',
+      createdAt: now - 900_000,
+    },
+    {
+      id: 'msg_seed_3',
+      chatId: ['friend_tuan_03', user.uid].sort().join('__'),
+      senderUid: 'friend_tuan_03',
+      senderName: 'Xưởng Rang Cao Nguyên',
+      senderAvatar: '☕',
+      recipientUid: user.uid,
+      text: 'Bên bạn còn dư Cà Phê Hạt không, treo lên Chợ P2P mình thu mua hết nhé!',
+      createdAt: now - 600_000,
+    },
+  ];
+
   return {
     user,
     marketListings,
@@ -484,5 +572,6 @@ export function createSandboxBundle(isAdminPreview: boolean): {
     redeemCodes,
     topupRequests,
     p2pCompanies,
+    friendMessages,
   };
 }

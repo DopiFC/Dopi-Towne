@@ -13,6 +13,7 @@ import {
   ShoppingCart,
   Sparkles,
   TrendingUp,
+  Zap,
 } from 'lucide-react';
 import {
   BOOSTERS,
@@ -38,6 +39,10 @@ interface ShopStorageViewProps {
   onActivateUtilityItem: (itemId: string) => Promise<void>;
   onExpandStorage: () => Promise<void>;
   onSellToNpc: (itemId: string, quantity: number) => Promise<void>;
+  onBulkSellToNpc: (
+    itemsToSell: Record<string, number>,
+    label: string
+  ) => Promise<void>;
   onGoToMarketWithItem: (itemId: string) => void;
 }
 
@@ -269,6 +274,7 @@ export const ShopStorageView: React.FC<ShopStorageViewProps> = ({
   onActivateUtilityItem,
   onExpandStorage,
   onSellToNpc,
+  onBulkSellToNpc,
   onGoToMarketWithItem,
 }) => {
   const [expanding, setExpanding] = useState(false);
@@ -288,6 +294,16 @@ export const ShopStorageView: React.FC<ShopStorageViewProps> = ({
         ([itemId, qty]) => qty > 0 && Boolean(ITEM_CATALOG[itemId])
       ),
     [user.inventory]
+  );
+
+  // Owned crops & processed products eligible for 1-click quick sell (excludes boosters)
+  const ownedCropsAndProducts = useMemo(
+    () =>
+      inventoryEntries.filter(([itemId]) => {
+        const cat = ITEM_CATALOG[itemId]?.category;
+        return cat === 'crop' || cat === 'product';
+      }),
+    [inventoryEntries]
   );
 
   // Total count per parent category group
@@ -338,13 +354,19 @@ export const ShopStorageView: React.FC<ShopStorageViewProps> = ({
         ([itemId]) => getGroupForItemId(itemId).id === grp.id
       );
       const totalQty = items.reduce((sum, [, qty]) => sum + qty, 0);
+      const totalValue = items.reduce(
+        (sum, [itemId, qty]) =>
+          sum + getItemSellPriceWithSurge(itemId, surge) * qty,
+        0
+      );
       return {
         group: grp,
         items,
         totalQty,
+        totalValue,
       };
     }).filter((section) => section.items.length > 0);
-  }, [filteredEntries]);
+  }, [filteredEntries, surge]);
 
   const toggleGroupCollapse = (groupId: string) => {
     setCollapsedGroups((prev) => ({
@@ -365,13 +387,14 @@ export const ShopStorageView: React.FC<ShopStorageViewProps> = ({
     if (!item) return null;
     const isSurging = surge.itemId === itemId;
     const livePrice = getItemSellPriceWithSurge(itemId, surge);
+    const stackValue = livePrice * qty;
     const isActivatableUtility =
       itemId === 'auto_sprinkler_2h' || itemId === 'premium_storage_card';
 
     return (
       <div
         key={itemId}
-        className="py-3 first:pt-0 last:pb-0 flex flex-wrap items-center justify-between gap-3"
+        className="py-3 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
       >
         <div className="flex items-center gap-3 min-w-0">
           <span className="w-10 h-10 rounded-xl bg-[#F5F9F0] border border-[#DCE7D3] flex items-center justify-center text-xl shrink-0">
@@ -386,8 +409,12 @@ export const ShopStorageView: React.FC<ShopStorageViewProps> = ({
                 ×{qty}
               </span>
             </div>
-            <div className="flex items-center gap-1.5 text-xs text-slate-500 font-mono-num">
-              <span>Giá thu mua: {formatNumber(livePrice)} V</span>
+            <div className="flex flex-wrap items-center gap-1.5 text-xs text-slate-500 font-mono-num">
+              <span>Đơn giá: {formatNumber(livePrice)} V</span>
+              <span>·</span>
+              <span className="text-amber-700 font-semibold">
+                Tổng: {formatNumber(stackValue)} V
+              </span>
               {isSurging && (
                 <span className="inline-flex items-center gap-0.5 text-amber-700 font-sans font-semibold">
                   <TrendingUp className="w-3 h-3" />+{surge.bonusPercent}%
@@ -410,20 +437,26 @@ export const ShopStorageView: React.FC<ShopStorageViewProps> = ({
           <button
             type="button"
             onClick={() => onSellToNpc(itemId, 1)}
-            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-amber-200 bg-amber-50 text-amber-900 text-xs font-semibold hover:bg-amber-100 cursor-pointer whitespace-nowrap"
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-100 cursor-pointer whitespace-nowrap"
           >
-            <Coins className="w-3.5 h-3.5" />
+            <Coins className="w-3.5 h-3.5 text-amber-600" />
             Bán 1
           </button>
-          {qty > 1 && (
-            <button
-              type="button"
-              onClick={() => onSellToNpc(itemId, qty)}
-              className="px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-100 cursor-pointer whitespace-nowrap"
-            >
-              Bán hết
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() =>
+              onBulkSellToNpc(
+                { [itemId]: qty },
+                `nông sản loại ${item.name}`
+              )
+            }
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-amber-500 text-white text-xs font-semibold hover:bg-amber-600 cursor-pointer whitespace-nowrap shadow-2xs"
+          >
+            <Zap className="w-3.5 h-3.5" />
+            <span>
+              Nhanh chóng bán tất cả {item.name} (×{qty})
+            </span>
+          </button>
           <button
             type="button"
             onClick={() => onGoToMarketWithItem(itemId)}
@@ -627,7 +660,7 @@ export const ShopStorageView: React.FC<ShopStorageViewProps> = ({
         </div>
       </section>
 
-      {/* Right: Storage Inventory with 2-Tier Category -> Child Product Filter */}
+      {/* Right: Storage Inventory with 2-Tier Category -> Child Product Filter & 1-Click Quick Sell All */}
       <section className="lg:col-span-5 space-y-4">
         <div className="flex items-center justify-between">
           <div>
@@ -635,12 +668,55 @@ export const ShopStorageView: React.FC<ShopStorageViewProps> = ({
               Kho Lưu Trữ ({usedStorage}/{user.storageCapacity})
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
-              Chọn danh mục lớn (ví dụ: Trái cây, Lương thực, Bánh & Đồ uống) để lọc nhanh các sản phẩm con bên trong.
+              Dọn kho 1 chạm với nút &ldquo;Nhanh chóng bán tất cả nông sản loại X&rdquo; mà không cần nhập số lượng thủ công.
             </p>
           </div>
         </div>
 
         <div className="bg-white rounded-2xl border border-[#DCE7D3] p-5 space-y-4">
+          {/* 1-Click Quick Storage Cleaner Bar */}
+          {ownedCropsAndProducts.length > 0 && (
+            <div className="rounded-xl bg-[#FFFDF5] border border-amber-200 p-3.5 space-y-2.5">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-amber-950">
+                  <Zap className="w-4 h-4 text-amber-600 shrink-0" />
+                  <span>Dọn Kho Nhanh Theo Từng Loại Nông Sản (1 Chạm)</span>
+                </div>
+                <span className="text-[11px] text-amber-800 font-mono-num">
+                  {ownedCropsAndProducts.length} loại sẵn sàng
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {ownedCropsAndProducts.map(([itemId, qty]) => {
+                  const item = ITEM_CATALOG[itemId];
+                  if (!item) return null;
+                  const val = getItemSellPriceWithSurge(itemId, surge) * qty;
+                  return (
+                    <button
+                      key={`quick_sell_${itemId}`}
+                      type="button"
+                      onClick={() =>
+                        onBulkSellToNpc(
+                          { [itemId]: qty },
+                          `nông sản loại ${item.name}`
+                        )
+                      }
+                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-amber-100/90 hover:bg-amber-500 text-amber-950 hover:text-white border border-amber-300 text-xs font-semibold transition-colors cursor-pointer"
+                    >
+                      <span>{item.emoji}</span>
+                      <span>
+                        Nhanh chóng bán tất cả nông sản loại {item.name}
+                      </span>
+                      <span className="font-mono-num text-[11px] font-bold">
+                        (×{qty} · +{formatNumber(val)}V)
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Quick Search Bar */}
           <div className="relative">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -791,49 +867,72 @@ export const ShopStorageView: React.FC<ShopStorageViewProps> = ({
             </div>
           ) : (
             <div className="space-y-3">
-              {groupedFilteredSections.map(({ group, items, totalQty }) => {
-                const isCollapsed =
-                  selectedGroup === 'all' && Boolean(collapsedGroups[group.id]);
-                return (
-                  <div
-                    key={group.id}
-                    className="rounded-xl border border-[#E2ECDA] bg-[#FCFEFA] overflow-hidden"
-                  >
-                    <button
-                      type="button"
-                      onClick={() => toggleGroupCollapse(group.id)}
-                      className="w-full px-3.5 py-2.5 bg-[#F4FAF0] border-b border-[#E2ECDA] flex items-center justify-between gap-2 text-left cursor-pointer hover:bg-[#EAF5E4] transition-colors"
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-base">{group.emoji}</span>
-                        <span className="text-xs sm:text-sm font-bold text-slate-900 truncate">
-                          {group.label}
-                        </span>
-                        <span className="text-[11px] font-mono-num text-emerald-700 font-semibold">
-                          ({items.length} loại · {totalQty} món)
-                        </span>
-                      </div>
-                      {selectedGroup === 'all' && (
-                        <span className="text-slate-500 shrink-0">
-                          {isCollapsed ? (
-                            <ChevronRight className="w-4 h-4" />
-                          ) : (
-                            <ChevronDown className="w-4 h-4" />
-                          )}
-                        </span>
-                      )}
-                    </button>
+              {groupedFilteredSections.map(
+                ({ group, items, totalQty, totalValue }) => {
+                  const isCollapsed =
+                    selectedGroup === 'all' && Boolean(collapsedGroups[group.id]);
+                  const canBulkSellGroup = group.id !== 'boosters' && totalQty > 0;
+                  const groupItemsRecord = Object.fromEntries(items);
 
-                    {!isCollapsed && (
-                      <div className="p-3.5 divide-y divide-slate-100">
-                        {items.map(([itemId, qty]) =>
-                          renderInventoryRow(itemId, qty)
+                  return (
+                    <div
+                      key={group.id}
+                      className="rounded-xl border border-[#E2ECDA] bg-[#FCFEFA] overflow-hidden"
+                    >
+                      <div className="px-3.5 py-2.5 bg-[#F4FAF0] border-b border-[#E2ECDA] flex flex-wrap items-center justify-between gap-2">
+                        <button
+                          type="button"
+                          onClick={() => toggleGroupCollapse(group.id)}
+                          className="flex items-center gap-2 min-w-0 text-left cursor-pointer"
+                        >
+                          <span className="text-base">{group.emoji}</span>
+                          <span className="text-xs sm:text-sm font-bold text-slate-900 truncate">
+                            {group.label}
+                          </span>
+                          <span className="text-[11px] font-mono-num text-emerald-700 font-semibold">
+                            ({items.length} loại · {totalQty} món)
+                          </span>
+                          {selectedGroup === 'all' && (
+                            <span className="text-slate-500 shrink-0">
+                              {isCollapsed ? (
+                                <ChevronRight className="w-4 h-4" />
+                              ) : (
+                                <ChevronDown className="w-4 h-4" />
+                              )}
+                            </span>
+                          )}
+                        </button>
+
+                        {canBulkSellGroup && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              onBulkSellToNpc(
+                                groupItemsRecord,
+                                `nhóm ${group.label}`
+                              )
+                            }
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500 text-white text-[11px] font-semibold hover:bg-amber-600 cursor-pointer whitespace-nowrap"
+                          >
+                            <Zap className="w-3 h-3" />
+                            <span>
+                              Bán tất cả nhóm ({totalQty} · +{formatNumber(totalValue)}V)
+                            </span>
+                          </button>
                         )}
                       </div>
-                    )}
-                  </div>
-                );
-              })}
+
+                      {!isCollapsed && (
+                        <div className="p-3.5 divide-y divide-slate-100">
+                          {items.map(([itemId, qty]) =>
+                            renderInventoryRow(itemId, qty)
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+              )}
             </div>
           )}
         </div>

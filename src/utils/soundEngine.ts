@@ -39,6 +39,15 @@ class SoundEngine {
       } catch {
         // ignore storage errors
       }
+      if (typeof document !== 'undefined') {
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) {
+            this.stopBgmLoop();
+          } else if (this.unlocked && this.bgmEnabled) {
+            this.startBgmLoop();
+          }
+        });
+      }
     }
   }
 
@@ -105,7 +114,7 @@ class SoundEngine {
   private startBgmLoop(): void {
     if (this.bgmTimer !== null || !this.bgmEnabled) return;
     const playStep = () => {
-      if (!this.bgmEnabled) {
+      if (!this.bgmEnabled || (typeof document !== 'undefined' && document.hidden)) {
         this.stopBgmLoop();
         return;
       }
@@ -155,6 +164,14 @@ class SoundEngine {
 
     osc.connect(gain);
     gain.connect(ctx.destination);
+    osc.onended = () => {
+      try {
+        osc.disconnect();
+        gain.disconnect();
+      } catch {
+        // ignore already disconnected nodes
+      }
+    };
     osc.start(startTime);
     osc.stop(startTime + duration + 0.02);
   }

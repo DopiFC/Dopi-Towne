@@ -4,6 +4,8 @@ import type {
   CheckInDayReward,
   CropDef,
   EmployeeDef,
+  EnterpriseCampaignDef,
+  EnterpriseSpecialistDef,
   EventShopItem,
   FactoryDef,
   ItemCatalogEntry,
@@ -12,7 +14,11 @@ import type {
   TreasureDef,
   VehicleDef,
   VipTier,
+  WholesaleContractDef,
 } from './types';
+
+export const MAX_PLAYER_LEVEL = 999;
+export const MAX_VIP_LEVEL = 20;
 
 export const INITIAL_PLOTS = 6;
 export const MAX_PLOTS = 30;
@@ -744,6 +750,313 @@ export const VIP_TIERS: VipTier[] = [
     frameTitle: 'Huyền Thoại DOPI TOWNE',
     frameRingClass: 'ring-amber-400 bg-gradient-to-br from-amber-50 to-yellow-100 text-amber-900',
     badgeColorClass: 'text-amber-700',
+  },
+  {
+    level: 11,
+    requiredCoins: 140000,
+    growthReductionPct: 21.5,
+    marketTaxPct: 2.8,
+    factoryQueueSlots: 7,
+    harvestAllUnlocked: true,
+    frameTitle: 'Tổng Tài Nông Nghiệp',
+    frameRingClass: 'ring-emerald-400 bg-gradient-to-br from-emerald-50 to-teal-100 text-emerald-900',
+    badgeColorClass: 'text-emerald-700',
+  },
+  {
+    level: 12,
+    requiredCoins: 190000,
+    growthReductionPct: 23,
+    marketTaxPct: 2.6,
+    factoryQueueSlots: 7,
+    harvestAllUnlocked: true,
+    frameTitle: 'Chủ Tịch Tập Đoàn',
+    frameRingClass: 'ring-teal-500 bg-gradient-to-br from-teal-50 to-cyan-100 text-teal-900',
+    badgeColorClass: 'text-teal-700',
+  },
+  {
+    level: 13,
+    requiredCoins: 250000,
+    growthReductionPct: 24.5,
+    marketTaxPct: 2.4,
+    factoryQueueSlots: 7,
+    harvestAllUnlocked: true,
+    frameTitle: 'Thống Đốc Thương Trường',
+    frameRingClass: 'ring-sky-500 bg-gradient-to-br from-sky-50 to-blue-100 text-sky-900',
+    badgeColorClass: 'text-sky-700',
+  },
+  {
+    level: 14,
+    requiredCoins: 330000,
+    growthReductionPct: 26,
+    marketTaxPct: 2.2,
+    factoryQueueSlots: 8,
+    harvestAllUnlocked: true,
+    frameTitle: 'Lãnh Chúa Thảo Nguyên',
+    frameRingClass: 'ring-blue-500 bg-gradient-to-br from-blue-50 to-indigo-100 text-blue-900',
+    badgeColorClass: 'text-blue-700',
+  },
+  {
+    level: 15,
+    requiredCoins: 430000,
+    growthReductionPct: 27.5,
+    marketTaxPct: 2.0,
+    factoryQueueSlots: 8,
+    harvestAllUnlocked: true,
+    frameTitle: 'Công Tước Hoàng Gia',
+    frameRingClass: 'ring-indigo-500 bg-gradient-to-br from-indigo-50 to-violet-100 text-indigo-900',
+    badgeColorClass: 'text-indigo-700',
+  },
+  {
+    level: 16,
+    requiredCoins: 560000,
+    growthReductionPct: 29,
+    marketTaxPct: 1.8,
+    factoryQueueSlots: 8,
+    harvestAllUnlocked: true,
+    frameTitle: 'Đại Công Tước DOPI',
+    frameRingClass: 'ring-violet-500 bg-gradient-to-br from-violet-50 to-purple-100 text-violet-900',
+    badgeColorClass: 'text-violet-700',
+  },
+  {
+    level: 17,
+    requiredCoins: 720000,
+    growthReductionPct: 30.5,
+    marketTaxPct: 1.6,
+    factoryQueueSlots: 9,
+    harvestAllUnlocked: true,
+    frameTitle: 'Vương Giả Tài Phú',
+    frameRingClass: 'ring-purple-500 bg-gradient-to-br from-purple-50 to-fuchsia-100 text-purple-900',
+    badgeColorClass: 'text-purple-700',
+  },
+  {
+    level: 18,
+    requiredCoins: 920000,
+    growthReductionPct: 32,
+    marketTaxPct: 1.4,
+    factoryQueueSlots: 9,
+    harvestAllUnlocked: true,
+    frameTitle: 'Thái Thượng Hoàng Nông Gia',
+    frameRingClass: 'ring-fuchsia-500 bg-gradient-to-br from-fuchsia-50 to-rose-100 text-fuchsia-900',
+    badgeColorClass: 'text-fuchsia-700',
+  },
+  {
+    level: 19,
+    requiredCoins: 1200000,
+    growthReductionPct: 33.5,
+    marketTaxPct: 1.2,
+    factoryQueueSlots: 9,
+    harvestAllUnlocked: true,
+    frameTitle: 'Đế Vương Kinh Tế DOPI',
+    frameRingClass: 'ring-rose-500 bg-gradient-to-br from-rose-50 to-amber-100 text-rose-900',
+    badgeColorClass: 'text-rose-700',
+  },
+  {
+    level: 20,
+    requiredCoins: 1600000,
+    growthReductionPct: 35,
+    marketTaxPct: 1.0,
+    factoryQueueSlots: 10,
+    harvestAllUnlocked: true,
+    frameTitle: 'Thần Nông Chí Tôn VIP 20',
+    frameRingClass: 'ring-amber-500 bg-gradient-to-br from-amber-100 via-yellow-50 to-emerald-100 text-amber-950',
+    badgeColorClass: 'text-amber-800',
+  },
+];
+
+export const ENTERPRISE_CAMPAIGNS: EnterpriseCampaignDef[] = [
+  {
+    id: 'camp_brand_festival',
+    name: 'Chiến Dịch Quảng Bá Thương Hiệu Nông Sản Sạch',
+    emoji: '📣',
+    costGold: 3500,
+    durationHours: 6,
+    orderBonusPct: 18,
+    wholesaleBonusPct: 15,
+    moraleBoost: 8,
+    description:
+      'Quảng bá thương hiệu nông trại trên toàn thị trấn: +18% giá trị đơn NPC, +15% doanh thu hợp đồng sỉ trong 6 giờ.',
+  },
+  {
+    id: 'camp_cold_chain',
+    name: 'Tối Ưu Chuỗi Cung Ứng Kho Lạnh B2B',
+    emoji: '❄️',
+    costGold: 8500,
+    durationHours: 12,
+    orderBonusPct: 24,
+    wholesaleBonusPct: 28,
+    moraleBoost: 12,
+    description:
+      'Chuẩn hóa bảo quản lạnh và vận tải nhanh: +28% doanh thu hợp đồng sỉ B2B, +24% thưởng đơn NPC trong 12 giờ.',
+  },
+  {
+    id: 'camp_global_expo',
+    name: 'Hội Chợ Xuất Khẩu Nông Sản Quốc Tế DOPI',
+    emoji: '🌐',
+    costGold: 22000,
+    durationHours: 24,
+    orderBonusPct: 35,
+    wholesaleBonusPct: 45,
+    moraleBoost: 20,
+    description:
+      'Ký kết hợp đồng xuất khẩu quy mô lớn: +45% giá trị lô hàng sỉ, +35% đơn hàng thị trấn và +20% tinh thần nhân sự suốt 24 giờ.',
+  },
+];
+
+export const WHOLESALE_CONTRACTS: WholesaleContractDef[] = [
+  {
+    id: 'ws_grain_supply',
+    title: 'Lô Hàng Lương Thực Chuỗi Tiệm Bánh',
+    partnerName: 'Hệ Thống Bakery Thị Trấn',
+    emoji: '🌾',
+    minLevel: 1,
+    items: { wheat: 8, corn: 4 },
+    rewardGold: 1150,
+    corporateFundBonus: 320,
+    rewardExp: 145,
+    rewardReputation: 25,
+  },
+  {
+    id: 'ws_fresh_fruit_box',
+    title: 'Hợp Đồng Trái Cây Tươi Siêu Thị Xanh',
+    partnerName: 'Chuỗi Siêu Thị DOPI Mart',
+    emoji: '🍓',
+    minLevel: 2,
+    items: { tomato: 6, strawberry: 3 },
+    rewardGold: 1780,
+    corporateFundBonus: 480,
+    rewardExp: 220,
+    rewardReputation: 40,
+  },
+  {
+    id: 'ws_coffee_bakery_combo',
+    title: 'Suất Cung Ứng Bữa Sáng Doanh Nghiệp',
+    partnerName: 'Khu Văn Phòng Trung Tâm DOPI',
+    emoji: '🥐',
+    minLevel: 3,
+    items: { butter_bread: 2, phin_coffee: 1, coffee: 2 },
+    rewardGold: 2850,
+    corporateFundBonus: 750,
+    rewardExp: 340,
+    rewardReputation: 65,
+  },
+  {
+    id: 'ws_tropical_export',
+    title: 'Container Xuất Khẩu Đặc Sản Nhiệt Đới',
+    partnerName: 'Tập Đoàn Xuất Nhập Khẩu Á Châu',
+    emoji: '🍈',
+    minLevel: 6,
+    items: { dopi_durian: 2, strawberry_tart: 1, fresh_milk: 1 },
+    rewardGold: 5600,
+    corporateFundBonus: 1450,
+    rewardExp: 620,
+    rewardReputation: 120,
+  },
+];
+
+export const HEADHUNT_COST_GOLD = 800;
+
+export const ENTERPRISE_SPECIALISTS: EnterpriseSpecialistDef[] = [
+  {
+    id: 'lean_engineer',
+    name: 'Kỹ Sư Trưởng Dây Chuyền',
+    role: 'Tự Động Hóa & Tăng Tốc Sản Xuất',
+    emoji: '⚙️',
+    skillName: 'Dây Chuyền Lean 4.0',
+    skillBadge: 'Tăng Tốc Sản Xuất',
+    skillCategory: 'production_speed',
+    maxLevel: 5,
+    baseHireFundCost: 1600,
+    monthlySalaryGold: 320,
+    effectPerLevelPct: 5, // -5%/cấp thời gian sản xuất nhà máy (tối đa -25%)
+    secondaryPerLevelPct: 3, // +3%/cấp tỉ lệ sản lượng kép
+    wealthPerLevel: 2600,
+    description:
+      'Kỹ năng đặc biệt: Giảm 5% thời gian chế biến nhà máy và tăng +3% tỉ lệ thu hoạch nhân đôi mỗi cấp (Tối đa -25% thời gian SX).',
+  },
+  {
+    id: 'cost_auditor',
+    name: 'Chuyên Gia Tối Ưu Chi Phí',
+    role: 'Kiểm Toán ERP & Cắt Giảm Vận Hành',
+    emoji: '📉',
+    skillName: 'Kiểm Toán Chi Phí ERP',
+    skillBadge: 'Giảm Chi Phí Vận Hành',
+    skillCategory: 'cost_reduction',
+    maxLevel: 5,
+    baseHireFundCost: 1800,
+    monthlySalaryGold: 340,
+    effectPerLevelPct: 5, // -5%/cấp chi phí vận hành, quỹ lương tháng & chiến dịch (tối đa -25%)
+    secondaryPerLevelPct: 2, // +2%/cấp hiệu suất tinh thần nhân sự
+    wealthPerLevel: 2800,
+    description:
+      'Kỹ năng đặc biệt: Giảm 5% tổng chi phí vận hành, quỹ lương hàng tháng và phí chạy chiến dịch kinh doanh mỗi cấp (Tối đa -25%).',
+  },
+  {
+    id: 'bio_agronomist',
+    name: 'Tiến Sĩ Giống Cây Trồng',
+    role: 'Công Nghệ Gen & Tăng Tốc Sinh Trưởng',
+    emoji: '🧬',
+    skillName: 'Đột Biến Sinh Học Nông Nghiệp',
+    skillBadge: 'Tăng Tốc Cây & Giảm Vốn Giống',
+    skillCategory: 'crop_genetics',
+    maxLevel: 5,
+    baseHireFundCost: 2100,
+    monthlySalaryGold: 380,
+    effectPerLevelPct: 4, // -4%/cấp thời gian cây trồng chín (tối đa -20%)
+    secondaryPerLevelPct: 4, // -4%/cấp chi phí mua hạt giống gieo trồng (tối đa -20%)
+    wealthPerLevel: 3100,
+    description:
+      'Kỹ năng đặc biệt: Rút ngắn 4% thời gian cây trồng chín và giảm 4% chi phí mua hạt giống gieo trồng mỗi cấp (Tối đa -20%).',
+  },
+  {
+    id: 'b2b_director',
+    name: 'Giám Đốc Đàm Phán B2B',
+    role: 'Thương Thuyết Hợp Đồng Sỉ & Xuất Khẩu',
+    emoji: '🤝',
+    skillName: 'Đàm Phán Thương Mại Quốc Tế',
+    skillBadge: 'Tăng Doanh Thu Hợp Đồng',
+    skillCategory: 'revenue_boost',
+    maxLevel: 5,
+    baseHireFundCost: 2400,
+    monthlySalaryGold: 420,
+    effectPerLevelPct: 6, // +6%/cấp doanh thu hợp đồng sỉ B2B & đơn NPC (tối đa +30%)
+    secondaryPerLevelPct: 5, // +5%/cấp thưởng nạp vào Quỹ Doanh Nghiệp khi giao lô sỉ
+    wealthPerLevel: 3400,
+    description:
+      'Kỹ năng đặc biệt: Tăng +6% doanh thu Hợp đồng Sỉ B2B & Đơn hàng NPC, cộng thêm +5% thưởng trích Quỹ Doanh Nghiệp mỗi cấp.',
+  },
+  {
+    id: 'logistics_architect',
+    name: 'Kiến Trúc Sư Kho Vận',
+    role: 'Tối Ưu Hóa Lưu Kho & Thanh Khoản',
+    emoji: '📦',
+    skillName: 'Chuỗi Kho Thông Minh',
+    skillBadge: 'Thưởng Giá Bán Kho & Tiếp Vận',
+    skillCategory: 'logistics',
+    maxLevel: 5,
+    baseHireFundCost: 1950,
+    monthlySalaryGold: 350,
+    effectPerLevelPct: 4, // +4%/cấp giá bán nông sản/thành phẩm tại Kho Lưu Trữ (tối đa +20%)
+    secondaryPerLevelPct: 3, // -3%/cấp thời gian chờ đơn hàng NPC mới
+    wealthPerLevel: 2900,
+    description:
+      'Kỹ năng đặc biệt: Tăng +4% giá bán nhanh toàn bộ nông sản/hàng hóa tại Kho Lưu Trữ và giảm 3% thời gian chờ đơn NPC mỗi cấp.',
+  },
+  {
+    id: 'cfo_treasurer',
+    name: 'Giám Đốc Tài Chính (CFO)',
+    role: 'Quản Trị Nguồn Vốn & Định Giá Tập Đoàn',
+    emoji: '🏛️',
+    skillName: 'Tái Cấu Trúc Vốn Doanh Nghiệp',
+    skillBadge: 'Giảm Vốn Nâng Phòng Ban',
+    skillCategory: 'finance',
+    maxLevel: 5,
+    baseHireFundCost: 2800,
+    monthlySalaryGold: 480,
+    effectPerLevelPct: 5, // -5%/cấp chi phí nâng cấp các Phòng Ban R&D/Marketing/Vận hành (tối đa -25%)
+    secondaryPerLevelPct: 4, // +4.500 Điểm Tài Phú định giá mỗi cấp
+    wealthPerLevel: 4500,
+    description:
+      'Kỹ năng đặc biệt: Giảm 5% chi phí Quỹ khi nâng cấp các Phòng Ban (R&D, Marketing, Vận Hành) và tăng +4.500 Điểm Tài Phú mỗi cấp.',
   },
 ];
 

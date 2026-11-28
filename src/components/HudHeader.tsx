@@ -3,6 +3,7 @@ import {
   Award,
   BookOpen,
   Briefcase,
+  Building2,
   CalendarHeart,
   Check,
   ChevronDown,
@@ -26,7 +27,7 @@ import {
   VolumeX,
   X,
 } from 'lucide-react';
-import { AVATAR_OPTIONS } from '../game/constants';
+import { AVATAR_OPTIONS, MAX_PLAYER_LEVEL, MAX_VIP_LEVEL } from '../game/constants';
 import {
   formatNumber,
   getExpRequiredForLevel,
@@ -60,17 +61,15 @@ interface NavTabItem {
   description: string;
   icon: React.ComponentType<{ className?: string }>;
   group: 'production' | 'finance' | 'community' | 'support';
-  quickPin?: boolean;
 }
 
 const ALL_TABS: NavTabItem[] = [
   {
     id: 'farm',
     label: 'Nông Trại',
-    description: 'Gieo hạt, bón phân & thu hoạch',
+    description: 'Gieo hạt, bón phân & thu hoạch nông sản',
     icon: Sprout,
     group: 'production',
-    quickPin: true,
   },
   {
     id: 'factory',
@@ -78,30 +77,27 @@ const ALL_TABS: NavTabItem[] = [
     description: 'Chế biến bánh, cà phê, sữa & giao đơn NPC',
     icon: Factory,
     group: 'production',
-    quickPin: true,
   },
   {
     id: 'shop',
     label: 'Cửa Hàng & Kho',
-    description: 'Mua vật phẩm, báu vật & lọc kho lưu trữ',
+    description: 'Mua vật phẩm, báu vật & bán nhanh nông sản',
     icon: ShoppingBag,
     group: 'production',
-    quickPin: true,
   },
   {
     id: 'business',
     label: 'Doanh Nghiệp',
-    description: 'Thuê nhân sự tự động & sắm đội xe vận tải',
+    description: 'Quản lý quỹ, hợp đồng sỉ, chiến dịch & lương tháng',
     icon: Briefcase,
     group: 'production',
   },
   {
     id: 'market',
     label: 'Chợ P2P',
-    description: 'Mua bán vật phẩm tự do giữa người chơi',
+    description: 'Mua bán nông sản tự do giữa người chơi',
     icon: Store,
     group: 'finance',
-    quickPin: true,
   },
   {
     id: 'invest',
@@ -109,7 +105,6 @@ const ALL_TABS: NavTabItem[] = [
     description: 'Sàn chứng khoán 6 mã ngành & gọi vốn IPO',
     icon: TrendingUp,
     group: 'finance',
-    quickPin: true,
   },
   {
     id: 'events',
@@ -120,8 +115,8 @@ const ALL_TABS: NavTabItem[] = [
   },
   {
     id: 'friends',
-    label: 'Bạn Bè',
-    description: 'Kết bạn, ghé thăm & tưới cây nhận Vàng',
+    label: 'Bạn Bè & Chat',
+    description: 'Kết bạn, trò chuyện trực tuyến & tưới cây',
     icon: Users,
     group: 'community',
   },
@@ -135,14 +130,14 @@ const ALL_TABS: NavTabItem[] = [
   {
     id: 'quests',
     label: 'Nhiệm Vụ & VIP',
-    description: 'Nhiệm vụ ngày, thành tựu & đặc quyền VIP',
+    description: 'Nhiệm vụ ngày, thành tựu & đặc quyền VIP 1–20',
     icon: Award,
     group: 'community',
   },
   {
     id: 'guide',
     label: 'Hướng Dẫn Chơi',
-    description: 'Cẩm nang tân thủ & bí quyết làm giàu',
+    description: 'Cẩm nang tân thủ & bí quyết vận hành doanh nghiệp',
     icon: BookOpen,
     group: 'support',
   },
@@ -190,9 +185,13 @@ export const HudHeader: React.FC<HudHeaderProps> = ({
   const [savingProfile, setSavingProfile] = useState(false);
 
   const expNeeded = getExpRequiredForLevel(user.level);
-  const expPct = Math.min(100, Math.round((user.exp / expNeeded) * 100));
+  const expPct =
+    user.level >= MAX_PLAYER_LEVEL
+      ? 100
+      : Math.min(100, Math.round((user.exp / Math.max(1, expNeeded)) * 100));
   const usedStorage = getTotalInventoryCount(user.inventory);
   const storageFull = usedStorage >= user.storageCapacity;
+  const corporateFund = user.enterprise?.corporateFund ?? 0;
 
   const getBadgeCount = (tabId: GameTab): number => {
     if (tabId === 'friends') return pendingFriendRequests;
@@ -207,9 +206,6 @@ export const HudHeader: React.FC<HudHeaderProps> = ({
   const activeTabDef =
     ALL_TABS.find((t) => t.id === activeTab) ?? ALL_TABS[0];
   const ActiveIcon = activeTabDef.icon;
-
-  const quickTabs = ALL_TABS.filter((t) => t.quickPin);
-  const isCurrentInQuick = quickTabs.some((t) => t.id === activeTab);
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -232,10 +228,10 @@ export const HudHeader: React.FC<HudHeaderProps> = ({
   return (
     <header className="bg-white border-b border-[#DCE7D3] shadow-[0_1px_2px_rgba(20,50,20,0.04)] sticky top-0 z-30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        {/* Top HUD Strip */}
+        {/* Single Unified Top HUD Strip */}
         <div className="py-2.5 flex flex-wrap items-center justify-between gap-3">
-          {/* Left: Hamburger Button + Brand + Business Identity */}
-          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+          {/* Left: Hamburger Button + Active Section Pill + Brand + Business Identity */}
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
             <button
               type="button"
               onClick={() => setMenuOpen((prev) => !prev)}
@@ -243,7 +239,7 @@ export const HudHeader: React.FC<HudHeaderProps> = ({
               aria-label="Mở menu điều hướng"
               className={`relative inline-flex items-center gap-2 px-3 py-2 rounded-xl border text-xs sm:text-sm font-bold transition-colors cursor-pointer shrink-0 ${
                 menuOpen
-                  ? 'bg-emerald-700 text-white border-emerald-700'
+                  ? 'bg-emerald-700 text-white border-emerald-700 shadow-xs'
                   : 'bg-[#F4FAF0] text-emerald-950 border-[#CDE0C1] hover:bg-emerald-100/70'
               }`}
             >
@@ -253,19 +249,29 @@ export const HudHeader: React.FC<HudHeaderProps> = ({
                 <Menu className="w-4 h-4 shrink-0" />
               )}
               <span>Menu</span>
+              <span
+                className={`hidden sm:inline-flex items-center gap-1 pl-2 ml-0.5 border-l text-xs font-semibold ${
+                  menuOpen
+                    ? 'border-emerald-500 text-emerald-50'
+                    : 'border-emerald-300/80 text-emerald-800'
+                }`}
+              >
+                <ActiveIcon className="w-3.5 h-3.5 shrink-0" />
+                <span className="max-w-[115px] truncate">{activeTabDef.label}</span>
+              </span>
               <ChevronDown
                 className={`w-3.5 h-3.5 transition-transform ${
                   menuOpen ? 'rotate-180' : ''
                 }`}
               />
               {totalMenuBadges > 0 && (
-                <span className="font-mono-num text-[11px] font-bold px-1.5 py-0.2 rounded-md bg-rose-600 text-white">
+                <span className="font-mono-num text-[11px] font-bold px-1.5 py-0.5 rounded-md bg-rose-600 text-white leading-none">
                   {totalMenuBadges}
                 </span>
               )}
             </button>
 
-            <BrandCrest size={36} className="hidden md:block shrink-0" />
+            <BrandCrest size={34} className="hidden xl:block shrink-0" />
             <VipAvatarFrame
               avatarEmoji={user.profile.avatarEmoji}
               vipLevel={user.vipLevel}
@@ -273,7 +279,7 @@ export const HudHeader: React.FC<HudHeaderProps> = ({
             />
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
-                <span className="font-display font-bold text-sm sm:text-base text-slate-900 truncate max-w-[135px] sm:max-w-[200px]">
+                <span className="font-display font-bold text-sm sm:text-base text-slate-900 truncate max-w-[130px] sm:max-w-[185px]">
                   {user.businessName}
                 </span>
                 <button
@@ -290,27 +296,36 @@ export const HudHeader: React.FC<HudHeaderProps> = ({
                 </button>
               </div>
               <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
-                <span className="font-semibold text-emerald-700 font-mono-num">
+                <span
+                  className="font-semibold text-emerald-700 font-mono-num"
+                  title={`Cấp độ tối đa: Lv.${MAX_PLAYER_LEVEL} · VIP tối đa: VIP ${MAX_VIP_LEVEL}`}
+                >
                   Lv.{user.level}
                 </span>
                 <div
                   className="w-16 sm:w-24 h-1.5 bg-slate-100 rounded-full overflow-hidden"
-                  title={`EXP: ${user.exp} / ${expNeeded}`}
+                  title={
+                    user.level >= MAX_PLAYER_LEVEL
+                      ? `Đã đạt cấp tối đa Lv.${MAX_PLAYER_LEVEL}`
+                      : `EXP: ${formatNumber(user.exp)} / ${formatNumber(expNeeded)} (${expPct}%)`
+                  }
                 >
                   <div
                     className="h-full bg-emerald-500 rounded-full transition-all duration-300"
                     style={{ width: `${expPct}%` }}
                   />
                 </div>
-                <span className="hidden xl:inline font-mono-num text-[11px]">
-                  {user.exp}/{expNeeded} EXP
+                <span className="hidden 2xl:inline font-mono-num text-[11px]">
+                  {user.level >= MAX_PLAYER_LEVEL
+                    ? 'MAX LV.999'
+                    : `${formatNumber(user.exp)}/${formatNumber(expNeeded)} EXP`}
                 </span>
               </div>
             </div>
           </div>
 
           {/* Center: Live Resource Readouts */}
-          <div className="flex items-center gap-4 sm:gap-6 text-sm order-3 lg:order-2 w-full lg:w-auto justify-between lg:justify-center border-t lg:border-t-0 border-slate-100 pt-2 lg:pt-0">
+          <div className="flex items-center gap-3 sm:gap-5 text-sm order-3 lg:order-2 w-full lg:w-auto justify-between lg:justify-center border-t lg:border-t-0 border-slate-100 pt-2 lg:pt-0">
             <div className="flex items-center gap-2" title="Vàng (Tiền tệ cơ bản)">
               <span className="w-7 h-7 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 shrink-0">
                 <Coins className="w-4 h-4" />
@@ -335,7 +350,29 @@ export const HudHeader: React.FC<HudHeaderProps> = ({
               </div>
             </div>
 
-            <div className="flex items-center gap-2" title="Sức chứa kho nông sản">
+            <button
+              type="button"
+              onClick={() => handlePickTab('business')}
+              title="Quỹ Vận Hành Doanh Nghiệp (Nhấn để quản lý Quỹ & Lương)"
+              className="hidden sm:flex items-center gap-2 text-left hover:opacity-85 transition-opacity cursor-pointer"
+            >
+              <span className="w-7 h-7 rounded-lg bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-700 shrink-0">
+                <Building2 className="w-4 h-4" />
+              </span>
+              <div>
+                <div className="text-[11px] text-slate-500 leading-none">Quỹ DN</div>
+                <div className="font-mono-num font-bold text-sky-800 leading-tight">
+                  {formatNumber(corporateFund)}
+                </div>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handlePickTab('shop')}
+              title="Sức chứa kho nông sản (Nhấn để mở Kho & Bán nhanh)"
+              className="flex items-center gap-2 text-left hover:opacity-85 transition-opacity cursor-pointer"
+            >
               <span
                 className={`w-7 h-7 rounded-lg border flex items-center justify-center shrink-0 ${
                   storageFull
@@ -355,7 +392,7 @@ export const HudHeader: React.FC<HudHeaderProps> = ({
                   {usedStorage}/{user.storageCapacity}
                 </div>
               </div>
-            </div>
+            </button>
           </div>
 
           {/* Right: Audio Toggles & Action Buttons */}
@@ -410,7 +447,7 @@ export const HudHeader: React.FC<HudHeaderProps> = ({
                 <Shield className="w-4 h-4" />
                 <span className="hidden sm:inline">Admin</span>
                 {pendingTopupCount > 0 && (
-                  <span className="font-mono-num text-[11px] font-bold px-1.5 py-0.2 rounded-md bg-rose-600 text-white">
+                  <span className="font-mono-num text-[11px] font-bold px-1.5 py-0.5 rounded-md bg-rose-600 text-white leading-none">
                     {pendingTopupCount}
                   </span>
                 )}
@@ -428,97 +465,13 @@ export const HudHeader: React.FC<HudHeaderProps> = ({
             </button>
           </div>
         </div>
-
-        {/* Streamlined Quick Bar + Active Section Indicator */}
-        <nav
-          aria-label="Điều hướng chính"
-          className="flex items-center justify-between gap-2 pb-2 pt-0.5 overflow-x-auto"
-        >
-          <div className="flex items-center gap-1.5">
-            {quickTabs.map((tab) => {
-              const Icon = tab.icon;
-              const active = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={active}
-                  onClick={() => handlePickTab(tab.id)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap shrink-0 transition-colors cursor-pointer ${
-                    active
-                      ? 'bg-emerald-600 text-white shadow-xs'
-                      : 'text-slate-600 hover:bg-[#EDF5E7] hover:text-emerald-900'
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5 shrink-0" />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
-
-            {!isCurrentInQuick && (
-              <button
-                type="button"
-                role="tab"
-                aria-selected={true}
-                onClick={() => setMenuOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap shrink-0 bg-emerald-600 text-white shadow-xs cursor-pointer"
-              >
-                <ActiveIcon className="w-3.5 h-3.5 shrink-0" />
-                <span>{activeTabDef.label}</span>
-              </button>
-            )}
-          </div>
-
-          <div className="hidden md:flex items-center gap-1.5 shrink-0">
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activeTab === 'guide'}
-              onClick={() => handlePickTab('guide')}
-              className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
-                activeTab === 'guide'
-                  ? 'bg-emerald-600 text-white'
-                  : 'text-slate-600 hover:bg-[#EDF5E7] hover:text-emerald-900'
-              }`}
-            >
-              <BookOpen className="w-3.5 h-3.5" />
-              <span>Hướng Dẫn</span>
-            </button>
-
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activeTab === 'donate'}
-              onClick={() => handlePickTab('donate')}
-              className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
-                activeTab === 'donate'
-                  ? 'bg-rose-600 text-white'
-                  : 'text-rose-700 bg-rose-50/70 hover:bg-rose-100'
-              }`}
-            >
-              <Heart className="w-3.5 h-3.5" />
-              <span>Donate</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setMenuOpen((prev) => !prev)}
-              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-emerald-800 bg-[#F4FAF0] border border-[#DCE7D3] hover:bg-emerald-100/70 cursor-pointer"
-            >
-              <Menu className="w-3.5 h-3.5" />
-              <span>Tất cả (12)</span>
-            </button>
-          </div>
-        </nav>
       </div>
 
       {/* Hamburger Menu Categorized Drawer / Dropdown */}
       {menuOpen && (
         <>
           <div
-            className="fixed inset-0 z-40 bg-slate-900/30"
+            className="fixed inset-0 z-40 bg-slate-900/35"
             onClick={() => setMenuOpen(false)}
           />
           <div
@@ -526,23 +479,24 @@ export const HudHeader: React.FC<HudHeaderProps> = ({
             aria-label="Danh mục tính năng DOPI TOWNE"
             className="relative z-50 bg-white border-t border-b border-[#DCE7D3] shadow-xl"
           >
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 space-y-5 max-h-[80vh] overflow-y-auto">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 space-y-5 max-h-[82vh] overflow-y-auto">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
                 <div>
                   <h2 className="text-base font-bold text-slate-900">
-                    Danh Mục Hệ Thống DOPI TOWNE
+                    Danh Mục Hệ Thống DOPI TOWNE (12 Phân Khu)
                   </h2>
                   <p className="text-xs text-slate-500">
-                    Chọn nhanh phân khu chức năng bạn muốn truy cập
+                    Cấp tối đa Lv.{MAX_PLAYER_LEVEL} · Đặc quyền VIP 1–{MAX_VIP_LEVEL} · Chọn phân khu bạn muốn điều hành
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setMenuOpen(false)}
                   aria-label="Đóng menu"
-                  className="p-2 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-100 cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer"
                 >
                   <X className="w-4 h-4" />
+                  <span>Đóng</span>
                 </button>
               </div>
 
