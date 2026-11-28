@@ -146,3 +146,19 @@ test('Portfolio PnL and combined NPC + P2P dividend calculations work accurately
   assert.equal(div.p2pGoldDividend, 200);
   assert.equal(div.totalGold, div.npcGoldDividend + 200);
 });
+
+test('INVESTMENT_LOCKUP_MS is 0 (T+0 instant trading) and default P2P companies seed 3 valid enterprises', async () => {
+  const { INVESTMENT_LOCKUP_MS, createDefaultP2PCompanies, normalizeUserInvestments } = await import('./investment');
+  assert.equal(INVESTMENT_LOCKUP_MS, 0);
+  const seeded = createDefaultP2PCompanies(1_760_000_000_000);
+  assert.equal(seeded.length, 3);
+  for (const c of seeded) {
+    assert.equal(c.isListed, true);
+    assert.ok(c.availableShares > 0);
+    assert.ok(c.sharePrice >= 120);
+  }
+  const norm = normalizeUserInvestments({
+    npcHoldings: { DAGR: { shares: 3, avgBuyPrice: 180, lockedUntil: 9999999999999 } },
+  });
+  assert.equal(norm.npcHoldings.DAGR?.lockedUntil, 0);
+});

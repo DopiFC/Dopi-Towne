@@ -8,7 +8,9 @@ export type GameTab =
   | 'events'
   | 'business'
   | 'leaderboard'
-  | 'quests';
+  | 'quests'
+  | 'guide'
+  | 'donate';
 
 export type ItemCategory = 'crop' | 'product' | 'booster' | 'treasure';
 export type CurrencyType = 'gold' | 'coins';

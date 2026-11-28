@@ -103,7 +103,7 @@ export const InvestmentView: React.FC<InvestmentViewProps> = ({
   const [subTab, setSubTab] = useState<InvestSubTab>('stocks');
   const [selectedCode, setSelectedCode] = useState<StockCode>('DAGR');
   const [tradeMode, setTradeMode] = useState<'buy' | 'sell'>('buy');
-  const [tradeQty, setTradeQty] = useState<number>(5);
+  const [tradeQty, setTradeQty] = useState<number>(1);
   const [submittingTrade, setSubmittingTrade] = useState(false);
 
   const [tickerIdx, setTickerIdx] = useState(0);
@@ -233,10 +233,15 @@ export const InvestmentView: React.FC<InvestmentViewProps> = ({
     return Math.min(999, Math.max(0, qty));
   }, [isCoinStock, user.dopiCoins, user.gold, selectedStock.currentPrice, feePct, user.vipLevel]);
 
+  const effectiveSellQty =
+    ownedSelectedShares > 0
+      ? Math.min(safeTradeQty, ownedSelectedShares)
+      : safeTradeQty;
+
   const canSubmitNpcTrade =
     tradeMode === 'buy'
       ? (isCoinStock ? user.dopiCoins : user.gold) >= buyPreview.totalCost
-      : ownedSelectedShares >= safeTradeQty && selectedLockedMs === 0;
+      : ownedSelectedShares >= 1 && selectedLockedMs === 0;
 
   const handleSubmitNpcTrade = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -246,7 +251,7 @@ export const InvestmentView: React.FC<InvestmentViewProps> = ({
       if (tradeMode === 'buy') {
         await onBuyNpcStock(selectedStock.def.code, safeTradeQty);
       } else {
-        await onSellNpcStock(selectedStock.def.code, safeTradeQty);
+        await onSellNpcStock(selectedStock.def.code, effectiveSellQty);
       }
     } finally {
       setSubmittingTrade(false);
@@ -386,7 +391,7 @@ export const InvestmentView: React.FC<InvestmentViewProps> = ({
           <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
             Phí sàn hiện tại của bạn:{' '}
             <strong className="font-mono-num text-emerald-700">{feePct}%</strong>{' '}
-            (VIP {user.vipLevel}) · Khóa lệnh T+30 phút sau khi mua
+            (VIP {user.vipLevel}) · Khớp lệnh T+0 mua bán tức thì
           </p>
         </div>
 
@@ -695,7 +700,12 @@ export const InvestmentView: React.FC<InvestmentViewProps> = ({
                   </button>
                   <button
                     type="button"
-                    onClick={() => setTradeMode('sell')}
+                    onClick={() => {
+                      setTradeMode('sell');
+                      if (ownedSelectedShares > 0 && tradeQty > ownedSelectedShares) {
+                        setTradeQty(ownedSelectedShares);
+                      }
+                    }}
                     className={`px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
                       tradeMode === 'sell'
                         ? 'bg-rose-600 text-white'
@@ -822,10 +832,10 @@ export const InvestmentView: React.FC<InvestmentViewProps> = ({
                 <span className="text-xs text-slate-500 inline-flex items-center gap-1.5">
                   <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                   {tradeMode === 'buy'
-                    ? 'Cổ phiếu mua mới sẽ khóa lệnh T+30 phút để chống spam.'
+                    ? 'Khớp lệnh T+0 tức thì — có thể mua và chốt lời bán lại ngay.'
                     : selectedLockedMs > 0
-                      ? `Đang khóa T+30p (còn ${formatTimeRemaining(selectedLockedMs)}).`
-                      : 'Cổ phiếu đã mở khóa, sẵn sàng khớp lệnh bán ngay.'}
+                      ? `Đang khóa lệnh (còn ${formatTimeRemaining(selectedLockedMs)}).`
+                      : 'Cổ phiếu sẵn sàng khớp lệnh bán ngay.'}
                 </span>
 
                 <button
@@ -841,7 +851,7 @@ export const InvestmentView: React.FC<InvestmentViewProps> = ({
                     ? 'Đang khớp lệnh...'
                     : tradeMode === 'buy'
                       ? `Mua ${safeTradeQty} ${selectedStock.def.code}`
-                      : `Bán ${safeTradeQty} ${selectedStock.def.code}`}
+                      : `Bán ${effectiveSellQty} ${selectedStock.def.code}`}
                 </button>
               </div>
             </form>
@@ -1025,7 +1035,7 @@ export const InvestmentView: React.FC<InvestmentViewProps> = ({
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {filteredP2PCompanies.map((comp) => {
                 const isMine = comp.ownerUid === user.uid;
-                const qty = Math.max(1, p2pBuyQtys[comp.ownerUid] ?? 5);
+                const qty = Math.max(1, p2pBuyQtys[comp.ownerUid] ?? 1);
                 const trade = calculateBuyTrade(
                   comp.sharePrice,
                   qty,
@@ -1162,7 +1172,7 @@ export const InvestmentView: React.FC<InvestmentViewProps> = ({
                       </button>
 
                       {!isMine && (
-                        <div className="flex items-center gap-2 flex-1 sm:flex-initial justify-end">
+                        <div className="flex flex-wrap items-center gap-2 flex-1 sm:flex-initial justify-end">
                           <input
                             type="number"
                             min={1}
@@ -1194,7 +1204,7 @@ export const InvestmentView: React.FC<InvestmentViewProps> = ({
                                 setBusyP2PUid(null);
                               }
                             }}
-                            className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-500 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap"
+                            className="px-3.5 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-500 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap"
                             title={`Gồm ${formatNumber(trade.gross)}V vốn + ${formatNumber(trade.feeAmount)}V phí sàn (${trade.feePct}%)`}
                           >
                             {busyP2PUid === comp.ownerUid
@@ -1203,6 +1213,27 @@ export const InvestmentView: React.FC<InvestmentViewProps> = ({
                                 ? 'Hết cổ phần'
                                 : `Mua (${formatNumber(trade.totalCost)}V)`}
                           </button>
+                          {ownedByMe > 0 && (
+                            <button
+                              type="button"
+                              disabled={busyP2PUid === comp.ownerUid}
+                              onClick={async () => {
+                                setBusyP2PUid(comp.ownerUid);
+                                try {
+                                  await onSellP2PShares(
+                                    comp.ownerUid,
+                                    Math.min(qty, ownedByMe)
+                                  );
+                                } finally {
+                                  setBusyP2PUid(null);
+                                }
+                              }}
+                              className="px-3 py-2 rounded-xl bg-rose-600 text-white text-xs font-bold hover:bg-rose-700 disabled:bg-slate-200 disabled:text-slate-500 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap"
+                              title="Bán cổ phần đang nắm giữ"
+                            >
+                              Bán {Math.min(qty, ownedByMe)} CP
+                            </button>
+                          )}
                         </div>
                       )}
                     </div>

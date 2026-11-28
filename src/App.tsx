@@ -134,6 +134,8 @@ import { RedeemCodeModal } from './components/RedeemCodeModal';
 import { SetupGuideScreen } from './components/SetupGuideScreen';
 import { ShopStorageView } from './components/ShopStorageView';
 import { ToastStack } from './components/ToastStack';
+import { GuideView } from './components/GuideView';
+import { DonateView } from './components/DonateView';
 
 function getSearchParams() {
   if (typeof window === 'undefined') return new URLSearchParams();
@@ -244,6 +246,7 @@ export default function App() {
       setFirebaseUser(fbUser);
       if (fbUser && fbUser.emailVerified) {
         try {
+          await fbUser.getIdToken(true).catch(() => undefined);
           const docData = await ensureUserDocument(
             fbUser.uid,
             fbUser.email || '',
@@ -349,17 +352,30 @@ export default function App() {
   // Sync accepted outgoing friend requests into user.friends
   useEffect(() => {
     if (!isVerifiedAuthenticated || !userData) return;
+    const currentFriends = Array.isArray(userData.friends)
+      ? userData.friends
+      : [];
     const acceptedNewUids = outgoingReqs
       .filter(
-        (r) => r.status === 'accepted' && !userData.friends.includes(r.toUid)
+        (r) =>
+          r.status === 'accepted' &&
+          r.toUid !== userData.uid &&
+          !currentFriends.includes(r.toUid)
       )
       .map((r) => r.toUid);
     if (acceptedNewUids.length > 0) {
+      const mergedFriends = Array.from(
+        new Set([...currentFriends, ...acceptedNewUids])
+      ).slice(0, 100);
       const next: UserGameData = {
         ...userData,
-        friends: [...userData.friends, ...acceptedNewUids].slice(0, 100),
+        friends: mergedFriends,
+        updatedAt: Date.now(),
       };
-      void saveUserState(next);
+      setUserData(next);
+      saveUserState(next).catch((err) => {
+        console.warn('Sync accepted friend warning:', err);
+      });
     }
   }, [outgoingReqs, userData, isVerifiedAuthenticated]);
 
@@ -397,12 +413,21 @@ export default function App() {
     }
   }, [isSandboxMode, isVerifiedAuthenticated, pushToast]);
 
-  // Auto-fetch Server Leaderboard when opening the leaderboard tab
+  // Auto-fetch Server Leaderboard when opening leaderboard or friends tab
   useEffect(() => {
-    if (activeTab === 'leaderboard' && isVerifiedAuthenticated) {
+    if (
+      (activeTab === 'leaderboard' ||
+        (activeTab === 'friends' && serverLeaderboard.length === 0)) &&
+      isVerifiedAuthenticated
+    ) {
       void handleRefreshLeaderboard();
     }
-  }, [activeTab, isVerifiedAuthenticated, handleRefreshLeaderboard]);
+  }, [
+    activeTab,
+    isVerifiedAuthenticated,
+    handleRefreshLeaderboard,
+    serverLeaderboard.length,
+  ]);
 
   const commitUserUpdate = useCallback(
     async (updater: (prev: UserGameData) => UserGameData) => {
@@ -415,10 +440,20 @@ export default function App() {
       };
       setUserData(next);
       if (!isSandboxMode) {
-        await saveUserState(next);
+        try {
+          await saveUserState(next);
+        } catch (err) {
+          console.error('Lỗi đồng bộ dữ liệu Firestore:', err);
+          pushToast(
+            'error',
+            err instanceof Error
+              ? err.message
+              : 'Không thể lưu thao tác lên máy chủ.'
+          );
+        }
       }
     },
-    [userData, isSandboxMode]
+    [userData, isSandboxMode, pushToast]
   );
 
   // Diligent Farmer auto-harvest while online (throttled to every 4s, writes only when crops are ready)
@@ -1744,7 +1779,7 @@ export default function App() {
       'success',
       `Khớp lệnh Mua ${safeQty} ${code} với tổng ${formatNumber(trade.totalCost)} ${
         isCoin ? 'Xu DOPI' : 'Vàng'
-      } (phí ${trade.feePct}% · khóa T+30p).`
+      } (phí ${trade.feePct}%).`
     );
   };
 
@@ -2121,15 +2156,15 @@ export default function App() {
   const handleRespondRequest = async (req: FriendRequestDoc, accept: boolean) => {
     if (!userData) return;
     try {
+      setIncomingReqs((prev) => prev.filter((r) => r.id !== req.id));
       if (isSandboxMode) {
-        setIncomingReqs((prev) => prev.filter((r) => r.id !== req.id));
         if (accept) {
           await commitUserUpdate((prev) => ({
             ...prev,
-            friends: [...prev.friends, req.fromUid],
+            friends: Array.from(new Set([...prev.friends, req.fromUid])),
           }));
           setFriendsFarms((prev) => [
-            ...prev,
+            ...prev.filter((f) => f.uid !== req.fromUid),
             {
               uid: req.fromUid,
               isPublic: true,
@@ -2156,7 +2191,20 @@ export default function App() {
           ]);
         }
       } else {
-        await respondFriendRequest(req, accept, userData);
+        const nextFriends = await respondFriendRequest(req, accept, userData);
+        if (accept) {
+          setUserData((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  friends: nextFriends,
+                  updatedAt: Date.now(),
+                }
+              : prev
+          );
+          const farms = await fetchPublicFarmsByUids(nextFriends);
+          setFriendsFarms(farms);
+        }
       }
       soundEngine.playClick();
       pushToast(
@@ -2615,6 +2663,7 @@ export default function App() {
             if (!firebaseUser) return;
             await firebaseUser.reload();
             if (auth?.currentUser?.emailVerified) {
+              await auth.currentUser.getIdToken(true).catch(() => undefined);
               const docData = await ensureUserDocument(
                 auth.currentUser.uid,
                 auth.currentUser.email || '',
@@ -2820,6 +2869,7 @@ export default function App() {
             user={userData}
             nowMs={nowMs}
             friendsFarms={friendsFarms}
+            suggestedFarms={serverLeaderboard}
             incomingRequests={incomingReqs}
             outgoingRequests={outgoingReqs}
             onSearchPlayer={handleSearchPlayer}
@@ -2836,6 +2886,28 @@ export default function App() {
             onClaimDailyQuest={handleClaimDailyQuest}
             onClaimAchievement={handleClaimAchievement}
             onOpenRedeemModal={() => setShowRedeemModal(true)}
+          />
+        )}
+
+        {activeTab === 'guide' && (
+          <GuideView
+            onNavigateTab={(tab) => {
+              soundEngine.playClick();
+              setActiveTab(tab);
+            }}
+          />
+        )}
+
+        {activeTab === 'donate' && (
+          <DonateView
+            onNavigateTab={(tab) => {
+              soundEngine.playClick();
+              setActiveTab(tab);
+            }}
+            onOpenTopupModal={() => {
+              soundEngine.playClick();
+              setShowRedeemModal(true);
+            }}
           />
         )}
       </main>

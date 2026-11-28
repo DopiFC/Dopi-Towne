@@ -1,4 +1,5 @@
 import {
+  arrayUnion,
   collection,
   deleteDoc,
   doc,
@@ -18,6 +19,7 @@ import {
 import {
   db,
   handleFirestoreError,
+  logFirestoreListenerError,
   OperationType,
 } from '../firebaseConfig';
 import {
@@ -40,7 +42,9 @@ import {
   getCurrentMonthKey,
   getTodayDateKey,
   getTotalInventoryCount,
+  normalizePublicFarmData,
   normalizeUserData,
+  sanitizeForFirestore,
   validateRedeemCodeState,
 } from '../game/economy';
 import {
@@ -49,6 +53,7 @@ import {
   calculateClaimableDividends,
   calculateP2PShareholderDividend,
   calculateSellTrade,
+  createDefaultP2PCompanies,
   DIVIDEND_CYCLE_MS,
   getEffectiveP2PCompanyState,
   INVESTMENT_LOCKUP_MS,
@@ -77,49 +82,64 @@ function requireDb() {
   return db;
 }
 
-export async function syncPublicProjections(user: UserGameData): Promise<void> {
+export async function syncPublicProjections(
+  user: UserGameData,
+  syncEmailDir: boolean = true
+): Promise<void> {
   const firestore = requireDb();
-  const wealthScore = calculateWealthScore(user);
-  const publicFarm: PublicFarmData = {
-    uid: user.uid,
+  const normalizedUser = normalizeUserData(user);
+  const wealthScore = calculateWealthScore(normalizedUser);
+
+  const publicFarm: PublicFarmData = normalizePublicFarmData({
+    uid: normalizedUser.uid,
     isPublic: true,
-    businessName: user.businessName.slice(0, 40),
-    displayName: user.profile.displayName.slice(0, 60),
-    avatarEmoji: user.profile.avatarEmoji.slice(0, 16),
-    level: Math.floor(user.level),
-    vipLevel: Math.floor(user.vipLevel),
-    totalRechargedCoins: Math.floor(user.totalRechargedCoins || 0),
+    businessName: normalizedUser.businessName.slice(0, 40),
+    displayName: normalizedUser.profile.displayName.slice(0, 60),
+    avatarEmoji: normalizedUser.profile.avatarEmoji.slice(0, 16),
+    level: Math.floor(normalizedUser.level),
+    vipLevel: Math.floor(normalizedUser.vipLevel),
+    totalRechargedCoins: Math.floor(normalizedUser.totalRechargedCoins || 0),
     wealthScore,
-    vehicles: (user.vehicles ?? []).slice(0, 20),
-    treasures: (user.treasures ?? []).slice(0, 30),
-    farmPlots: user.farmPlots.slice(0, MAX_PLOTS),
+    vehicles: (normalizedUser.vehicles ?? []).slice(0, 20),
+    treasures: (normalizedUser.treasures ?? []).slice(0, 30),
+    farmPlots: normalizedUser.farmPlots.slice(0, MAX_PLOTS),
     updatedAt: Date.now(),
-  };
+  });
 
   try {
-    await setDoc(doc(firestore, 'public_farms', user.uid), publicFarm, {
-      merge: false,
-    });
+    await setDoc(
+      doc(firestore, 'public_farms', normalizedUser.uid),
+      sanitizeForFirestore(publicFarm),
+      { merge: false }
+    );
   } catch (error) {
-    handleFirestoreError(error, OperationType.WRITE, `public_farms/${user.uid}`);
+    logFirestoreListenerError(
+      error,
+      OperationType.WRITE,
+      `public_farms/${normalizedUser.uid}`
+    );
   }
 
-  const emailKey = encodeEmailKey(user.email);
+  if (!syncEmailDir || !normalizedUser.email) return;
+
+  const emailKey = encodeEmailKey(normalizedUser.email);
+  if (!emailKey) return;
+
   try {
     await setDoc(
       doc(firestore, 'email_directory', emailKey),
-      {
-        uid: user.uid,
+      sanitizeForFirestore({
+        uid: normalizedUser.uid,
         businessName: publicFarm.businessName,
         displayName: publicFarm.displayName,
         avatarEmoji: publicFarm.avatarEmoji,
         level: publicFarm.level,
         vipLevel: publicFarm.vipLevel,
-      },
+      }),
       { merge: false }
     );
   } catch (error) {
-    handleFirestoreError(
+    logFirestoreListenerError(
       error,
       OperationType.WRITE,
       `email_directory/${emailKey}`
@@ -137,31 +157,35 @@ export async function ensureUserDocument(
   try {
     const snap = await getDoc(userRef);
     if (snap.exists()) {
-      const existing = normalizeUserData(
-        snap.data() as Partial<UserGameData> & { uid: string; email: string }
-      );
+      const rawData = snap.data() as Partial<UserGameData>;
+      const existing = normalizeUserData({
+        ...rawData,
+        uid,
+        email: rawData.email || email || `${uid}@dopi.local`,
+      });
       const today = getTodayDateKey();
       if (existing.lastDailyReset !== today) {
-        const refreshed: UserGameData = {
+        const refreshed: UserGameData = normalizeUserData({
           ...existing,
           lastDailyReset: today,
           dailyQuests: generateDailyQuests(),
           helpCountToday: 0,
           helpedFriendsToday: [],
           updatedAt: Date.now(),
-        };
-        refreshed.wealthScore = calculateWealthScore(refreshed);
-        await setDoc(userRef, refreshed);
-        await syncPublicProjections(refreshed);
+        });
+        await setDoc(userRef, sanitizeForFirestore(refreshed));
+        await syncPublicProjections(refreshed, true);
         return refreshed;
       }
-      await syncPublicProjections(existing);
+      // Persist normalized schema so legacy user documents always have all required fields
+      await setDoc(userRef, sanitizeForFirestore(existing));
+      await syncPublicProjections(existing, true);
       return existing;
     }
 
     const fresh = createInitialUserData(uid, email, displayName);
-    await setDoc(userRef, fresh);
-    await syncPublicProjections(fresh);
+    await setDoc(userRef, sanitizeForFirestore(fresh));
+    await syncPublicProjections(fresh, true);
     return fresh;
   } catch (error) {
     handleFirestoreError(error, OperationType.WRITE, `users/${uid}`);
@@ -178,15 +202,18 @@ export function subscribeUserData(
     userRef,
     (snap) => {
       if (snap.exists()) {
+        const raw = snap.data() as Partial<UserGameData>;
         onData(
-          normalizeUserData(
-            snap.data() as Partial<UserGameData> & { uid: string; email: string }
-          )
+          normalizeUserData({
+            ...raw,
+            uid,
+            email: raw.email || `${uid}@dopi.local`,
+          })
         );
       }
     },
     (error) => {
-      handleFirestoreError(error, OperationType.GET, `users/${uid}`);
+      logFirestoreListenerError(error, OperationType.GET, `users/${uid}`);
     }
   );
 }
@@ -201,29 +228,36 @@ export function subscribeMyPublicFarm(
     ref,
     (snap) => {
       if (snap.exists()) {
-        onData(snap.data() as PublicFarmData);
+        onData(
+          normalizePublicFarmData({
+            ...(snap.data() as Partial<PublicFarmData>),
+            uid,
+          })
+        );
       }
     },
     (error) => {
-      handleFirestoreError(error, OperationType.GET, `public_farms/${uid}`);
+      logFirestoreListenerError(error, OperationType.GET, `public_farms/${uid}`);
     }
   );
 }
 
-export async function saveUserState(nextUser: UserGameData): Promise<void> {
+export async function saveUserState(
+  nextUser: UserGameData,
+  syncEmailDir: boolean = false
+): Promise<void> {
   const firestore = requireDb();
-  const payload: UserGameData = {
+  const payload = normalizeUserData({
     ...nextUser,
     businessName: nextUser.businessName.trim().slice(0, 40) || 'Nông Trại DOPI',
-    wealthScore: calculateWealthScore(nextUser),
     updatedAt: Date.now(),
-  };
+  });
   try {
-    await setDoc(doc(firestore, 'users', payload.uid), payload);
-    await syncPublicProjections(payload);
+    await setDoc(doc(firestore, 'users', payload.uid), sanitizeForFirestore(payload));
   } catch (error) {
     handleFirestoreError(error, OperationType.UPDATE, `users/${payload.uid}`);
   }
+  await syncPublicProjections(payload, syncEmailDir);
 }
 
 /**
@@ -262,22 +296,30 @@ export async function txRedeemCode(
       }
 
       const validCode = codeDoc as RedeemCodeDoc;
-      const userData = userSnap.data() as UserGameData;
+      const userData = normalizeUserData({
+        ...(userSnap.data() as Partial<UserGameData>),
+        uid,
+        email: (userSnap.data() as Partial<UserGameData>).email || `${uid}@dopi.local`,
+      });
       const nextTotalRecharged =
         (userData.totalRechargedCoins || 0) + validCode.amount;
       const nextVipLevel = calculateVipLevel(nextTotalRecharged);
+      const now = Date.now();
 
       tx.update(codeRef, {
         usedCount: validCode.usedCount + 1,
         usedBy: [...validCode.usedBy, uid],
       });
 
-      tx.update(userRef, {
+      const updatedUser = normalizeUserData({
+        ...userData,
         dopiCoins: userData.dopiCoins + validCode.amount,
         totalRechargedCoins: nextTotalRecharged,
         vipLevel: nextVipLevel,
-        updatedAt: Date.now(),
+        updatedAt: now,
       });
+
+      tx.set(userRef, sanitizeForFirestore(updatedUser));
 
       return {
         amount: validCode.amount,
@@ -302,14 +344,20 @@ export async function txRedeemCode(
 /**
  * Mua thêm ô đất bằng Firestore runTransaction()
  */
-export async function txBuyNewPlot(uid: string): Promise<{ cost: number; totalPlots: number }> {
+export async function txBuyNewPlot(
+  uid: string
+): Promise<{ cost: number; totalPlots: number }> {
   const firestore = requireDb();
   const userRef = doc(firestore, 'users', uid);
   try {
     return await runTransaction(firestore, async (tx) => {
       const snap = await tx.get(userRef);
       if (!snap.exists()) throw new Error('Không tìm thấy dữ liệu người chơi.');
-      const user = snap.data() as UserGameData;
+      const user = normalizeUserData({
+        ...(snap.data() as Partial<UserGameData>),
+        uid,
+        email: (snap.data() as Partial<UserGameData>).email || `${uid}@dopi.local`,
+      });
       if (user.farmPlots.length >= MAX_PLOTS) {
         throw new Error('Bạn đã mở khóa tối đa 30 ô đất.');
       }
@@ -326,13 +374,17 @@ export async function txBuyNewPlot(uid: string): Promise<{ cost: number; totalPl
           readyAt: null,
           wateredBy: null,
           wateredAt: null,
+          yieldBoosted: false,
+          mutationBoosted: false,
         },
       ];
-      tx.update(userRef, {
+      const updatedUser = normalizeUserData({
+        ...user,
         gold: user.gold - cost,
         farmPlots: nextPlots,
         updatedAt: Date.now(),
       });
+      tx.set(userRef, sanitizeForFirestore(updatedUser));
       return { cost, totalPlots: nextPlots.length };
     });
   } catch (error) {
@@ -346,14 +398,20 @@ export async function txBuyNewPlot(uid: string): Promise<{ cost: number; totalPl
 /**
  * Mở rộng kho bằng Firestore runTransaction()
  */
-export async function txExpandStorage(uid: string): Promise<{ cost: number; newCapacity: number }> {
+export async function txExpandStorage(
+  uid: string
+): Promise<{ cost: number; newCapacity: number }> {
   const firestore = requireDb();
   const userRef = doc(firestore, 'users', uid);
   try {
     return await runTransaction(firestore, async (tx) => {
       const snap = await tx.get(userRef);
       if (!snap.exists()) throw new Error('Không tìm thấy dữ liệu người chơi.');
-      const user = snap.data() as UserGameData;
+      const user = normalizeUserData({
+        ...(snap.data() as Partial<UserGameData>),
+        uid,
+        email: (snap.data() as Partial<UserGameData>).email || `${uid}@dopi.local`,
+      });
       if (user.storageCapacity >= 5000) {
         throw new Error('Kho đã đạt sức chứa tối đa.');
       }
@@ -362,11 +420,13 @@ export async function txExpandStorage(uid: string): Promise<{ cost: number; newC
         throw new Error(`Cần ${cost} Vàng để mở rộng kho.`);
       }
       const newCapacity = user.storageCapacity + STORAGE_UPGRADE_STEP;
-      tx.update(userRef, {
+      const updatedUser = normalizeUserData({
+        ...user,
         gold: user.gold - cost,
         storageCapacity: newCapacity,
         updatedAt: Date.now(),
       });
+      tx.set(userRef, sanitizeForFirestore(updatedUser));
       return { cost, newCapacity };
     });
   } catch (error) {
@@ -380,7 +440,10 @@ export async function txExpandStorage(uid: string): Promise<{ cost: number; newC
 /**
  * Mở khóa nhà máy bằng Firestore runTransaction()
  */
-export async function txUnlockFactory(uid: string, factoryId: FactoryId): Promise<{ cost: number }> {
+export async function txUnlockFactory(
+  uid: string,
+  factoryId: FactoryId
+): Promise<{ cost: number }> {
   const firestore = requireDb();
   const userRef = doc(firestore, 'users', uid);
   const factoryDef = FACTORIES.find((f) => f.id === factoryId);
@@ -390,7 +453,11 @@ export async function txUnlockFactory(uid: string, factoryId: FactoryId): Promis
     return await runTransaction(firestore, async (tx) => {
       const snap = await tx.get(userRef);
       if (!snap.exists()) throw new Error('Không tìm thấy dữ liệu người chơi.');
-      const user = snap.data() as UserGameData;
+      const user = normalizeUserData({
+        ...(snap.data() as Partial<UserGameData>),
+        uid,
+        email: (snap.data() as Partial<UserGameData>).email || `${uid}@dopi.local`,
+      });
       if (user.level < factoryDef.unlockLevel) {
         throw new Error(`Cần đạt Level ${factoryDef.unlockLevel} để mở khóa.`);
       }
@@ -404,11 +471,13 @@ export async function txUnlockFactory(uid: string, factoryId: FactoryId): Promis
       const nextFactories = user.factories.map((f) =>
         f.id === factoryId ? { ...f, unlocked: true } : f
       );
-      tx.update(userRef, {
+      const updatedUser = normalizeUserData({
+        ...user,
         gold: user.gold - factoryDef.unlockCostGold,
         factories: nextFactories,
         updatedAt: Date.now(),
       });
+      tx.set(userRef, sanitizeForFirestore(updatedUser));
       return { cost: factoryDef.unlockCostGold };
     });
   } catch (error) {
@@ -421,6 +490,7 @@ export async function txUnlockFactory(uid: string, factoryId: FactoryId): Promis
 
 /**
  * Chợ P2P: Lắng nghe danh sách rao bán đang hoạt động
+ * (Sắp xếp client-side để không phụ thuộc composite index trên Firestore)
  */
 export function subscribeActiveMarketListings(
   onData: (listings: MarketListing[]) => void
@@ -428,20 +498,21 @@ export function subscribeActiveMarketListings(
   const firestore = requireDb();
   const q = query(
     collection(firestore, 'market_listings'),
-    where('status', '==', 'active'),
-    orderBy('createdAt', 'desc')
+    where('status', '==', 'active')
   );
   return onSnapshot(
     q,
     (snap) => {
-      const items: MarketListing[] = snap.docs.map((d) => ({
-        ...(d.data() as Omit<MarketListing, 'id'>),
-        id: d.id,
-      }));
+      const items: MarketListing[] = snap.docs
+        .map((d) => ({
+          ...(d.data() as Omit<MarketListing, 'id'>),
+          id: d.id,
+        }))
+        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
       onData(items);
     },
     (error) => {
-      handleFirestoreError(error, OperationType.LIST, 'market_listings');
+      logFirestoreListenerError(error, OperationType.LIST, 'market_listings');
     }
   );
 }
@@ -474,7 +545,12 @@ export async function txCreateMarketListing(
     await runTransaction(firestore, async (tx) => {
       const userSnap = await tx.get(userRef);
       if (!userSnap.exists()) throw new Error('Không tìm thấy tài khoản.');
-      const user = userSnap.data() as UserGameData;
+      const user = normalizeUserData({
+        ...(userSnap.data() as Partial<UserGameData>),
+        uid: sellerUid,
+        email:
+          (userSnap.data() as Partial<UserGameData>).email || `${sellerUid}@dopi.local`,
+      });
       const owned = user.inventory[itemId] || 0;
       if (owned < safeQty) {
         throw new Error('Số lượng vật phẩm trong kho không đủ.');
@@ -488,7 +564,8 @@ export async function txCreateMarketListing(
       }
 
       const now = Date.now();
-      tx.update(userRef, {
+      const updatedUser = normalizeUserData({
+        ...user,
         inventory: nextInventory,
         stats: {
           ...user.stats,
@@ -497,18 +574,23 @@ export async function txCreateMarketListing(
         updatedAt: now,
       });
 
-      tx.set(listingRef, {
-        sellerUid: user.uid,
-        sellerName: user.businessName.slice(0, 40),
-        sellerVipLevel: user.vipLevel,
-        itemId,
-        quantity: safeQty,
-        currency,
-        price: safePrice,
-        status: 'active',
-        createdAt: now,
-        updatedAt: now,
-      });
+      tx.set(userRef, sanitizeForFirestore(updatedUser));
+
+      tx.set(
+        listingRef,
+        sanitizeForFirestore({
+          sellerUid: user.uid,
+          sellerName: (user.businessName || 'Nông Trại DOPI').slice(0, 40),
+          sellerVipLevel: Math.floor(user.vipLevel || 0),
+          itemId,
+          quantity: safeQty,
+          currency,
+          price: safePrice,
+          status: 'active',
+          createdAt: now,
+          updatedAt: now,
+        })
+      );
     });
   } catch (error) {
     if (error instanceof Error && !error.message.includes('permission')) {
@@ -539,7 +621,12 @@ export async function txCancelMarketListing(
       if (!userSnap.exists()) throw new Error('Không tìm thấy tài khoản.');
 
       const listing = listingSnap.data() as Omit<MarketListing, 'id'>;
-      const user = userSnap.data() as UserGameData;
+      const user = normalizeUserData({
+        ...(userSnap.data() as Partial<UserGameData>),
+        uid: sellerUid,
+        email:
+          (userSnap.data() as Partial<UserGameData>).email || `${sellerUid}@dopi.local`,
+      });
       if (listing.sellerUid !== sellerUid) {
         throw new Error('Bạn không thể hủy đơn của người khác.');
       }
@@ -557,10 +644,13 @@ export async function txCancelMarketListing(
         status: 'cancelled',
         updatedAt: now,
       });
-      tx.update(userRef, {
+
+      const updatedUser = normalizeUserData({
+        ...user,
         inventory: nextInventory,
         updatedAt: now,
       });
+      tx.set(userRef, sanitizeForFirestore(updatedUser));
     });
   } catch (error) {
     if (error instanceof Error && !error.message.includes('permission')) {
@@ -580,7 +670,12 @@ export async function txCancelMarketListing(
 export async function txBuyMarketListing(
   buyerUid: string,
   listingId: string
-): Promise<{ taxAmount: number; netSellerPayout: number; itemId: string; quantity: number }> {
+): Promise<{
+  taxAmount: number;
+  netSellerPayout: number;
+  itemId: string;
+  quantity: number;
+}> {
   const firestore = requireDb();
   const buyerRef = doc(firestore, 'users', buyerUid);
   const listingRef = doc(firestore, 'market_listings', listingId);
@@ -593,10 +688,16 @@ export async function txBuyMarketListing(
       ]);
 
       if (!listingSnap.exists()) throw new Error('Mặt hàng không còn tồn tại.');
-      if (!buyerSnap.exists()) throw new Error('Không tìm thấy tài khoản người mua.');
+      if (!buyerSnap.exists())
+        throw new Error('Không tìm thấy tài khoản người mua.');
 
       const listing = listingSnap.data() as Omit<MarketListing, 'id'>;
-      const buyer = buyerSnap.data() as UserGameData;
+      const buyer = normalizeUserData({
+        ...(buyerSnap.data() as Partial<UserGameData>),
+        uid: buyerUid,
+        email:
+          (buyerSnap.data() as Partial<UserGameData>).email || `${buyerUid}@dopi.local`,
+      });
 
       if (listing.status !== 'active') {
         throw new Error('Mặt hàng này vừa có người khác mua mất rồi.');
@@ -605,9 +706,14 @@ export async function txBuyMarketListing(
         throw new Error('Không thể tự mua mặt hàng do chính bạn đăng bán.');
       }
 
+      const sellerRef = doc(firestore, 'users', listing.sellerUid);
+      const sellerSnap = await tx.get(sellerRef);
+
       const totalStored = getTotalInventoryCount(buyer.inventory);
       if (totalStored + listing.quantity > buyer.storageCapacity) {
-        throw new Error('Kho của bạn không đủ sức chứa. Hãy mở rộng kho trước.');
+        throw new Error(
+          'Kho của bạn không đủ sức chứa. Hãy mở rộng kho trước.'
+        );
       }
 
       if (listing.currency === 'gold' && buyer.gold < listing.price) {
@@ -622,7 +728,6 @@ export async function txBuyMarketListing(
         listing.sellerVipLevel
       );
       const now = Date.now();
-      const sellerRef = doc(firestore, 'users', listing.sellerUid);
 
       const nextBuyerInventory = {
         ...buyer.inventory,
@@ -636,7 +741,8 @@ export async function txBuyMarketListing(
         updatedAt: now,
       });
 
-      tx.update(buyerRef, {
+      const updatedBuyer = normalizeUserData({
+        ...buyer,
         gold:
           listing.currency === 'gold'
             ? buyer.gold - listing.price
@@ -649,16 +755,20 @@ export async function txBuyMarketListing(
         updatedAt: now,
       });
 
-      if (listing.currency === 'gold') {
-        tx.update(sellerRef, {
-          gold: increment(netSellerPayout),
-          updatedAt: now,
-        });
-      } else {
-        tx.update(sellerRef, {
-          dopiCoins: increment(netSellerPayout),
-          updatedAt: now,
-        });
+      tx.set(buyerRef, sanitizeForFirestore(updatedBuyer));
+
+      if (sellerSnap.exists()) {
+        if (listing.currency === 'gold') {
+          tx.update(sellerRef, {
+            gold: increment(netSellerPayout),
+            updatedAt: now,
+          });
+        } else {
+          tx.update(sellerRef, {
+            dopiCoins: increment(netSellerPayout),
+            updatedAt: now,
+          });
+        }
       }
 
       return {
@@ -681,7 +791,7 @@ export async function txBuyMarketListing(
 }
 
 /**
- * Bạn bè: Tìm người chơi theo UID hoặc Email
+ * Bạn bè: Tìm người chơi theo UID, Email, Tên Nông Trại hoặc Tên Hiển Thị
  */
 export async function findPlayerByUidOrEmail(
   rawQuery: string
@@ -690,16 +800,23 @@ export async function findPlayerByUidOrEmail(
   const q = rawQuery.trim();
   if (!q) return null;
 
+  // 1. Tìm theo Email qua email_directory
   if (q.includes('@')) {
     const key = encodeEmailKey(q);
     try {
       const dirSnap = await getDoc(doc(firestore, 'email_directory', key));
-      if (!dirSnap.exists()) return null;
-      const { uid } = dirSnap.data() as { uid: string };
-      const farmSnap = await getDoc(doc(firestore, 'public_farms', uid));
-      return farmSnap.exists() ? (farmSnap.data() as PublicFarmData) : null;
+      if (dirSnap.exists()) {
+        const { uid } = dirSnap.data() as { uid: string };
+        const farmSnap = await getDoc(doc(firestore, 'public_farms', uid));
+        if (farmSnap.exists()) {
+          return normalizePublicFarmData({
+            ...(farmSnap.data() as Partial<PublicFarmData>),
+            uid,
+          });
+        }
+      }
     } catch (error) {
-      handleFirestoreError(
+      logFirestoreListenerError(
         error,
         OperationType.GET,
         `email_directory/${key}`
@@ -707,24 +824,65 @@ export async function findPlayerByUidOrEmail(
     }
   }
 
-  if (!/^[a-zA-Z0-9_-]{1,128}$/.test(q)) return null;
-  try {
-    const farmSnap = await getDoc(doc(firestore, 'public_farms', q));
-    return farmSnap.exists() ? (farmSnap.data() as PublicFarmData) : null;
-  } catch (error) {
-    handleFirestoreError(error, OperationType.GET, `public_farms/${q}`);
+  // 2. Tìm trực tiếp theo UID chính xác
+  if (/^[a-zA-Z0-9_-]{1,128}$/.test(q)) {
+    try {
+      const farmSnap = await getDoc(doc(firestore, 'public_farms', q));
+      if (farmSnap.exists()) {
+        return normalizePublicFarmData({
+          ...(farmSnap.data() as Partial<PublicFarmData>),
+          uid: q,
+        });
+      }
+    } catch (error) {
+      logFirestoreListenerError(error, OperationType.GET, `public_farms/${q}`);
+    }
   }
+
+  // 3. Tìm kiếm linh hoạt không phân biệt hoa thường theo UID, Tên Nông Trại hoặc Tên Hiển Thị trên public_farms
+  try {
+    const snap = await getDocs(
+      query(collection(firestore, 'public_farms'), limit(100))
+    );
+    const lower = q.toLowerCase();
+    for (const d of snap.docs) {
+      const data = normalizePublicFarmData({
+        ...(d.data() as Partial<PublicFarmData>),
+        uid: d.id,
+      });
+      if (
+        data.uid.toLowerCase() === lower ||
+        data.businessName.toLowerCase().includes(lower) ||
+        data.displayName.toLowerCase().includes(lower)
+      ) {
+        return data;
+      }
+    }
+  } catch (error) {
+    logFirestoreListenerError(error, OperationType.LIST, 'public_farms');
+  }
+
+  return null;
 }
 
 export async function fetchPublicFarmsByUids(
   uids: string[]
 ): Promise<PublicFarmData[]> {
   const firestore = requireDb();
+  const uniqueUids = Array.from(
+    new Set(uids.filter((u) => typeof u === 'string' && u.trim().length > 0))
+  ).slice(0, 50);
+
   const results = await Promise.all(
-    uids.slice(0, 50).map(async (uid) => {
+    uniqueUids.map(async (uid) => {
       try {
         const snap = await getDoc(doc(firestore, 'public_farms', uid));
-        return snap.exists() ? (snap.data() as PublicFarmData) : null;
+        return snap.exists()
+          ? normalizePublicFarmData({
+              ...(snap.data() as Partial<PublicFarmData>),
+              uid,
+            })
+          : null;
       } catch {
         return null;
       }
@@ -758,7 +916,8 @@ export function subscribeFriendRequests(
         }))
       );
     },
-    (error) => handleFirestoreError(error, OperationType.LIST, 'friend_requests')
+    (error) =>
+      logFirestoreListenerError(error, OperationType.LIST, 'friend_requests')
   );
 
   const unsub2 = onSnapshot(
@@ -771,7 +930,8 @@ export function subscribeFriendRequests(
         }))
       );
     },
-    (error) => handleFirestoreError(error, OperationType.LIST, 'friend_requests')
+    (error) =>
+      logFirestoreListenerError(error, OperationType.LIST, 'friend_requests')
   );
 
   return () => {
@@ -785,24 +945,33 @@ export async function sendFriendRequest(
   toUid: string
 ): Promise<void> {
   const firestore = requireDb();
-  if (fromUser.uid === toUid) {
+  const cleanToUid = toUid.trim();
+  if (!cleanToUid) {
+    throw new Error('UID người nhận không hợp lệ.');
+  }
+  if (fromUser.uid === cleanToUid) {
     throw new Error('Không thể tự gửi lời mời kết bạn cho chính mình.');
   }
-  if (fromUser.friends.includes(toUid)) {
+  if (fromUser.friends.includes(cleanToUid)) {
     throw new Error('Người này đã nằm trong danh sách bạn bè.');
   }
 
-  const reqId = `fr_${fromUser.uid}_${toUid}`.slice(0, 128);
+  const reqId = `fr_${fromUser.uid}_${cleanToUid}`.slice(0, 128);
   const reqRef = doc(firestore, 'friend_requests', reqId);
+  const now = Date.now();
   try {
-    await setDoc(reqRef, {
-      fromUid: fromUser.uid,
-      fromEmail: fromUser.email,
-      fromName: fromUser.businessName.slice(0, 60),
-      toUid,
-      status: 'pending',
-      createdAt: Date.now(),
-    });
+    await setDoc(
+      reqRef,
+      sanitizeForFirestore({
+        fromUid: fromUser.uid,
+        fromEmail: (fromUser.email || '').slice(0, 254),
+        fromName: (fromUser.businessName || 'Nông Trại DOPI').slice(0, 60),
+        toUid: cleanToUid,
+        status: 'pending',
+        createdAt: now,
+        updatedAt: now,
+      })
+    );
   } catch (error) {
     handleFirestoreError(error, OperationType.CREATE, `friend_requests/${reqId}`);
   }
@@ -812,21 +981,52 @@ export async function respondFriendRequest(
   req: FriendRequestDoc,
   accept: boolean,
   currentUser: UserGameData
-): Promise<void> {
+): Promise<string[]> {
   const firestore = requireDb();
   const reqRef = doc(firestore, 'friend_requests', req.id);
+  const myUserRef = doc(firestore, 'users', currentUser.uid);
+  const senderUserRef = doc(firestore, 'users', req.fromUid);
   const now = Date.now();
+
   try {
     await updateDoc(reqRef, {
       status: accept ? 'accepted' : 'rejected',
       updatedAt: now,
     });
-    if (accept && !currentUser.friends.includes(req.fromUid)) {
-      await updateDoc(doc(firestore, 'users', currentUser.uid), {
-        friends: [...currentUser.friends, req.fromUid].slice(0, 100),
+
+    const nextFriends = accept
+      ? Array.from(new Set([...currentUser.friends, req.fromUid]))
+          .filter((uid) => uid && uid !== currentUser.uid)
+          .slice(0, 100)
+      : currentUser.friends;
+
+    if (accept) {
+      const normalizedMe = normalizeUserData({
+        ...currentUser,
+        friends: nextFriends,
         updatedAt: now,
       });
+      await setDoc(myUserRef, sanitizeForFirestore(normalizedMe));
+
+      // Đồng bộ luôn danh sách bạn bè phía người gửi lời mời (nếu hồ sơ tồn tại)
+      try {
+        const senderSnap = await getDoc(senderUserRef);
+        if (senderSnap.exists()) {
+          await updateDoc(senderUserRef, {
+            friends: arrayUnion(currentUser.uid),
+            updatedAt: now,
+          });
+        }
+      } catch (peerErr) {
+        logFirestoreListenerError(
+          peerErr,
+          OperationType.UPDATE,
+          `users/${req.fromUid}`
+        );
+      }
     }
+
+    return nextFriends;
   } catch (error) {
     handleFirestoreError(
       error,
@@ -855,11 +1055,22 @@ export async function txWaterFriendPlot(
         tx.get(friendFarmRef),
       ]);
 
-      if (!helperSnap.exists()) throw new Error('Không tìm thấy tài khoản của bạn.');
-      if (!farmSnap.exists()) throw new Error('Không tìm thấy nông trại bạn bè.');
+      if (!helperSnap.exists())
+        throw new Error('Không tìm thấy tài khoản của bạn.');
+      if (!farmSnap.exists())
+        throw new Error('Không tìm thấy nông trại bạn bè.');
 
-      const helper = helperSnap.data() as UserGameData;
-      const farm = farmSnap.data() as PublicFarmData;
+      const helper = normalizeUserData({
+        ...(helperSnap.data() as Partial<UserGameData>),
+        uid: helperUid,
+        email:
+          (helperSnap.data() as Partial<UserGameData>).email ||
+          `${helperUid}@dopi.local`,
+      });
+      const farm = normalizePublicFarmData({
+        ...(farmSnap.data() as Partial<PublicFarmData>),
+        uid: friendUid,
+      });
       const now = Date.now();
 
       if (helper.helpCountToday >= MAX_FRIEND_HELPS_PER_DAY) {
@@ -907,11 +1118,12 @@ export async function txWaterFriendPlot(
         : [...helper.helpedFriendsToday, friendUid].slice(0, 5);
 
       tx.update(friendFarmRef, {
-        farmPlots: nextFarmPlots,
+        farmPlots: sanitizeForFirestore(nextFarmPlots),
         updatedAt: now,
       });
 
-      tx.update(helperRef, {
+      const updatedHelper = normalizeUserData({
+        ...helper,
         gold: helper.gold + FRIEND_HELP_REWARD_GOLD,
         helpCountToday: helper.helpCountToday + 1,
         helpedFriendsToday: nextHelpedFriends,
@@ -922,6 +1134,8 @@ export async function txWaterFriendPlot(
         },
         updatedAt: now,
       });
+
+      tx.set(helperRef, sanitizeForFirestore(updatedHelper));
 
       return {
         ...farm,
@@ -956,7 +1170,7 @@ export function subscribeAllRedeemCodes(
     (snap) => {
       onData(snap.docs.map((d) => d.data() as RedeemCodeDoc));
     },
-    (error) => handleFirestoreError(error, OperationType.LIST, 'redeem_codes')
+    (error) => logFirestoreListenerError(error, OperationType.LIST, 'redeem_codes')
   );
 }
 
@@ -1000,7 +1214,7 @@ export async function createRedeemCode(params: {
   };
 
   try {
-    await setDoc(ref, payload);
+    await setDoc(ref, sanitizeForFirestore(payload));
     return payload;
   } catch (error) {
     handleFirestoreError(error, OperationType.CREATE, `redeem_codes/${normalized}`);
@@ -1066,7 +1280,10 @@ export async function createTopupRequest(params: {
   };
 
   try {
-    await setDoc(doc(firestore, 'topup_requests', reqId), payload);
+    await setDoc(
+      doc(firestore, 'topup_requests', reqId),
+      sanitizeForFirestore(payload)
+    );
     return { id: reqId, ...payload };
   } catch (error) {
     handleFirestoreError(error, OperationType.CREATE, `topup_requests/${reqId}`);
@@ -1093,7 +1310,8 @@ export function subscribeUserTopupRequests(
         .sort((a, b) => b.createdAt - a.createdAt);
       onData(list);
     },
-    (error) => handleFirestoreError(error, OperationType.LIST, 'topup_requests')
+    (error) =>
+      logFirestoreListenerError(error, OperationType.LIST, 'topup_requests')
   );
 }
 
@@ -1114,7 +1332,8 @@ export function subscribeAllTopupRequests(
       }));
       onData(list);
     },
-    (error) => handleFirestoreError(error, OperationType.LIST, 'topup_requests')
+    (error) =>
+      logFirestoreListenerError(error, OperationType.LIST, 'topup_requests')
   );
 }
 
@@ -1160,7 +1379,14 @@ export async function txApproveTopupRequest(
       const now = Date.now();
       const monthKey = getCurrentMonthKey(now);
       const userData = normalizeUserData(
-        userSnap.data() as Partial<UserGameData> & { uid: string; email: string },
+        {
+          ...(userSnap.data() as Partial<UserGameData>),
+          uid: req.uid,
+          email:
+            (userSnap.data() as Partial<UserGameData>).email ||
+            req.email ||
+            `${req.uid}@dopi.local`,
+        },
         now
       );
 
@@ -1170,10 +1396,6 @@ export async function txApproveTopupRequest(
       const nextEventRecharged =
         (userData.eventMonthKey === monthKey ? userData.eventRechargedCoins : 0) +
         req.amount;
-      const nextWealth = calculateWealthScore({
-        ...userData,
-        vipLevel: nextVipLevel,
-      });
 
       tx.update(reqRef, {
         status: 'approved',
@@ -1181,22 +1403,24 @@ export async function txApproveTopupRequest(
         processedAt: now,
       });
 
-      tx.update(userRef, {
+      const updatedUser = normalizeUserData({
+        ...userData,
         dopiCoins: nextDopiCoins,
         totalRechargedCoins: nextTotalRecharged,
         vipLevel: nextVipLevel,
         eventRechargedCoins: nextEventRecharged,
         eventMonthKey: monthKey,
         hasFirstTopup: true,
-        wealthScore: nextWealth,
         updatedAt: now,
       });
+
+      tx.set(userRef, sanitizeForFirestore(updatedUser));
 
       if (pubFarmSnap.exists()) {
         tx.update(pubFarmRef, {
           vipLevel: nextVipLevel,
           totalRechargedCoins: nextTotalRecharged,
-          wealthScore: nextWealth,
+          wealthScore: updatedUser.wealthScore,
           updatedAt: now,
         });
       }
@@ -1226,7 +1450,8 @@ export async function rejectTopupRequest(
 ): Promise<void> {
   const firestore = requireDb();
   const cleanReason =
-    reason.trim().slice(0, 200) || 'Không tìm thấy giao dịch chuyển khoản tương ứng.';
+    reason.trim().slice(0, 200) ||
+    'Không tìm thấy giao dịch chuyển khoản tương ứng.';
   try {
     await updateDoc(doc(firestore, 'topup_requests', reqId), {
       status: 'rejected',
@@ -1253,7 +1478,12 @@ export async function fetchServerLeaderboard(): Promise<PublicFarmData[]> {
   );
   try {
     const snap = await getDocs(q);
-    return snap.docs.map((d) => d.data() as PublicFarmData);
+    return snap.docs.map((d) =>
+      normalizePublicFarmData({
+        ...(d.data() as Partial<PublicFarmData>),
+        uid: d.id,
+      })
+    );
   } catch (error) {
     handleFirestoreError(error, OperationType.LIST, 'public_farms');
   }
@@ -1265,13 +1495,20 @@ export async function fetchPublicFarmByUid(
   const firestore = requireDb();
   try {
     const snap = await getDoc(doc(firestore, 'public_farms', uid));
-    return snap.exists() ? (snap.data() as PublicFarmData) : null;
+    return snap.exists()
+      ? normalizePublicFarmData({
+          ...(snap.data() as Partial<PublicFarmData>),
+          uid,
+        })
+      : null;
   } catch (error) {
     handleFirestoreError(error, OperationType.GET, `public_farms/${uid}`);
   }
 }
 
 // ==================== P2P INVESTMENT EXCHANGE & DIVIDENDS ====================
+
+let seededDefaultP2P = false;
 
 export function subscribeListedP2PCompanies(
   onData: (companies: P2PCompanyDoc[]) => void
@@ -1285,12 +1522,28 @@ export function subscribeListedP2PCompanies(
   return onSnapshot(
     q,
     (snap) => {
+      if (snap.empty && !seededDefaultP2P) {
+        seededDefaultP2P = true;
+        const defaults = createDefaultP2PCompanies(Date.now());
+        onData(defaults);
+        // Seed default community IPO companies into Firestore so transactions succeed
+        void Promise.all(
+          defaults.map((comp) =>
+            setDoc(
+              doc(firestore, 'p2p_companies', comp.ownerUid),
+              sanitizeForFirestore(comp)
+            ).catch(() => {})
+          )
+        );
+        return;
+      }
       const list = snap.docs
         .map((d) => d.data() as P2PCompanyDoc)
         .sort((a, b) => b.wealthScore - a.wealthScore);
       onData(list);
     },
-    (error) => handleFirestoreError(error, OperationType.LIST, 'p2p_companies')
+    (error) =>
+      logFirestoreListenerError(error, OperationType.LIST, 'p2p_companies')
   );
 }
 
@@ -1305,7 +1558,8 @@ export function subscribeMyP2PCompany(
     (snap) => {
       onData(snap.exists() ? (snap.data() as P2PCompanyDoc) : null);
     },
-    (error) => handleFirestoreError(error, OperationType.GET, `p2p_companies/${uid}`)
+    (error) =>
+      logFirestoreListenerError(error, OperationType.GET, `p2p_companies/${uid}`)
   );
 }
 
@@ -1335,24 +1589,7 @@ export async function upsertMyP2PCompanyIpo(
         existing,
         Date.now()
       );
-      if (existing) {
-        tx.update(compRef, {
-          businessName: payload.businessName,
-          level: payload.level,
-          wealthScore: payload.wealthScore,
-          plotCount: payload.plotCount,
-          employeeCount: payload.employeeCount,
-          vehicleCount: payload.vehicleCount,
-          recentOrders: payload.recentOrders,
-          sharePrice: payload.sharePrice,
-          dividendRate: payload.dividendRate,
-          creditRating: payload.creditRating,
-          lastActiveAt: payload.lastActiveAt,
-          isListed: payload.isListed,
-        });
-      } else {
-        tx.set(compRef, payload);
-      }
+      tx.set(compRef, sanitizeForFirestore(payload));
       return payload;
     });
   } catch (error) {
@@ -1395,19 +1632,7 @@ export async function syncP2PCompanyDividendFromOrder(
         Date.now()
       );
 
-      tx.update(compRef, {
-        businessName: updated.businessName,
-        level: updated.level,
-        wealthScore: updated.wealthScore,
-        plotCount: updated.plotCount,
-        employeeCount: updated.employeeCount,
-        vehicleCount: updated.vehicleCount,
-        recentOrders: updated.recentOrders,
-        sharePrice: updated.sharePrice,
-        dividendPool: updated.dividendPool,
-        creditRating: updated.creditRating,
-        lastActiveAt: updated.lastActiveAt,
-      });
+      tx.set(compRef, sanitizeForFirestore(updated));
 
       return { contributed, dividendRate: existing.dividendRate };
     });
@@ -1420,9 +1645,9 @@ export async function syncP2PCompanyDividendFromOrder(
 /**
  * Mua cổ phần doanh nghiệp P2P bằng Firestore runTransaction():
  * - Trừ Vàng người mua (giá cổ phần + phí sàn 4% giảm theo VIP)
- * - Chuyển vốn Vàng (gross) cho chủ doanh nghiệp IPO
+ * - Chuyển vốn Vàng (gross) cho chủ doanh nghiệp IPO (nếu là người chơi thực)
  * - Trừ availableShares trên p2p_companies/{ownerUid}
- * - Lưu vào investments.p2pHoldings kèm thời gian khóa lệnh 30 phút
+ * - Lưu vào investments.p2pHoldings
  */
 export async function txBuyP2PShares(
   buyerUid: string,
@@ -1450,18 +1675,35 @@ export async function txBuyP2PShares(
 
   try {
     return await runTransaction(firestore, async (tx) => {
-      const [buyerSnap, compSnap] = await Promise.all([
+      const [buyerSnap, compSnap, ownerSnap] = await Promise.all([
         tx.get(buyerRef),
         tx.get(compRef),
+        tx.get(ownerRef),
       ]);
 
-      if (!buyerSnap.exists()) throw new Error('Không tìm thấy hồ sơ nhà đầu tư.');
-      if (!compSnap.exists()) throw new Error('Doanh nghiệp này chưa niêm yết IPO.');
+      if (!buyerSnap.exists())
+        throw new Error('Không tìm thấy hồ sơ nhà đầu tư.');
 
-      const buyer = normalizeUserData(
-        buyerSnap.data() as Partial<UserGameData> & { uid: string; email: string }
-      );
-      const rawComp = compSnap.data() as P2PCompanyDoc;
+      let rawComp: P2PCompanyDoc | undefined;
+      if (compSnap.exists()) {
+        rawComp = compSnap.data() as P2PCompanyDoc;
+      } else {
+        rawComp = createDefaultP2PCompanies(Date.now()).find(
+          (c) => c.ownerUid === ownerUid
+        );
+      }
+
+      if (!rawComp) {
+        throw new Error('Doanh nghiệp này chưa niêm yết IPO.');
+      }
+
+      const buyer = normalizeUserData({
+        ...(buyerSnap.data() as Partial<UserGameData>),
+        uid: buyerUid,
+        email:
+          (buyerSnap.data() as Partial<UserGameData>).email ||
+          `${buyerUid}@dopi.local`,
+      });
       if (!rawComp.isListed) {
         throw new Error('Doanh nghiệp này đã tạm ngừng gọi vốn.');
       }
@@ -1503,27 +1745,36 @@ export async function txBuyP2PShares(
             businessName: rawComp.businessName,
             shares: nextShares,
             avgBuyPrice: nextAvgPrice,
-            lockedUntil: now + INVESTMENT_LOCKUP_MS,
+            lockedUntil: INVESTMENT_LOCKUP_MS > 0 ? now + INVESTMENT_LOCKUP_MS : 0,
           },
         },
         totalInvested: inv.totalInvested + trade.totalCost,
       };
 
-      tx.update(compRef, {
-        availableShares: rawComp.availableShares - safeQty,
-      });
+      tx.set(
+        compRef,
+        sanitizeForFirestore({
+          ...rawComp,
+          availableShares: Math.max(0, rawComp.availableShares - safeQty),
+        })
+      );
 
-      tx.update(buyerRef, {
+      const updatedBuyer = normalizeUserData({
+        ...buyer,
         gold: buyer.gold - trade.totalCost,
         investments: nextInvestments,
         updatedAt: now,
       });
 
-      // Chuyển vốn IPO trực tiếp cho chủ doanh nghiệp
-      tx.update(ownerRef, {
-        gold: increment(trade.gross),
-        updatedAt: now,
-      });
+      tx.set(buyerRef, sanitizeForFirestore(updatedBuyer));
+
+      // Chuyển vốn IPO trực tiếp cho chủ doanh nghiệp nếu là tài khoản người chơi thực
+      if (ownerSnap.exists()) {
+        tx.update(ownerRef, {
+          gold: increment(trade.gross),
+          updatedAt: now,
+        });
+      }
 
       return {
         businessName: rawComp.businessName,
@@ -1543,7 +1794,6 @@ export async function txBuyP2PShares(
 
 /**
  * Bán cổ phần P2P bằng Firestore runTransaction():
- * - Kiểm tra khóa lệnh 30 phút
  * - Trừ cổ phần trong danh mục, cộng Vàng ròng (đã trừ phí sàn theo VIP)
  * - Hoàn cổ phần về availableShares của doanh nghiệp (tối đa 400)
  */
@@ -1575,13 +1825,16 @@ export async function txSellP2PShares(
         tx.get(compRef),
       ]);
 
-      if (!sellerSnap.exists()) throw new Error('Không tìm thấy hồ sơ tài khoản.');
-      if (!compSnap.exists()) throw new Error('Không tìm thấy hồ sơ doanh nghiệp P2P.');
+      if (!sellerSnap.exists())
+        throw new Error('Không tìm thấy hồ sơ tài khoản.');
 
-      const seller = normalizeUserData(
-        sellerSnap.data() as Partial<UserGameData> & { uid: string; email: string }
-      );
-      const rawComp = compSnap.data() as P2PCompanyDoc;
+      const seller = normalizeUserData({
+        ...(sellerSnap.data() as Partial<UserGameData>),
+        uid: sellerUid,
+        email:
+          (sellerSnap.data() as Partial<UserGameData>).email ||
+          `${sellerUid}@dopi.local`,
+      });
       const inv = normalizeUserInvestments(seller.investments);
       const holding = inv.p2pHoldings[ownerUid];
 
@@ -1590,18 +1843,15 @@ export async function txSellP2PShares(
       }
 
       const now = Date.now();
-      if (holding.lockedUntil > now) {
-        throw new Error(
-          'Cổ phần đang trong thời gian khóa lệnh T+30 phút, chưa thể bán.'
-        );
-      }
+      const rawComp = compSnap.exists()
+        ? (compSnap.data() as P2PCompanyDoc)
+        : createDefaultP2PCompanies(now).find((c) => c.ownerUid === ownerUid);
 
-      const effectiveComp = getEffectiveP2PCompanyState(rawComp, now);
-      const trade = calculateSellTrade(
-        effectiveComp.sharePrice,
-        safeQty,
-        seller.vipLevel
-      );
+      const unitPrice = rawComp
+        ? getEffectiveP2PCompanyState(rawComp, now).sharePrice
+        : Math.max(50, Math.round(holding.avgBuyPrice));
+
+      const trade = calculateSellTrade(unitPrice, safeQty, seller.vipLevel);
       const costBasis = Math.round(holding.avgBuyPrice * safeQty);
       const profit = trade.netProceeds - costBasis;
 
@@ -1621,24 +1871,32 @@ export async function txSellP2PShares(
         realizedProfit: inv.realizedProfit + profit,
       };
 
-      const nextAvailable = Math.min(
-        P2P_MAX_PUBLIC_SHARES,
-        rawComp.availableShares + safeQty
-      );
+      if (rawComp) {
+        const nextAvailable = Math.min(
+          P2P_MAX_PUBLIC_SHARES,
+          rawComp.availableShares + safeQty
+        );
+        tx.set(
+          compRef,
+          sanitizeForFirestore({
+            ...rawComp,
+            availableShares: nextAvailable,
+          })
+        );
+      }
 
-      tx.update(compRef, {
-        availableShares: nextAvailable,
-      });
-
-      tx.update(sellerRef, {
+      const updatedSeller = normalizeUserData({
+        ...seller,
         gold: seller.gold + trade.netProceeds,
         investments: nextInvestments,
         updatedAt: now,
       });
 
+      tx.set(sellerRef, sanitizeForFirestore(updatedSeller));
+
       return {
-        businessName: rawComp.businessName,
-        unitPrice: effectiveComp.sharePrice,
+        businessName: rawComp?.businessName || holding.businessName,
+        unitPrice,
         quantity: safeQty,
         feeAmount: trade.feeAmount,
         netProceeds: trade.netProceeds,
@@ -1675,9 +1933,12 @@ export async function txClaimDividends(
       const userSnap = await tx.get(userRef);
       if (!userSnap.exists()) throw new Error('Không tìm thấy tài khoản.');
 
-      const user = normalizeUserData(
-        userSnap.data() as Partial<UserGameData> & { uid: string; email: string }
-      );
+      const user = normalizeUserData({
+        ...(userSnap.data() as Partial<UserGameData>),
+        uid,
+        email:
+          (userSnap.data() as Partial<UserGameData>).email || `${uid}@dopi.local`,
+      });
       const inv = normalizeUserInvestments(user.investments);
       const now = Date.now();
 
@@ -1717,13 +1978,18 @@ export async function txClaimDividends(
         if (!holding) continue;
         const payout = calculateP2PShareholderDividend(comp, holding.shares);
         if (payout > 0 && comp.dividendPool >= payout) {
-          tx.update(doc(firestore, 'p2p_companies', comp.ownerUid), {
-            dividendPool: Math.max(0, comp.dividendPool - payout),
-          });
+          tx.set(
+            doc(firestore, 'p2p_companies', comp.ownerUid),
+            sanitizeForFirestore({
+              ...comp,
+              dividendPool: Math.max(0, comp.dividendPool - payout),
+            })
+          );
         }
       }
 
-      tx.update(userRef, {
+      const updatedUser = normalizeUserData({
+        ...user,
         gold: user.gold + breakdown.totalGold,
         dopiCoins: user.dopiCoins + breakdown.totalCoins,
         investments: {
@@ -1732,6 +1998,8 @@ export async function txClaimDividends(
         },
         updatedAt: now,
       });
+
+      tx.set(userRef, sanitizeForFirestore(updatedUser));
 
       return {
         totalGold: breakdown.totalGold,

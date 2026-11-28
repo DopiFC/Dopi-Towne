@@ -22,8 +22,10 @@ import {
 import type {
   DailyQuest,
   EmployeeId,
+  FarmPlot,
   MarketSurgeEvent,
   NpcOrder,
+  PublicFarmData,
   RedeemCodeDoc,
   RushOrder,
   UserGameData,
@@ -492,6 +494,88 @@ export function validateRedeemCodeState(
   return { valid: true };
 }
 
+export function sanitizeForFirestore<T>(input: T): T {
+  if (input === null || input === undefined) {
+    return null as unknown as T;
+  }
+  if (typeof input === 'number') {
+    return (Number.isFinite(input) ? input : 0) as unknown as T;
+  }
+  if (Array.isArray(input)) {
+    return input.map((item) => sanitizeForFirestore(item)) as unknown as T;
+  }
+  if (typeof input === 'object') {
+    const out: Record<string, unknown> = {};
+    for (const [key, val] of Object.entries(input as Record<string, unknown>)) {
+      if (val !== undefined) {
+        out[key] = sanitizeForFirestore(val);
+      }
+    }
+    return out as T;
+  }
+  return input;
+}
+
+export function normalizeFarmPlots(
+  rawPlots?: FarmPlot[] | null,
+  nowMs: number = Date.now()
+): FarmPlot[] {
+  const source = Array.isArray(rawPlots) ? rawPlots : [];
+  if (source.length === 0) {
+    return Array.from({ length: INITIAL_PLOTS }, (_, idx) => ({
+      id: idx,
+      cropId: idx < 2 ? 'wheat' : null,
+      plantedAt: idx < 2 ? nowMs - 20_000 : null,
+      readyAt: idx < 2 ? nowMs + 10_000 : null,
+      wateredBy: null,
+      wateredAt: null,
+      yieldBoosted: false,
+      mutationBoosted: false,
+    }));
+  }
+  return source.map((p, idx) => ({
+    id: typeof p?.id === 'number' ? p.id : idx,
+    cropId: typeof p?.cropId === 'string' && p.cropId ? p.cropId : null,
+    plantedAt: typeof p?.plantedAt === 'number' ? p.plantedAt : null,
+    readyAt: typeof p?.readyAt === 'number' ? p.readyAt : null,
+    wateredBy: typeof p?.wateredBy === 'string' ? p.wateredBy : null,
+    wateredAt: typeof p?.wateredAt === 'number' ? p.wateredAt : null,
+    yieldBoosted: Boolean(p?.yieldBoosted),
+    mutationBoosted: Boolean(p?.mutationBoosted),
+  }));
+}
+
+export function normalizePublicFarmData(
+  raw: Partial<PublicFarmData> & { uid?: string },
+  nowMs: number = Date.now()
+): PublicFarmData {
+  const safeBusinessName =
+    (raw.businessName || '').trim().slice(0, 40) || 'Nông Trại DOPI';
+  const safeDisplayName =
+    (raw.displayName || '').trim().slice(0, 60) || safeBusinessName;
+  const safeAvatar = (raw.avatarEmoji || '').trim().slice(0, 16) || '🧑‍🌾';
+
+  return {
+    uid: raw.uid || 'unknown_uid',
+    isPublic: raw.isPublic ?? true,
+    businessName: safeBusinessName.length >= 2 ? safeBusinessName : 'Nông Trại DOPI',
+    displayName: safeDisplayName.length >= 1 ? safeDisplayName : 'Nông Dân',
+    avatarEmoji: safeAvatar,
+    level: Math.max(1, Math.floor(Number(raw.level) || 1)),
+    vipLevel: Math.max(0, Math.min(10, Math.floor(Number(raw.vipLevel) || 0))),
+    totalRechargedCoins: Math.max(0, Math.floor(Number(raw.totalRechargedCoins) || 0)),
+    wealthScore: Math.max(0, Math.round(Number(raw.wealthScore) || 0)),
+    vehicles: Array.isArray(raw.vehicles)
+      ? raw.vehicles.filter((v): v is string => typeof v === 'string').slice(0, 20)
+      : [],
+    treasures: Array.isArray(raw.treasures)
+      ? raw.treasures.filter((t): t is string => typeof t === 'string').slice(0, 30)
+      : [],
+    farmPlots: normalizeFarmPlots(raw.farmPlots, nowMs),
+    updatedAt: Number(raw.updatedAt) || nowMs,
+  };
+}
+
 export function normalizeUserData(
   raw: Partial<UserGameData> & { uid: string; email: string },
   nowMs: number = Date.now()
@@ -500,70 +584,124 @@ export function normalizeUserData(
   const weekKey = getCurrentWeekKey(nowMs);
   const sameMonth = raw.eventMonthKey === monthKey;
 
+  const safeEmail = (raw.email || '').trim() || `${raw.uid}@dopi.local`;
+  const fallbackName = (safeEmail.split('@')[0] || 'Nông Dân').slice(0, 32);
+  const safeDisplayName =
+    (raw.profile?.displayName || '').trim().slice(0, 60) || fallbackName || 'Nông Dân';
+  const safeAvatar = (raw.profile?.avatarEmoji || '').trim().slice(0, 16) || '🧑‍🌾';
+  const rawBiz = (raw.businessName || '').trim().slice(0, 40);
+  const safeBusinessName =
+    rawBiz.length >= 2 ? rawBiz : `Nông Trại ${safeDisplayName}`.slice(0, 40);
+
+  const rawFactories = Array.isArray(raw.factories) ? raw.factories : [];
+  const normalizedFactories = FACTORIES.map((def) => {
+    const found = rawFactories.find((f) => f && f.id === def.id);
+    return {
+      id: def.id,
+      unlocked: found ? Boolean(found.unlocked) : def.unlockCostGold === 0,
+      queue: Array.isArray(found?.queue)
+        ? found.queue.map((q, idx) => ({
+            id: q?.id || `q_${nowMs}_${idx}`,
+            recipeId: q?.recipeId || 'butter_bread',
+            startedAt: Number(q?.startedAt) || nowMs,
+            readyAt: Number(q?.readyAt) || nowMs + 60_000,
+          }))
+        : [],
+    };
+  });
+
+  const cleanFriends = Array.isArray(raw.friends)
+    ? Array.from(
+        new Set(
+          raw.friends.filter(
+            (f): f is string => typeof f === 'string' && f.trim().length > 0 && f !== raw.uid
+          )
+        )
+      ).slice(0, 100)
+    : [];
+
   const normalized: UserGameData = {
     uid: raw.uid,
-    email: raw.email,
-    profile: raw.profile ?? {
-      displayName: raw.email.split('@')[0] || 'Nông Dân',
-      avatarEmoji: '🧑‍🌾',
-      joinedAt: nowMs,
+    email: safeEmail,
+    profile: {
+      displayName: safeDisplayName,
+      avatarEmoji: safeAvatar,
+      joinedAt: Number(raw.profile?.joinedAt) || nowMs,
     },
-    businessName: raw.businessName || 'Nông Trại DOPI',
-    level: raw.level ?? 1,
-    exp: raw.exp ?? 0,
-    gold: raw.gold ?? 450,
-    dopiCoins: raw.dopiCoins ?? 15,
-    totalRechargedCoins: raw.totalRechargedCoins ?? 0,
-    vipLevel: raw.vipLevel ?? 0,
-    farmPlots: raw.farmPlots ?? [],
-    factories: raw.factories ?? [],
-    inventory: raw.inventory ?? {},
-    storageCapacity: raw.storageCapacity ?? INITIAL_STORAGE_CAPACITY,
-    friends: raw.friends ?? [],
-    dailyQuests: raw.dailyQuests ?? generateDailyQuests(),
-    achievements: raw.achievements ?? {},
-    npcOrders: raw.npcOrders ?? generateNpcOrders(raw.level ?? 1, nowMs),
-    lastDailyReset: raw.lastDailyReset ?? getTodayDateKey(nowMs),
-    helpCountToday: raw.helpCountToday ?? 0,
-    helpedFriendsToday: raw.helpedFriendsToday ?? [],
+    businessName: safeBusinessName,
+    level: Math.max(1, Math.floor(Number(raw.level) || 1)),
+    exp: Math.max(0, Math.floor(Number(raw.exp) || 0)),
+    gold: Math.max(0, Math.floor(Number(raw.gold ?? 450))),
+    dopiCoins: Math.max(0, Math.floor(Number(raw.dopiCoins ?? 15))),
+    totalRechargedCoins: Math.max(0, Math.floor(Number(raw.totalRechargedCoins) || 0)),
+    vipLevel: Math.max(0, Math.min(10, Math.floor(Number(raw.vipLevel) || 0))),
+    farmPlots: normalizeFarmPlots(raw.farmPlots, nowMs),
+    factories: normalizedFactories,
+    inventory: raw.inventory && typeof raw.inventory === 'object' ? { ...raw.inventory } : {},
+    storageCapacity: Math.max(
+      20,
+      Math.floor(Number(raw.storageCapacity) || INITIAL_STORAGE_CAPACITY)
+    ),
+    friends: cleanFriends,
+    dailyQuests:
+      Array.isArray(raw.dailyQuests) && raw.dailyQuests.length > 0
+        ? raw.dailyQuests
+        : generateDailyQuests(),
+    achievements:
+      raw.achievements && typeof raw.achievements === 'object' ? { ...raw.achievements } : {},
+    npcOrders:
+      Array.isArray(raw.npcOrders) && raw.npcOrders.length > 0
+        ? raw.npcOrders
+        : generateNpcOrders(raw.level ?? 1, nowMs),
+    lastDailyReset: raw.lastDailyReset || getTodayDateKey(nowMs),
+    helpCountToday: Math.max(0, Math.floor(Number(raw.helpCountToday) || 0)),
+    helpedFriendsToday: Array.isArray(raw.helpedFriendsToday)
+      ? raw.helpedFriendsToday.filter((x): x is string => typeof x === 'string').slice(0, 10)
+      : [],
     stats: {
-      totalHarvested: raw.stats?.totalHarvested ?? 0,
-      totalOrdersDone: raw.stats?.totalOrdersDone ?? 0,
-      totalSoldMarket: raw.stats?.totalSoldMarket ?? 0,
-      totalProduced: raw.stats?.totalProduced ?? 0,
-      totalFriendsHelped: raw.stats?.totalFriendsHelped ?? 0,
+      totalHarvested: Math.max(0, Math.floor(Number(raw.stats?.totalHarvested) || 0)),
+      totalOrdersDone: Math.max(0, Math.floor(Number(raw.stats?.totalOrdersDone) || 0)),
+      totalSoldMarket: Math.max(0, Math.floor(Number(raw.stats?.totalSoldMarket) || 0)),
+      totalProduced: Math.max(0, Math.floor(Number(raw.stats?.totalProduced) || 0)),
+      totalFriendsHelped: Math.max(0, Math.floor(Number(raw.stats?.totalFriendsHelped) || 0)),
     },
-    hasFirstTopup: raw.hasFirstTopup ?? false,
-    firstTopupClaimed: raw.firstTopupClaimed ?? false,
-    eventRechargedCoins: sameMonth ? (raw.eventRechargedCoins ?? 0) : 0,
+    hasFirstTopup: Boolean(raw.hasFirstTopup),
+    firstTopupClaimed: Boolean(raw.firstTopupClaimed),
+    eventRechargedCoins: sameMonth ? Math.max(0, Math.floor(Number(raw.eventRechargedCoins) || 0)) : 0,
     eventMonthKey: monthKey,
-    monthlyTopupClaimed: sameMonth ? (raw.monthlyTopupClaimed ?? []) : [],
-    checkInStreak: raw.checkInStreak ?? 0,
-    lastCheckInDate: raw.lastCheckInDate ?? '',
-    eventTickets: raw.eventTickets ?? 0,
-    eventWeekKey: raw.eventWeekKey ?? weekKey,
+    monthlyTopupClaimed: sameMonth && Array.isArray(raw.monthlyTopupClaimed)
+      ? raw.monthlyTopupClaimed
+      : [],
+    checkInStreak: Math.max(0, Math.min(7, Math.floor(Number(raw.checkInStreak) || 0))),
+    lastCheckInDate: typeof raw.lastCheckInDate === 'string' ? raw.lastCheckInDate : '',
+    eventTickets: Math.max(0, Math.floor(Number(raw.eventTickets) || 0)),
+    eventWeekKey: raw.eventWeekKey || weekKey,
     rushOrder:
       raw.rushOrder && raw.rushOrder.expiresAt > nowMs
         ? raw.rushOrder
         : generateRushOrder(raw.level ?? 1, nowMs),
-    reputation: raw.reputation ?? 0,
-    autoWaterUntil: raw.autoWaterUntil ?? 0,
-    treasures: raw.treasures ?? [],
+    reputation: Math.max(0, Math.floor(Number(raw.reputation) || 0)),
+    autoWaterUntil: Math.max(0, Number(raw.autoWaterUntil) || 0),
+    treasures: Array.isArray(raw.treasures)
+      ? raw.treasures.filter((t): t is string => typeof t === 'string')
+      : [],
     employees: {
-      diligent_farmer: raw.employees?.diligent_farmer ?? 0,
-      agri_engineer: raw.employees?.agri_engineer ?? 0,
-      factory_manager: raw.employees?.factory_manager ?? 0,
-      sales_director: raw.employees?.sales_director ?? 0,
+      diligent_farmer: Math.max(0, Math.floor(Number(raw.employees?.diligent_farmer) || 0)),
+      agri_engineer: Math.max(0, Math.floor(Number(raw.employees?.agri_engineer) || 0)),
+      factory_manager: Math.max(0, Math.floor(Number(raw.employees?.factory_manager) || 0)),
+      sales_director: Math.max(0, Math.floor(Number(raw.employees?.sales_director) || 0)),
     },
-    vehicles: raw.vehicles ?? [],
-    wealthScore: raw.wealthScore ?? 0,
+    vehicles: Array.isArray(raw.vehicles)
+      ? raw.vehicles.filter((v): v is string => typeof v === 'string')
+      : [],
+    wealthScore: Math.max(0, Math.round(Number(raw.wealthScore) || 0)),
     investments: normalizeUserInvestments(raw.investments),
-    createdAt: raw.createdAt ?? nowMs,
-    updatedAt: raw.updatedAt ?? nowMs,
+    createdAt: Number(raw.createdAt) || nowMs,
+    updatedAt: Number(raw.updatedAt) || nowMs,
   };
 
   normalized.wealthScore = calculateWealthScore(normalized);
-  return normalized;
+  return sanitizeForFirestore(normalized);
 }
 
 export function createInitialUserData(
@@ -572,12 +710,13 @@ export function createInitialUserData(
   displayName: string,
   nowMs: number = Date.now()
 ): UserGameData {
-  const safeName = (displayName || email.split('@')[0] || 'Nông Dân').slice(0, 32);
+  const safeEmail = (email || '').trim() || `${uid}@dopi.local`;
+  const safeName = (displayName.trim() || safeEmail.split('@')[0] || 'Nông Dân').slice(0, 32);
   const businessName = `Nông Trại ${safeName}`.slice(0, 40);
 
   const base: UserGameData = {
     uid,
-    email,
+    email: safeEmail,
     profile: {
       displayName: safeName,
       avatarEmoji: '🧑‍🌾',
@@ -597,6 +736,8 @@ export function createInitialUserData(
       readyAt: idx < 2 ? nowMs + 10_000 : null,
       wateredBy: null,
       wateredAt: null,
+      yieldBoosted: false,
+      mutationBoosted: false,
     })),
     factories: FACTORIES.map((f) => ({
       id: f.id,

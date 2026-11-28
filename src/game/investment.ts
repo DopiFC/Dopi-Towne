@@ -13,7 +13,7 @@ import type {
 
 export const MARKET_SESSION_MS = 15 * 60_000; // 15 phút mỗi phiên
 export const MARKET_HISTORY_SESSIONS = 24; // 24 phiên = 6 giờ gần nhất
-export const INVESTMENT_LOCKUP_MS = 30 * 60_000; // Khóa lệnh T+30 phút chống spam
+export const INVESTMENT_LOCKUP_MS = 0; // Khớp lệnh T+0 tức thì giúp mua bán linh hoạt
 export const DIVIDEND_CYCLE_MS = 4 * 3_600_000; // Chu kỳ nhận cổ tức 4 giờ/lần (6 kỳ/ngày)
 
 export const P2P_TOTAL_SHARES = 1000;
@@ -309,13 +309,100 @@ export function createEmptyInvestments(): UserInvestments {
 export function normalizeUserInvestments(
   raw?: Partial<UserInvestments> | null
 ): UserInvestments {
+  const npcHoldings: UserInvestments['npcHoldings'] = {};
+  if (raw?.npcHoldings && typeof raw.npcHoldings === 'object') {
+    for (const [code, h] of Object.entries(raw.npcHoldings)) {
+      if (h && Number(h.shares) > 0) {
+        npcHoldings[code as StockCode] = {
+          shares: Math.floor(Number(h.shares)),
+          avgBuyPrice: Number(h.avgBuyPrice) || 0,
+          lockedUntil: 0,
+        };
+      }
+    }
+  }
+
+  const p2pHoldings: UserInvestments['p2pHoldings'] = {};
+  if (raw?.p2pHoldings && typeof raw.p2pHoldings === 'object') {
+    for (const [ownerUid, h] of Object.entries(raw.p2pHoldings)) {
+      if (h && Number(h.shares) > 0) {
+        p2pHoldings[ownerUid] = {
+          ownerUid: h.ownerUid || ownerUid,
+          businessName: h.businessName || 'Doanh Nghiệp DOPI',
+          shares: Math.floor(Number(h.shares)),
+          avgBuyPrice: Number(h.avgBuyPrice) || 0,
+          lockedUntil: 0,
+        };
+      }
+    }
+  }
+
   return {
-    npcHoldings: raw?.npcHoldings ? { ...raw.npcHoldings } : {},
-    p2pHoldings: raw?.p2pHoldings ? { ...raw.p2pHoldings } : {},
+    npcHoldings,
+    p2pHoldings,
     totalInvested: Math.max(0, Number(raw?.totalInvested || 0)),
     realizedProfit: Number(raw?.realizedProfit || 0),
     lastDividendClaimAt: Math.max(0, Number(raw?.lastDividendClaimAt || 0)),
   };
+}
+
+export function createDefaultP2PCompanies(nowMs: number = Date.now()): P2PCompanyDoc[] {
+  return [
+    {
+      ownerUid: 'top_tycoon_01',
+      businessName: 'Tập Đoàn Nông Sản Hoàng Kim',
+      level: 32,
+      wealthScore: 285_400,
+      plotCount: 18,
+      employeeCount: 12,
+      vehicleCount: 5,
+      recentOrders: 68,
+      sharePrice: 1410,
+      totalShares: 1000,
+      availableShares: 210,
+      dividendRate: 9,
+      dividendPool: 18_500,
+      creditRating: 'AAA',
+      lastActiveAt: nowMs - 15 * 60_000,
+      isListed: true,
+    },
+    {
+      ownerUid: 'top_tycoon_02',
+      businessName: 'Đồn Điền Cà Phê Tây Nguyên',
+      level: 26,
+      wealthScore: 174_900,
+      plotCount: 15,
+      employeeCount: 9,
+      vehicleCount: 4,
+      recentOrders: 44,
+      sharePrice: 1105,
+      totalShares: 1000,
+      availableShares: 275,
+      dividendRate: 8,
+      dividendPool: 9_600,
+      creditRating: 'AA',
+      lastActiveAt: nowMs - 40 * 60_000,
+      isListed: true,
+    },
+    {
+      ownerUid: 'top_tycoon_03',
+      businessName: 'Nông Trại Sầu Riêng Chín Hương',
+      level: 18,
+      wealthScore: 98_200,
+      plotCount: 12,
+      employeeCount: 6,
+      vehicleCount: 3,
+      recentOrders: 29,
+      sharePrice: 800,
+      totalShares: 1000,
+      availableShares: 330,
+      dividendRate: 7,
+      dividendPool: 4_800,
+      creditRating: 'A',
+      lastActiveAt: nowMs - 95 * 60_000,
+      isListed: true,
+    },
+  ];
 }
 
 /**

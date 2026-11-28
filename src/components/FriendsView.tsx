@@ -4,6 +4,7 @@ import {
   Copy,
   Home,
   Search,
+  Sparkles,
   UserPlus,
   X,
 } from 'lucide-react';
@@ -23,6 +24,7 @@ interface FriendsViewProps {
   user: UserGameData;
   nowMs: number;
   friendsFarms: PublicFarmData[];
+  suggestedFarms?: PublicFarmData[];
   incomingRequests: FriendRequestDoc[];
   outgoingRequests: FriendRequestDoc[];
   onSearchPlayer: (query: string) => Promise<PublicFarmData | null>;
@@ -39,6 +41,7 @@ export const FriendsView: React.FC<FriendsViewProps> = ({
   user,
   nowMs,
   friendsFarms,
+  suggestedFarms = [],
   incomingRequests,
   outgoingRequests,
   onSearchPlayer,
@@ -52,11 +55,23 @@ export const FriendsView: React.FC<FriendsViewProps> = ({
   const [searchResult, setSearchResult] = useState<PublicFarmData | null>(null);
   const [searchNotFound, setSearchNotFound] = useState(false);
   const [visitingFarm, setVisitingFarm] = useState<PublicFarmData | null>(null);
+  const [localSentUids, setLocalSentUids] = useState<string[]>([]);
+  const [processingReqId, setProcessingReqId] = useState<string | null>(null);
+  const [sendingToUid, setSendingToUid] = useState<string | null>(null);
 
   const pendingIncoming = incomingRequests.filter((r) => r.status === 'pending');
-  const pendingOutgoingUids = new Set(
-    outgoingRequests.filter((r) => r.status === 'pending').map((r) => r.toUid)
-  );
+  const pendingOutgoingUids = new Set([
+    ...outgoingRequests.filter((r) => r.status === 'pending').map((r) => r.toUid),
+    ...localSentUids,
+  ]);
+  const friendUidSet = new Set([
+    ...(user.friends ?? []),
+    ...friendsFarms.map((f) => f.uid),
+  ]);
+
+  const discoverableFarms = suggestedFarms
+    .filter((f) => f.uid !== user.uid && !friendUidSet.has(f.uid))
+    .slice(0, 6);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,6 +84,27 @@ export const FriendsView: React.FC<FriendsViewProps> = ({
       if (!found) setSearchNotFound(true);
     } finally {
       setSearching(false);
+    }
+  };
+
+  const handleSendInvite = async (toUid: string) => {
+    if (sendingToUid) return;
+    setSendingToUid(toUid);
+    try {
+      await onSendFriendRequest(toUid);
+      setLocalSentUids((prev) => (prev.includes(toUid) ? prev : [...prev, toUid]));
+    } finally {
+      setSendingToUid(null);
+    }
+  };
+
+  const handleRespond = async (req: FriendRequestDoc, accept: boolean) => {
+    if (processingReqId) return;
+    setProcessingReqId(req.id);
+    try {
+      await onRespondRequest(req, accept);
+    } finally {
+      setProcessingReqId(null);
     }
   };
 
@@ -100,13 +136,18 @@ export const FriendsView: React.FC<FriendsViewProps> = ({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left: Search & Requests */}
+        {/* Left: Search, Incoming Requests & Quick Suggestions */}
         <section className="lg:col-span-5 space-y-5">
           {/* Find Friends */}
           <div className="bg-white rounded-2xl border border-[#DCE7D3] p-5 space-y-4">
-            <h2 className="text-base font-bold text-slate-900">
-              Tìm Bạn Theo UID Hoặc Email
-            </h2>
+            <div>
+              <h2 className="text-base font-bold text-slate-900">
+                Tìm Bạn Theo Tên Nông Trại, UID Hoặc Email
+              </h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Nhập tên doanh nghiệp, tên hiển thị, Email hoặc mã UID để kết bạn.
+              </p>
+            </div>
             <form onSubmit={handleSearch} className="flex gap-2">
               <div className="relative flex-1">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -114,8 +155,8 @@ export const FriendsView: React.FC<FriendsViewProps> = ({
                   type="text"
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
-                  placeholder="Nhập Email hoặc UID bạn bè..."
-                  aria-label="Tìm bạn theo UID hoặc Email"
+                  placeholder="Nhập Tên nông trại, Email hoặc UID..."
+                  aria-label="Tìm bạn theo Tên nông trại, UID hoặc Email"
                   className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 bg-[#FAFDF8] text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
                 />
               </div>
@@ -130,7 +171,7 @@ export const FriendsView: React.FC<FriendsViewProps> = ({
 
             {searchNotFound && (
               <p className="text-xs text-slate-500">
-                Không tìm thấy nông trại nào khớp với UID hoặc Email vừa nhập.
+                Không tìm thấy nông trại nào khớp với từ khóa vừa nhập.
               </p>
             )}
 
@@ -153,7 +194,7 @@ export const FriendsView: React.FC<FriendsViewProps> = ({
                 </div>
                 {searchResult.uid === user.uid ? (
                   <span className="text-xs text-slate-500">Chính là bạn</span>
-                ) : user.friends.includes(searchResult.uid) ? (
+                ) : friendUidSet.has(searchResult.uid) ? (
                   <span className="text-xs font-semibold text-emerald-700">
                     Đã là bạn bè
                   </span>
@@ -164,8 +205,9 @@ export const FriendsView: React.FC<FriendsViewProps> = ({
                 ) : (
                   <button
                     type="button"
-                    onClick={() => onSendFriendRequest(searchResult.uid)}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 cursor-pointer whitespace-nowrap"
+                    disabled={sendingToUid === searchResult.uid}
+                    onClick={() => handleSendInvite(searchResult.uid)}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 disabled:opacity-50 cursor-pointer whitespace-nowrap"
                   >
                     <UserPlus className="w-3.5 h-3.5" />
                     Kết bạn
@@ -186,42 +228,102 @@ export const FriendsView: React.FC<FriendsViewProps> = ({
               </p>
             ) : (
               <div className="space-y-2.5">
-                {pendingIncoming.map((req) => (
-                  <div
-                    key={req.id}
-                    className="rounded-xl border border-slate-200 p-3 flex items-center justify-between gap-2"
-                  >
-                    <div className="min-w-0">
-                      <div className="text-sm font-bold text-slate-900 truncate">
-                        {req.fromName}
+                {pendingIncoming.map((req) => {
+                  const isBusy = processingReqId === req.id;
+                  return (
+                    <div
+                      key={req.id}
+                      className="rounded-xl border border-slate-200 p-3 flex items-center justify-between gap-2"
+                    >
+                      <div className="min-w-0">
+                        <div className="text-sm font-bold text-slate-900 truncate">
+                          {req.fromName || 'Nông Trại DOPI'}
+                        </div>
+                        <div className="text-xs text-slate-500 truncate">
+                          {req.fromEmail || req.fromUid}
+                        </div>
                       </div>
-                      <div className="text-xs text-slate-500 truncate">
-                        {req.fromEmail}
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <button
+                          type="button"
+                          disabled={isBusy}
+                          onClick={() => handleRespond(req, true)}
+                          aria-label={`Chấp nhận lời mời của ${req.fromName}`}
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 disabled:opacity-50 cursor-pointer"
+                        >
+                          <Check className="w-3.5 h-3.5" />
+                          <span>Chấp nhận</span>
+                        </button>
+                        <button
+                          type="button"
+                          disabled={isBusy}
+                          onClick={() => handleRespond(req, false)}
+                          aria-label={`Từ chối lời mời của ${req.fromName}`}
+                          className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-rose-50 hover:text-rose-600 disabled:opacity-50 cursor-pointer"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => onRespondRequest(req, true)}
-                        aria-label={`Chấp nhận lời mời của ${req.fromName}`}
-                        className="p-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 cursor-pointer"
-                      >
-                        <Check className="w-4 h-4" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => onRespondRequest(req, false)}
-                        aria-label={`Từ chối lời mời của ${req.fromName}`}
-                        className="p-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-rose-50 hover:text-rose-600 cursor-pointer"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
+
+          {/* Suggested Active Farms */}
+          {discoverableFarms.length > 0 && (
+            <div className="bg-white rounded-2xl border border-[#DCE7D3] p-5 space-y-3">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-emerald-700" />
+                <h2 className="text-base font-bold text-slate-900">
+                  Gợi Ý Kết Bạn Trên Máy Chủ
+                </h2>
+              </div>
+              <div className="space-y-2.5">
+                {discoverableFarms.map((cand) => {
+                  const alreadySent = pendingOutgoingUids.has(cand.uid);
+                  return (
+                    <div
+                      key={cand.uid}
+                      className="rounded-xl border border-slate-200/80 bg-[#FAFDF8] p-3 flex items-center justify-between gap-2"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <VipAvatarFrame
+                          avatarEmoji={cand.avatarEmoji}
+                          vipLevel={cand.vipLevel}
+                          size="sm"
+                        />
+                        <div className="min-w-0">
+                          <div className="text-xs sm:text-sm font-bold text-slate-900 truncate">
+                            {cand.businessName}
+                          </div>
+                          <div className="text-[11px] text-slate-500 font-mono-num">
+                            Lv.{cand.level} · VIP {cand.vipLevel}
+                          </div>
+                        </div>
+                      </div>
+                      {alreadySent ? (
+                        <span className="text-xs font-semibold text-amber-700 shrink-0">
+                          Đã gửi lời mời
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          disabled={sendingToUid === cand.uid}
+                          onClick={() => handleSendInvite(cand.uid)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 disabled:opacity-50 cursor-pointer shrink-0"
+                        >
+                          <UserPlus className="w-3.5 h-3.5" />
+                          <span>Kết bạn</span>
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </section>
 
         {/* Right: Friends List */}
@@ -232,13 +334,14 @@ export const FriendsView: React.FC<FriendsViewProps> = ({
 
           {friendsFarms.length === 0 ? (
             <div className="py-10 text-center text-sm text-slate-500">
-              Chưa có bạn bè nào. Hãy tìm kiếm bằng UID hoặc Email để kết bạn và cùng tưới cây nhận Vàng!
+              Chưa có bạn bè nào. Hãy tìm kiếm bằng Tên nông trại, UID, Email hoặc chọn trong mục Gợi Ý Kết Bạn bên trái!
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               {friendsFarms.map((friend) => {
-                const growingPlots = friend.farmPlots.filter(
-                  (p) => p.cropId && p.readyAt && p.readyAt > nowMs
+                const plots = Array.isArray(friend.farmPlots) ? friend.farmPlots : [];
+                const growingPlots = plots.filter(
+                  (p) => p && p.cropId && p.readyAt && p.readyAt > nowMs
                 ).length;
 
                 return (
@@ -248,16 +351,16 @@ export const FriendsView: React.FC<FriendsViewProps> = ({
                   >
                     <div className="flex items-center gap-3">
                       <VipAvatarFrame
-                        avatarEmoji={friend.avatarEmoji}
-                        vipLevel={friend.vipLevel}
+                        avatarEmoji={friend.avatarEmoji || '🧑‍🌾'}
+                        vipLevel={friend.vipLevel || 0}
                         size="md"
                       />
                       <div className="min-w-0">
                         <div className="font-bold text-sm text-slate-900 truncate">
-                          {friend.businessName}
+                          {friend.businessName || 'Nông Trại DOPI'}
                         </div>
                         <div className="text-xs text-slate-500">
-                          {friend.displayName} · Lv.{friend.level}
+                          {friend.displayName || 'Nông Dân'} · Lv.{friend.level || 1}
                         </div>
                         <div className="text-[11px] text-emerald-700 font-medium mt-0.5">
                           {growingPlots > 0

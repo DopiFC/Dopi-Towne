@@ -174,4 +174,10 @@ test('normalizeUserData safely upgrades legacy user docs and Rush Order builds v
   const rush = generateRushOrder(6, now);
   assert.ok(rush.rewardReputation >= 140);
   assert.ok(getTotalInventoryCount(createInitialUserData('u1', 'a@b.c', 'A', now).inventory) >= 8);
+
+  // Verify sanitizeForFirestore strips undefined and normalizeUserData guarantees 6 valid plots and 3 factories
+  assert.equal(legacy.farmPlots.length, 6);
+  assert.equal(legacy.factories.length, 3);
+  assert.ok(legacy.profile.displayName.length >= 1);
+  assert.ok(legacy.businessName.length >= 2);
 });

@@ -86,13 +86,13 @@ export const db = dbInstance;
 export const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });
 
-export function handleFirestoreError(
+export function buildFirestoreErrorInfo(
   error: unknown,
   operationType: OperationType,
   path: string | null
-): never {
+): FirestoreErrorInfo {
   const currentUser = auth?.currentUser;
-  const errInfo: FirestoreErrorInfo = {
+  return {
     error: error instanceof Error ? error.message : String(error),
     authInfo: {
       userId: currentUser?.uid ?? null,
@@ -109,8 +109,29 @@ export function handleFirestoreError(
     operationType,
     path,
   };
+}
+
+export function logFirestoreListenerError(
+  error: unknown,
+  operationType: OperationType,
+  path: string | null
+): void {
+  const errInfo = buildFirestoreErrorInfo(error, operationType, path);
+  console.warn('Firestore Listener Warning:', JSON.stringify(errInfo));
+}
+
+export function handleFirestoreError(
+  error: unknown,
+  operationType: OperationType,
+  path: string | null
+): never {
+  const errInfo = buildFirestoreErrorInfo(error, operationType, path);
   console.error('Firestore Error:', JSON.stringify(errInfo));
-  throw new Error(JSON.stringify(errInfo));
+  const rawMsg = errInfo.error;
+  if (rawMsg && !rawMsg.includes('Missing or insufficient permissions') && !rawMsg.includes('requires an index')) {
+    throw new Error(rawMsg);
+  }
+  throw new Error('Không thể đồng bộ thao tác với máy chủ. Vui lòng thử lại.');
 }
 
 export async function testFirestoreConnection(): Promise<boolean> {
